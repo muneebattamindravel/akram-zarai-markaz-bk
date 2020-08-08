@@ -1,0 +1,36 @@
+{
+  "name": "akram-zarai-markaz",
+  "version": "1.0.0",
+  "description": "Node Express Backend Engine for Akram Zarai Markaz. Powerful REST APIs",
+  "main": "app.js",
+  "scripts": {
+    "start": "export PORT=4000&& export HOST=localhost&& export USER=root&& export PASSWORD=root&& export DATABASE=akram-zarai-markaz export DIALECT=mysql&& export MAX_POOL=5&& export MIN_POOL=5&& export ACQUIRE=30000&& export IDLE=10000&& nodemon ./bin/www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/muneebattakhan/azm-bk.git"
+  },
+  "author": "Muneeb Atta Khan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/muneebattakhan/azm-bk/issues"
+  },
+  "homepage": "https://gitlab.com/muneebattakhan/azm-bk#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "connect-multiparty": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mysql2": "^2.1.0",
+    "nodemon": "^2.0.3",
+    "sequelize": "^5.21.8"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "rest",
+    "api",
+    "sequelize",
+    "mysql"
+  ]
+}
