@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const db = require('./models');
+const migrationScript = require('./migration-scripts/db-migration');
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', req.header('origin')
@@ -18,7 +19,11 @@ app.get('/', (req, res) => {
   res.send('OK');
 });
 
-db.sequelize.sync({force:false})
+force = true;
+db.sequelize.sync({force}).then(() => {
+  if (force)
+    migrationScript.RunMigration();
+})
 
 module.exports = app;
 console.log(process.pid)

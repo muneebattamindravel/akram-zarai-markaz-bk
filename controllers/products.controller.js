@@ -70,7 +70,6 @@ const getNextLotNumber = async (id) => {
     try {
         product = await Products.getByID(id)
         const nextLotNumber = product.nextLotNumber
-        product.nextLotNumber++
         await Products.update({nextLotNumber: (nextLotNumber + 1)}, id)
         return nextLotNumber
     }

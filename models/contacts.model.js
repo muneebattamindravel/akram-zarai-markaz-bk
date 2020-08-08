@@ -51,6 +51,16 @@ const initialize = (sequelize,Sequelize) => {
       throw err
     }
   }
+
+  const getAllByType = async(ptype) => {
+    try {
+      const contacts = require('../models').contacts
+      return await contacts.findAll({where: {type: ptype}})
+    }
+    catch (err) {
+      throw err
+    }
+  }
   
   const deleteById = async(id) => {
     try {
@@ -69,5 +79,6 @@ const initialize = (sequelize,Sequelize) => {
     update,
     getByID,
     getAll,
+    getAllByType,
     deleteById,
   }

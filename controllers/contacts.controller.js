@@ -66,6 +66,17 @@ const getAllContacts = async (req, res) => {
     }
 }
 
+/** get all contacts by Type*/
+const getAllContactsByType = async (req, res) => {
+    try {
+        res.send(await Contacts.getAllByType(req.params.type))
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({error: err.message.toString(), message: CONTACTS_STRINGS.ERROR_GETTING_CONTACTS, stack: err.stack})
+    }
+}
+
 /** delete contact by id */
 const deleteContact = async (req, res) => {
     try {
@@ -99,5 +110,6 @@ module.exports = {
     updateContact,
     getContact,
     getAllContacts,
+    getAllContactsByType,
     deleteContact,
 }

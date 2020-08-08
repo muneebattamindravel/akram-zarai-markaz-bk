@@ -1,0 +1,7 @@
+module.exports = {
+    //Purchases
+    INVOICE_NUMBER_NULL: "Invoice Number Can Not Be Null",
+    INVOICE_DATE_NULL: "Invoice Number Can Not Be Null",
+    CONTACT_NULL: "Contact Can Not Be Null",
+    PURCHASE_PRODUCT_STOCKS_EMPTY: "Please Add Atleast One Product Stock To The Purchase",
+}

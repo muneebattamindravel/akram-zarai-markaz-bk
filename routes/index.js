@@ -5,6 +5,7 @@ const contacts = require('./contacts.routes');
 const products = require('./products.routes');
 const images = require('./images.routes');
 const productStocks = require('./productStocks.routes');
+const purchases = require('./purchases.routes');
 
 module.exports = {
     companies,
@@ -14,4 +15,5 @@ module.exports = {
     products,
     images,
     productStocks,
+    purchases,
 }
