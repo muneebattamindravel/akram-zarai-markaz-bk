@@ -4,7 +4,7 @@
   "description": "Node Express Backend Engine for Akram Zarai Markaz. Powerful REST APIs",
   "main": "app.js",
   "scripts": {
-    "start": "export PORT=4000&& export HOST=localhost&& export USER=root&& export PASSWORD=root&& export DATABASE=akram-zarai-markaz export DIALECT=mysql&& export MAX_POOL=5&& export MIN_POOL=5&& export ACQUIRE=30000&& export IDLE=10000&& nodemon ./bin/www"
+    "start": "export IMAGES_URL='http://localhost:8888/akram-zarai-markaz-bk/images/' PORT=4000&& export HOST=localhost&& export USER=root&& export PASSWORD=root&& export DATABASE=akram-zarai-markaz export DIALECT=mysql&& export MAX_POOL=5&& export MIN_POOL=5&& export ACQUIRE=30000&& export IDLE=10000&& nodemon ./bin/www"
   },
   "repository": {
     "type": "git",

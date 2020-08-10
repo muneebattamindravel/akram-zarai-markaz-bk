@@ -66,10 +66,21 @@ const getAllContacts = async (req, res) => {
     }
 }
 
-/** get all contacts by Type*/
-const getAllContactsByType = async (req, res) => {
+/** get all suppliers*/
+const getAllSuppliers = async (req, res) => {
     try {
-        res.send(await Contacts.getAllByType(req.params.type))
+        res.send(await Contacts.getAllByType(CONTACTS_STRINGS.SUPPLIER))
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({error: err.message.toString(), message: CONTACTS_STRINGS.ERROR_GETTING_CONTACTS, stack: err.stack})
+    }
+}
+
+/** get all customers*/
+const getAllCustomers = async (req, res) => {
+    try {
+        res.send(await Contacts.getAllByType(CONTACTS_STRINGS.CUSTOMER))
     }
     catch (err) {
         console.log(err)
@@ -110,6 +121,7 @@ module.exports = {
     updateContact,
     getContact,
     getAllContacts,
-    getAllContactsByType,
+    getAllSuppliers,
+    getAllCustomers,
     deleteContact,
 }

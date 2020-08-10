@@ -4,7 +4,7 @@ var fs = require('fs');
 const uploadImage = async (req, res) => {
     try {
         var tmp_path = req.files.uploads[0].path;
-        var target_path = './images/' + req.files.uploads[0].name;
+        var target_path = process.env.IMAGES_URL + '/' + req.files.uploads[0].name;
         fs.rename(tmp_path, target_path, function(err) {
             if (err) throw err;
             fs.unlink(tmp_path, function() {
@@ -36,7 +36,7 @@ const deleteImageInternal = async (path) => {
 
 const deleteImage = async (req, res) => {
     try {
-        const path = `./images/${req.params.path}`
+        const path = `${process.env.IMAGES_URL }/${req.params.path}`
         fs.exists(path, (exists) => {
             if (exists) {
                 fs.unlink(path, (err) => {
