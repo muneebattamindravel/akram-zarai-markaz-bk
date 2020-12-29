@@ -111,19 +111,19 @@ const deleteProduct = async (req, res) => {
 
 const IsProductBodyValid = (body, res) => {
     if (!body.name) {
-        res.status(400).send({message: PRODUCTS_STRINGS.PRODUCT_NAME_NULL});
+        res.status(406).send({message: PRODUCTS_STRINGS.PRODUCT_NAME_NULL});
         return false;
     }
     if (!body.companyId) {
-        res.status(400).send({message: PRODUCTS_STRINGS.PRODUCT_COMPANYID_NULL});
+        res.status(406).send({message: PRODUCTS_STRINGS.PRODUCT_COMPANYID_NULL});
         return false;
     }
     if (!body.unitId) {
-        res.status(400).send({message: PRODUCTS_STRINGS.PRODUCT_UNITID_NULL});
+        res.status(406).send({message: PRODUCTS_STRINGS.PRODUCT_UNITID_NULL});
         return false;
     }
     if (!body.categoryId) {
-        res.status(400).send({message: PRODUCTS_STRINGS.PRODUCT_CATEGORYID_NULL});
+        res.status(406).send({message: PRODUCTS_STRINGS.PRODUCT_CATEGORYID_NULL});
         return false;
     }
     return true

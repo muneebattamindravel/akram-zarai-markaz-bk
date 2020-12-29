@@ -39,19 +39,19 @@ const createPurchase = async (req, res) => {
 
 const IsPurchaseBodyValid = (body, res) => {
     if (!body.contactId) {
-        res.status(400).send({message: PURCHASES_STRINGS.CONTACT_NULL});
+        res.status(406).send({message: PURCHASES_STRINGS.CONTACT_NULL});
         return false;
     }
     if (!body.invoiceNumber) {
-        res.status(400).send({message: PURCHASES_STRINGS.INVOICE_NUMBER_NULL});
+        res.status(406).send({message: PURCHASES_STRINGS.INVOICE_NUMBER_NULL});
         return false;
     }
     if (!body.invoiceDate) {
-        res.status(400).send({message: PURCHASES_STRINGS.INVOICE_DATE_NULL});
+        res.status(406).send({message: PURCHASES_STRINGS.INVOICE_DATE_NULL});
         return false;
     }
     if (body.purchasedProductStocks.length <= 0) {
-        res.status(400).send({message: PURCHASES_STRINGS.PURCHASE_PRODUCT_STOCKS_EMPTY});
+        res.status(406).send({message: PURCHASES_STRINGS.PURCHASE_PRODUCT_STOCKS_EMPTY});
         return false;
     }
     return true

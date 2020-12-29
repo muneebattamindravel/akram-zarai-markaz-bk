@@ -9,7 +9,7 @@ const createUnit = async (req, res) => {
             return;
         const result = await Units.exists({name: req.body.name})
         if (result) {
-            res.status(400).send({message: UNITS_STRINGS.DUPLICATE_UNIT_NAME})
+            res.status(406).send({message: UNITS_STRINGS.DUPLICATE_UNIT_NAME})
             return;
         }
         const unit = await Units.create({
@@ -31,12 +31,12 @@ const updateUnit = async (req, res) => {
             return;
         const result = await Units.exists({name: req.body.name, id: {[Op.not]: req.params.id}})
         if (result) {
-            res.status(400).send({message: UNITS_STRINGS.DUPLICATE_UNIT_NAME})
+            res.status(406).send({message: UNITS_STRINGS.DUPLICATE_UNIT_NAME})
             return;
         }
         await Units.update(req.body,req.params.id) ? 
         res.send({message: UNITS_STRINGS.UNIT_UPDATED_SUCCESSFULLY}) : 
-        res.status(400).send({message: `${UNITS_STRINGS.ERROR_UPDATING_UNIT}, id=${req.params.id}`})
+        res.status(406).send({message: `${UNITS_STRINGS.ERROR_UPDATING_UNIT}, id=${req.params.id}`})
     }
     catch (err) {
         console.log(err)
@@ -71,7 +71,7 @@ const getAllUnits = async (req, res) => {
 const deleteUnit = async (req, res) => {
     try {
         const id = req.params.id;
-        await Units.deleteById(req.params.id) ? res.send({message: UNITS_STRINGS.UNIT_DELETED}) : res.status(400).send({message: `${UNITS_STRINGS.UNIT_NOT_DELETED}, id=${req.params.id}`})
+        await Units.deleteById(req.params.id) ? res.send({message: UNITS_STRINGS.UNIT_DELETED}) : res.status(406).send({message: `${UNITS_STRINGS.UNIT_NOT_DELETED}, id=${req.params.id}`})
     }
     catch (err) {
         console.log(err)
@@ -81,7 +81,7 @@ const deleteUnit = async (req, res) => {
 
 const IsUnitBodyValid = (body, res) => {
     if (!body.name) {
-        res.status(400).send({message: UNITS_STRINGS.UNIT_NAME_NULL});
+        res.status(406).send({message: UNITS_STRINGS.UNIT_NAME_NULL});
         return false;
     }
     return true

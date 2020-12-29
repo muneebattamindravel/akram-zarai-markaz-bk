@@ -8,6 +8,7 @@ const Contacts = require('./contacts.model');
 const Products = require('./products.model');
 const ProductStocks = require('./productStocks.model');
 const Purchases = require('./purchases.model');
+const Login = require('./login.model');
 
 const sequelize = new Sequelize(
   dbConfig.DB, 
@@ -30,6 +31,7 @@ db.contacts = Contacts.initialize(sequelize,Sequelize);
 db.products = Products.initialize(sequelize,Sequelize);
 db.productStocks = ProductStocks.initialize(sequelize,Sequelize);
 db.purchases = Purchases.initialize(sequelize,Sequelize);
+db.login = Login.initialize(sequelize,Sequelize);
 
 //Associations
 Companies.setAssociations(db)

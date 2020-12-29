@@ -9,7 +9,7 @@ const createCompany = async (req, res) => {
             return;
         const result = await Companies.exists({name: req.body.name})
         if (result) {
-            res.status(400).send({message: COMPANIES_STRINGS.DUPLICATE_COMPANY_NAME})
+            res.status(406).send({message: COMPANIES_STRINGS.DUPLICATE_COMPANY_NAME})
             return;
         }
         const company = await Companies.create({
@@ -31,12 +31,12 @@ const updateCompany = async (req, res) => {
             return;
         const result = await Companies.exists({name: req.body.name, id: {[Op.not]: req.params.id}})
         if (result) {
-            res.status(400).send({message: COMPANIES_STRINGS.DUPLICATE_COMPANY_NAME})
+            res.status(406).send({message: COMPANIES_STRINGS.DUPLICATE_COMPANY_NAME})
             return;
         }    
         await Companies.update(req.body,req.params.id) ? 
         res.send({message: COMPANIES_STRINGS.COMPANY_UPDATED_SUCCESSFULLY}) : 
-        res.status(400).send({message: `${COMPANIES_STRINGS.ERROR_UPDATING_COMPANY}, id=${req.params.id}`})
+        res.status(406).send({message: `${COMPANIES_STRINGS.ERROR_UPDATING_COMPANY}, id=${req.params.id}`})
     }
     catch (err) {
         console.log(err)
@@ -71,7 +71,7 @@ const getAllCompanies = async (req, res) => {
 const deleteCompany = async (req, res) => {
     try {
         const id = req.params.id;
-        await Companies.deleteById(req.params.id) ? res.send({message: COMPANIES_STRINGS.COMPANY_DELETED}) : res.status(400).send({message: `${COMPANIES_STRINGS.COMPANY_NOT_DELETED}, id=${req.params.id}`})
+        await Companies.deleteById(req.params.id) ? res.send({message: COMPANIES_STRINGS.COMPANY_DELETED}) : res.status(406).send({message: `${COMPANIES_STRINGS.COMPANY_NOT_DELETED}, id=${req.params.id}`})
     }
     catch (err) {
         console.log(err)
@@ -81,7 +81,7 @@ const deleteCompany = async (req, res) => {
 
 const IsCompanyBodyValid = (body, res) => {
     if (!body.name) {
-        res.status(400).send({message: COMPANIES_STRINGS.COMPANY_NAME_NULL});
+        res.status(406).send({message: COMPANIES_STRINGS.COMPANY_NAME_NULL});
         return false;
     }
     return true

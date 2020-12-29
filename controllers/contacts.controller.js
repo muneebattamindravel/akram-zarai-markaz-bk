@@ -30,7 +30,7 @@ const updateContact = async (req, res) => {
         if (!IsContactBodyValid(req.body, res))
             return;
         if (!req.body.type) {
-            res.status(400).send({error: CONTACTS_STRINGS.CONTACT_TYPE_NULL})
+            res.status(406).send({error: CONTACTS_STRINGS.CONTACT_TYPE_NULL})
             return;
         }
         await Contacts.update(req.body,req.params.id) ? 
@@ -102,15 +102,15 @@ const deleteContact = async (req, res) => {
 
 const IsContactBodyValid = (body, res) => {
     if (!body.name) {
-        res.status(400).send({message: CONTACTS_STRINGS.CONTACT_NAME_NULL});
+        res.status(406).send({message: CONTACTS_STRINGS.CONTACT_NAME_NULL});
         return false
     }
     if (!body.type) {
-        res.status(400).send({message: CONTACTS_STRINGS.CONTACT_TYPE_NULL})
+        res.status(406).send({message: CONTACTS_STRINGS.CONTACT_TYPE_NULL})
         return false
     }
     if (body.type != CONTACTS_STRINGS.SUPPLIER && body.type != CONTACTS_STRINGS.CUSTOMER) {
-        res.status(400).send({message: CONTACTS_STRINGS.INVALID_CONTACT_TYPE})
+        res.status(406).send({message: CONTACTS_STRINGS.INVALID_CONTACT_TYPE})
         return false
     }
     return true

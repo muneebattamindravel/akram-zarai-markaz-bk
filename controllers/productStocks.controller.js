@@ -40,7 +40,7 @@ const updateProductStock = async (req, res) => {
 
         await ProductStocks.update(req.body, req.params.id) ? 
         res.send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY}) : 
-        res.status(400).send({message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}`})
+        res.status(406).send({message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}`})
     }
     catch (err) {
         console.log(err)
@@ -72,15 +72,15 @@ const getProductStockByID = async (req, res) => {
 
 const IsProductStockBodyValid = (body, res) => {
     if (!body.productId) {
-        res.status(400).send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_ID_NULL});
+        res.status(406).send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_ID_NULL});
         return false;
     }
     if (!body.initialQuantity) {
-        res.status(400).send({message: PRODUCT_STOCKS_STRINGS.INITIAL_QUANTITY_NULL});
+        res.status(406).send({message: PRODUCT_STOCKS_STRINGS.INITIAL_QUANTITY_NULL});
         return false;
     }
     if (!body.costPrice) {
-        res.status(400).send({message: PRODUCT_STOCKS_STRINGS.COST_PRICE_NULL});
+        res.status(406).send({message: PRODUCT_STOCKS_STRINGS.COST_PRICE_NULL});
         return false;
     }
     return true

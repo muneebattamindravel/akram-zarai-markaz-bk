@@ -3,6 +3,13 @@ const sequelize = require('../models').sequelize;
 /**DB Querries*/ 
 const RunMigration = async (req, res) => {
     try {
+        //FIX EMPTY / NULL DATE ISSUE
+        sequelize.query("SET sql_mode = ''");
+
+        // USERS
+        sequelize.query("INSERT INTO `users` (`id`, `username`, `password`, `createdAt`, `updatedAt`) VALUES (NULL, 'akram', 'akram', '', '');");
+
+        
         // CATEGORIES
         sequelize.query("INSERT INTO `categories` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Pesticides', 'All Pesticides Medicines', '', '');");
         sequelize.query("INSERT INTO `categories` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Seeds', 'All Types Of Seeds', '', '');");
@@ -36,6 +43,7 @@ const RunMigration = async (req, res) => {
         //PRODUCTS
         sequelize.query("INSERT INTO `products` (`id`, `name`, `salePrice`, `description`, `alertQuantity`, `currentStock`, `imageURL`, `nextLotNumber`, `createdAt`, `updatedAt`, `companyId`, `categoryId`, `unitId`) VALUES (NULL, 'Antracool 1 kg', NULL, NULL, '5', '0.00', NULL, '1', '', '', '2', '1', '2');");
         sequelize.query("INSERT INTO `products` (`id`, `name`, `salePrice`, `description`, `alertQuantity`, `currentStock`, `imageURL`, `nextLotNumber`, `createdAt`, `updatedAt`, `companyId`, `categoryId`, `unitId`) VALUES (NULL, 'Acephate 660 Gram', NULL, NULL, '5', '0.00', NULL, '1', '', '', '2', '1', '2');");
+        
     }
     catch (err) {
         console.log(err)

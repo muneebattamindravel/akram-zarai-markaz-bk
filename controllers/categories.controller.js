@@ -9,7 +9,7 @@ const createCategory = async (req, res) => {
             return;
         const result = await Categories.exists({name: req.body.name})
         if (result) {
-            res.status(400).send({message: CATEGORIES_STRINGS.DUPLICATE_CATEGORY_NAME})
+            res.status(406).send({message: CATEGORIES_STRINGS.DUPLICATE_CATEGORY_NAME})
             return;
         }
         const category = await Categories.create({
@@ -31,12 +31,12 @@ const updateCategory = async (req, res) => {
             return;
         const result = await Categories.exists({name: req.body.name, id: {[Op.not]: req.params.id}})
         if (result) {
-            res.status(400).send({message: CATEGORIES_STRINGS.DUPLICATE_CATEGORY_NAME})
+            res.status(406).send({message: CATEGORIES_STRINGS.DUPLICATE_CATEGORY_NAME})
             return;
         }
         await Categories.update(req.body,req.params.id) ? 
         res.send({message: CATEGORIES_STRINGS.CATEGORY_UPDATED_SUCCESSFULLY}) : 
-        res.status(400).send({message: `${CATEGORIES_STRINGS.ERROR_UPDATING_CATEGORY}, id=${req.params.id}`})
+        res.status(406).send({message: `${CATEGORIES_STRINGS.ERROR_UPDATING_CATEGORY}, id=${req.params.id}`})
     }
     catch (err) {
         console.log(err)
@@ -71,7 +71,7 @@ const getAllCategories = async (req, res) => {
 const deleteCategory = async (req, res) => {
     try {
         const id = req.params.id;
-        await Categories.deleteById(req.params.id) ? res.send({message: CATEGORIES_STRINGS.CATEGORY_DELETED}) : res.status(400).send({message: `${CATEGORIES_STRINGS.CATEGORY_NOT_DELETED}, id=${req.params.id}`})
+        await Categories.deleteById(req.params.id) ? res.send({message: CATEGORIES_STRINGS.CATEGORY_DELETED}) : res.status(406).send({message: `${CATEGORIES_STRINGS.CATEGORY_NOT_DELETED}, id=${req.params.id}`})
     }
     catch (err) {
         console.log(err)
@@ -81,7 +81,7 @@ const deleteCategory = async (req, res) => {
 
 const IsCategoryBodyValid = (body, res) => {
     if (!body.name) {
-        res.status(400).send({message: CATEGORIES_STRINGS.CATEGORY_NAME_NULL});
+        res.status(406).send({message: CATEGORIES_STRINGS.CATEGORY_NAME_NULL});
         return false;
     }
     return true
