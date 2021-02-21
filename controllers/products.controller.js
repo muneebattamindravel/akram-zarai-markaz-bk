@@ -12,9 +12,10 @@ const createProduct = async (req, res) => {
         const product = await Products.create({
             name: req.body.name,
             description: req.body.description,
-            alertQuantity: req.body.alertQuantity == '' ? undefined : req.body.alertQuantity,
+            alertQuantity: req.body.alertQuantity == '' ? 5 : req.body.alertQuantity,
             imageURL: req.body.imageURL,
             salePrice: req.body.salePrice == '' ? 0.00 : req.body.salePrice,
+            currentStock: 0.00,
             companyId: req.body.companyId,
             unitId: req.body.unitId,
             categoryId: req.body.categoryId,

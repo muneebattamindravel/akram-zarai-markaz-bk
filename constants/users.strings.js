@@ -1,5 +1,5 @@
 module.exports = {
-    //Login
+    //Users
     VALIDATED: "Validated!",
     INVALID_CREDENTIALS: "Invalid Credentials",
     ERROR_VALIDATING: "Error Validating",

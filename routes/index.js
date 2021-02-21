@@ -6,7 +6,8 @@ const products = require('./products.routes');
 const images = require('./images.routes');
 const productStocks = require('./productStocks.routes');
 const purchases = require('./purchases.routes');
-const login = require('./login.routes');
+const users = require('./users.routes');
+const accounts = require('./accounts.routes');
 
 module.exports = {
     companies,
@@ -17,5 +18,6 @@ module.exports = {
     images,
     productStocks,
     purchases,
-    login,
+    users,
+    accounts,
 }

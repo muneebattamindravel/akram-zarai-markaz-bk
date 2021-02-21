@@ -1,48 +1,54 @@
-
-const sequelize = require('../models').sequelize;
+const moment = require('moment')
+;const sequelize = require('../models').sequelize;
 /**DB Querries*/ 
 const RunMigration = async (req, res) => {
     try {
         //FIX EMPTY / NULL DATE ISSUE
-        sequelize.query("SET sql_mode = ''");
+        //sequelize.query("SET sql_mode = ''");
 
+        var createdAt = moment().format('YYYY-MM-DD hh:mm:ss')
+        var updatedAt = moment().format('YYYY-MM-DD hh:mm:ss')
+
+        console.log("Created At = "+createdAt);
         // USERS
-        sequelize.query("INSERT INTO `users` (`id`, `username`, `password`, `createdAt`, `updatedAt`) VALUES (NULL, 'akram', 'akram', '', '');");
+        sequelize.query("INSERT INTO `users` (`id`, `username`, `password`, `createdAt`, `updatedAt`) VALUES (NULL, 'akram', 'akram', '"+createdAt+"', '"+updatedAt+"');");
 
-        
         // CATEGORIES
-        sequelize.query("INSERT INTO `categories` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Pesticides', 'All Pesticides Medicines', '', '');");
-        sequelize.query("INSERT INTO `categories` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Seeds', 'All Types Of Seeds', '', '');");
-        sequelize.query("INSERT INTO `categories` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Fungicides', 'All Fungicides Medicines', '', '');");
-        sequelize.query("INSERT INTO `categories` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Herbicides', 'All Herbicides Medicines', '', '');");
+        sequelize.query("INSERT INTO `categories` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Pesticides', 'All Pesticides Medicines', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `categories` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Seeds', 'All Types Of Seeds', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `categories` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Fungicides', 'All Fungicides Medicines', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `categories` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Herbicides', 'All Herbicides Medicines', '"+createdAt+"', '"+updatedAt+"');");
 
         //COMPANIES
-        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Arysta', '', '', '');");
-        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Bayer', '', '', '');");
-        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Technofarm', '', '', '');");
-        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Zeangbang', '', '', '');");
-        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Target', '', '', '');");
-        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Jaffer', '', '', '');");
-        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'All Seeds', '', '', '');");
-        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Bajra Seeds', '', '', '');");
-        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Jowar Seeds', '', '', '');");
+        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Arysta', '', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Bayer', '', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Technofarm', '', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Zeangbang', '', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Target', '', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Jaffer', '', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'All Seeds', '', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Bajra Seeds', '', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `companies` (`id`, `name`, `description`, `createdAt`, `updatedAt`) VALUES (NULL, 'Jowar Seeds', '', '"+createdAt+"', '"+updatedAt+"');");
 
-        //UNITS
-        sequelize.query("INSERT INTO `units` (`id`, `name`, `description`, `allowDecimal`, `createdAt`, `updatedAt`) VALUES (NULL, 'Pack', 'Packet', '0', '', '');");
-        sequelize.query("INSERT INTO `units` (`id`, `name`, `description`, `allowDecimal`, `createdAt`, `updatedAt`) VALUES (NULL, 'Kilogram', 'Kilogram', '0', '', '');");
-        sequelize.query("INSERT INTO `units` (`id`, `name`, `description`, `allowDecimal`, `createdAt`, `updatedAt`) VALUES (NULL, 'Gram', 'Gram', '0', '', '');");
-        sequelize.query("INSERT INTO `units` (`id`, `name`, `description`, `allowDecimal`, `createdAt`, `updatedAt`) VALUES (NULL, 'Litre', 'Litre', '0', '', '');");
-        sequelize.query("INSERT INTO `units` (`id`, `name`, `description`, `allowDecimal`, `createdAt`, `updatedAt`) VALUES (NULL, 'MilliLitre', 'MilliLitre', '0', '', '');");
+        // //UNITS
+        sequelize.query("INSERT INTO `units` (`id`, `name`, `description`,  `createdAt`, `updatedAt`) VALUES (NULL, 'Pack', 'Packet',  '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `units` (`id`, `name`, `description`,  `createdAt`, `updatedAt`) VALUES (NULL, 'Kg', 'Kilogram',  '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `units` (`id`, `name`, `description`,  `createdAt`, `updatedAt`) VALUES (NULL, 'G', 'Gram',  '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `units` (`id`, `name`, `description`,  `createdAt`, `updatedAt`) VALUES (NULL, 'L', 'Litre',  '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `units` (`id`, `name`, `description`,  `createdAt`, `updatedAt`) VALUES (NULL, 'ML', 'MilliLitre',  '"+createdAt+"', '"+updatedAt+"');");
 
-        //SUPLLIERS
-        sequelize.query("INSERT INTO `contacts` (`id`, `type`, `name`, `businessName`, `number`, `email`, `address`, `notes`, `createdAt`, `updatedAt`) VALUES (NULL, 'supplier', 'Arysta Supplier', NULL, NULL, NULL, NULL, NULL, '', '');");
-        sequelize.query("INSERT INTO `contacts` (`id`, `type`, `name`, `businessName`, `number`, `email`, `address`, `notes`, `createdAt`, `updatedAt`) VALUES (NULL, 'supplier', 'Bayer Supplier', NULL, NULL, NULL, NULL, NULL, '', '');");
-        sequelize.query("INSERT INTO `contacts` (`id`, `type`, `name`, `businessName`, `number`, `email`, `address`, `notes`, `createdAt`, `updatedAt`) VALUES (NULL, 'supplier', 'Technofarm Supplier', NULL, NULL, NULL, NULL, NULL, '', '');");
-        sequelize.query("INSERT INTO `contacts` (`id`, `type`, `name`, `businessName`, `number`, `email`, `address`, `notes`, `createdAt`, `updatedAt`) VALUES (NULL, 'supplier', 'Zeangbang Supplier', NULL, NULL, NULL, NULL, NULL, '', '');");
+        // //SUPLLIERS
+        sequelize.query("INSERT INTO `contacts` (`id`, `type`, `name`, `businessName`, `number`, `email`, `address`, `notes`, `createdAt`, `updatedAt`) VALUES (NULL, 'supplier', 'Arysta Supplier', '', '', '', '', '', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `contacts` (`id`, `type`, `name`, `businessName`, `number`, `email`, `address`, `notes`, `createdAt`, `updatedAt`) VALUES (NULL, 'supplier', 'Bayer Supplier', '', '', '', '', '', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `contacts` (`id`, `type`, `name`, `businessName`, `number`, `email`, `address`, `notes`, `createdAt`, `updatedAt`) VALUES (NULL, 'supplier', 'Technofarm Supplier', '', '', '', '', '', '"+createdAt+"', '"+updatedAt+"');");
+        sequelize.query("INSERT INTO `contacts` (`id`, `type`, `name`, `businessName`, `number`, `email`, `address`, `notes`, `createdAt`, `updatedAt`) VALUES (NULL, 'supplier', 'Zeangbang Supplier', '', '', '', '', '', '"+createdAt+"', '"+updatedAt+"');");
 
-        //PRODUCTS
-        sequelize.query("INSERT INTO `products` (`id`, `name`, `salePrice`, `description`, `alertQuantity`, `currentStock`, `imageURL`, `nextLotNumber`, `createdAt`, `updatedAt`, `companyId`, `categoryId`, `unitId`) VALUES (NULL, 'Antracool 1 kg', NULL, NULL, '5', '0.00', NULL, '1', '', '', '2', '1', '2');");
-        sequelize.query("INSERT INTO `products` (`id`, `name`, `salePrice`, `description`, `alertQuantity`, `currentStock`, `imageURL`, `nextLotNumber`, `createdAt`, `updatedAt`, `companyId`, `categoryId`, `unitId`) VALUES (NULL, 'Acephate 660 Gram', NULL, NULL, '5', '0.00', NULL, '1', '', '', '2', '1', '2');");
+        // //PRODUCTS
+        sequelize.query("INSERT INTO `products` (`id`, `name`, `salePrice`, `description`, `alertQuantity`, `imageURL`, `nextLotNumber`, `createdAt`, `updatedAt`, `companyId`, `categoryId`, `unitId`) VALUES (NULL, 'Antracool 1 kg', 0.00, '', 5.00, '', '1', '"+createdAt+"', '"+updatedAt+"', '2', '1', '2');");
+        sequelize.query("INSERT INTO `products` (`id`, `name`, `salePrice`, `description`, `alertQuantity`, `imageURL`, `nextLotNumber`, `createdAt`, `updatedAt`, `companyId`, `categoryId`, `unitId`) VALUES (NULL, 'Sulphite 1 Kg', 0.00, '', 5.00, '', '1', '"+createdAt+"', '"+updatedAt+"', '2', '1', '1');");
+
+        // ACCOUNTS
+        sequelize.query("INSERT INTO `accounts` (`id`, `name`, `type`, `openingBalance`, `description`, `bankName`, `bankAccountNumber`, `createdAt`, `updatedAt`, `companyId`) VALUES (NULL, 'Madina Chowk Cash', 'CASH', '100000', 'Cash Register Of Akram Zarai Markaz Madina Chowk Branch', '', '', '2021-02-21 15:04:38', '2021-02-28 15:01:38', NULL);");
         
     }
     catch (err) {

@@ -9,6 +9,7 @@ const createProductStock = async (req, res) => {
         if (!IsProductStockBodyValid(req.body, res))
             return;
         productNextLotNumber = await productsController.getNextLotNumber(req.body.productId);
+
         const productStock = await ProductStocks.create({
             productId: req.body.productId,
             quantity: req.body.initialQuantity,
@@ -16,7 +17,7 @@ const createProductStock = async (req, res) => {
             batchNumber: req.body.batchNumber,
             expiryDate: req.body.expiryDate,
             lotNumber: productNextLotNumber,
-            purchaseId: req.body.purchaseId,
+            purchaseId: req.body.purchaseId == 0 ? null : req.body.purchaseId,
             initialQuantity: req.body.initialQuantity,
             notes: req.body.notes,
         })
@@ -38,13 +39,15 @@ const updateProductStock = async (req, res) => {
         const diff = req.body.initialQuantity - existingStock.initialQuantity;
         req.body.quantity = existingStock.quantity + diff;
 
+        req.body.purchaseId = req.body.purchaseId == 0 ? null : req.body.purchaseId
+
         await ProductStocks.update(req.body, req.params.id) ? 
         res.send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY}) : 
         res.status(406).send({message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}`})
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: COMPANIES_STRINGS.ERROR_UPDATING_COMPANY, stack: err.stack})
+        res.status(500).send({raw: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK, stack: err.stack})
     }
 }
 

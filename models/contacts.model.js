@@ -4,11 +4,11 @@ const initialize = (sequelize,Sequelize) => {
       type: {type: Sequelize.ENUM, values: [CONTACTS_STRINGS.SUPPLIER,CONTACTS_STRINGS.CUSTOMER],
          allowNull: false},
       name: {type: Sequelize.STRING, allowNull: false},
-      businessName: {type: Sequelize.STRING},
-      number: {type: Sequelize.STRING},
-      email: {type: Sequelize.STRING},
-      address: {type: Sequelize.STRING},
-      notes: {type: Sequelize.STRING},
+      businessName: {type: Sequelize.STRING, defaultValue: ''},
+      number: {type: Sequelize.STRING, defaultValue: ''},
+      email: {type: Sequelize.STRING, defaultValue: ''},
+      address: {type: Sequelize.STRING, defaultValue: ''},
+      notes: {type: Sequelize.STRING, defaultValue: ''},
     });
   }
   

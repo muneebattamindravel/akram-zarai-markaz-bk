@@ -8,7 +8,8 @@ const Contacts = require('./contacts.model');
 const Products = require('./products.model');
 const ProductStocks = require('./productStocks.model');
 const Purchases = require('./purchases.model');
-const Login = require('./login.model');
+const Users = require('./users.model');
+const Accounts = require('./accounts.model');
 
 const sequelize = new Sequelize(
   dbConfig.DB, 
@@ -31,7 +32,8 @@ db.contacts = Contacts.initialize(sequelize,Sequelize);
 db.products = Products.initialize(sequelize,Sequelize);
 db.productStocks = ProductStocks.initialize(sequelize,Sequelize);
 db.purchases = Purchases.initialize(sequelize,Sequelize);
-db.login = Login.initialize(sequelize,Sequelize);
+db.users = Users.initialize(sequelize,Sequelize);
+db.accounts = Accounts.initialize(sequelize,Sequelize);
 
 //Associations
 Companies.setAssociations(db)
@@ -40,5 +42,6 @@ Units.setAssociations(db)
 Products.setAssociations(db)
 ProductStocks.setAssociations(db)
 Purchases.setAssociations(db)
+Accounts.setAssociations(db)
 
 module.exports = db;

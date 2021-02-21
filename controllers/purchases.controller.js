@@ -13,6 +13,8 @@ const createPurchase = async (req, res) => {
             invoiceDate: req.body.invoiceDate,
             invoiceNumber: req.body.invoiceNumber,
             imageURL: req.body.imageURL,
+            notes: req.body.notes,
+            totalAmount: req.body.totalAmount,
         })
         Promise.all(req.body.purchasedProductStocks.map(async (productStock) => {
             const productNextLotNumber = await ProductsController.getNextLotNumber(productStock.productId);
@@ -37,6 +39,17 @@ const createPurchase = async (req, res) => {
     }
 }
 
+/** get all purchases */
+const getAllPurchases = async (req, res) => {
+    try {
+        res.send(await Purchases.getAll())
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: PURCHASES_STRINGS.ERROR_GETTING_PURCHASES, stack: err.stack})
+    }
+}
+
 const IsPurchaseBodyValid = (body, res) => {
     if (!body.contactId) {
         res.status(406).send({message: PURCHASES_STRINGS.CONTACT_NULL});
@@ -54,9 +67,17 @@ const IsPurchaseBodyValid = (body, res) => {
         res.status(406).send({message: PURCHASES_STRINGS.PURCHASE_PRODUCT_STOCKS_EMPTY});
         return false;
     }
+    if (!body.totalAmount) {
+        res.status(406).send({message: PURCHASES_STRINGS.INVALID_TOTAL_AMOUNT});
+        return false;
+    }
+    if (body.totalAmount <= 0) {
+
+    }
     return true
 }
 
 module.exports = {
     createPurchase,
+    getAllPurchases,
 }
