@@ -26,6 +26,13 @@ const initialize = (sequelize,Sequelize) => {
   
   const setAssociations = (db) => {
     db.accounts.belongsTo(db.companies)
+    db.accounts.hasMany(db.accountTransactions)
+    db.accounts.hasMany(db.bookings, {
+      foreignKey: 'fromAccountId'
+    });
+    db.accounts.hasMany(db.bookings, {
+      foreignKey: 'companyAccountId'
+    });
   }
   
   const create = async (account) => {

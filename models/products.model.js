@@ -18,7 +18,6 @@ const initialize = (sequelize,Sequelize) => {
     db.products.belongsTo(db.companies)
     db.products.belongsTo(db.units)
     db.products.belongsTo(db.categories)
-
     db.products.hasMany(db.productStocks, {onDelete: 'RESTRICT'})
   }
   

@@ -48,7 +48,6 @@ const RunMigration = async (req, res) => {
         sequelize.query("INSERT INTO `products` (`id`, `name`, `salePrice`, `description`, `alertQuantity`, `imageURL`, `nextLotNumber`, `createdAt`, `updatedAt`, `companyId`, `categoryId`, `unitId`) VALUES (NULL, 'Sulphite 1 Kg', 0.00, '', 5.00, '', '1', '"+createdAt+"', '"+updatedAt+"', '2', '1', '1');");
 
         // ACCOUNTS
-        sequelize.query("INSERT INTO `accounts` (`id`, `name`, `type`, `openingBalance`, `description`, `bankName`, `bankAccountNumber`, `createdAt`, `updatedAt`, `companyId`) VALUES (NULL, 'Madina Chowk Cash', 'CASH', '100000', 'Cash Register Of Akram Zarai Markaz Madina Chowk Branch', '', '', '2021-02-21 15:04:38', '2021-02-28 15:01:38', NULL);");
         
     }
     catch (err) {

@@ -13,6 +13,7 @@ const initialize = (sequelize,Sequelize) => {
 const setAssociations = (db) => {
   db.companies.hasMany(db.products, {onDelete: 'RESTRICT'})
   db.companies.hasOne(db.accounts, {onDelete: 'RESTRICT'})
+  db.companies.hasMany(db.bookings, {onDelete: 'RESTRICT'})
 }
 
 const create = async (company) => {

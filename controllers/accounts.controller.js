@@ -1,5 +1,6 @@
 const ACCOUNTS_STRINGS = require('../constants/accounts.strings');
 const Accounts = require('../models/accounts.model');
+const AccountTransactions = require('../controllers/accountTransactions.controller');
 const { Op } = require("sequelize");
 
 /**creates a new account */
@@ -30,6 +31,7 @@ const createAccount = async (req, res) => {
             bankAccountNumber: req.body.bankAccountNumber,
         })
 
+        await AccountTransactions.createAccountTransaction(req.body.openingBalance, ACCOUNTS_STRINGS.ACCOUNT_CREATED, account.id);
         res.send(account);
     }
     catch (err) {

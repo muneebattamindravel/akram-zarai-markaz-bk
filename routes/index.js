@@ -8,6 +8,8 @@ const productStocks = require('./productStocks.routes');
 const purchases = require('./purchases.routes');
 const users = require('./users.routes');
 const accounts = require('./accounts.routes');
+const accountTransactions = require('./accounts.routes');
+const bookings = require('./bookings.routes');
 
 module.exports = {
     companies,
@@ -20,4 +22,6 @@ module.exports = {
     purchases,
     users,
     accounts,
+    accountTransactions,
+    bookings,
 }
