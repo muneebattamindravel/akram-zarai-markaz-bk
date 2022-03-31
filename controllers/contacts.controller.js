@@ -1,5 +1,9 @@
 const CONTACTS_STRINGS = require('../constants/contacts.strings')
 const Contacts = require('../models/contacts.model')
+const AccountsModel = require('../models/accounts.model')
+const AccountTransactionsModel = require('../models/accountTransactions.model')
+const AccountsController = require('../controllers/accounts.controller');
+const AccountTransactionsController = require('../controllers/accountTransactions.controller');
 
 /**creates a new contact */
 const createContact = async (req, res) => {
@@ -16,11 +20,52 @@ const createContact = async (req, res) => {
             notes: req.body.notes,
             type: req.body.type,
         })
+
+        if (req.body.type == "Customer") {
+            const createdAccount = await AccountsController.createAccountDBMigration(new Date(), req.body.name + " Account", "", "Customer", req.body.openingBalance, contact.id, "","", false); 
+            let updatedContactObject = {
+                accountId: createdAccount.id
+            }
+            await Contacts.update(updatedContactObject, contact.id)
+        }
+        else {
+            let updatedContactObject = {
+                accountId: null
+            }
+            await Contacts.update(updatedContactObject, contact.id)
+        }
+            
         res.send(contact);
     }
     catch (err) {
         console.log(err)
         res.status(500).send({error: err.message.toString(), message: CONTACTS_STRINGS.ERROR_CREATING_CONTACT, stack: err.stack})
+    }
+}
+
+const createContactDBMigration = async (type, name, businessName, number, email, address, notes, openingBalance) => {
+    const contact = await Contacts.create({
+        type: type,
+        name: name,
+        businessName: businessName,
+        number: number,
+        email: email,
+        address: address,
+        notes: notes,
+    })
+
+    if (type == "Customer") {
+        const createdAccount = await AccountsController.createAccountDBMigration(new Date(), name + " Account", "", "Customer", openingBalance, contact.id, "","", false); 
+        let updatedContactObject = {
+            accountId: createdAccount.id
+        }
+        await Contacts.update(updatedContactObject, contact.id)
+    }
+    else {
+        let updatedContactObject = {
+            accountId: null
+        }
+        await Contacts.update(updatedContactObject, contact.id)
     }
 }
 
@@ -33,6 +78,17 @@ const updateContact = async (req, res) => {
             res.status(406).send({error: CONTACTS_STRINGS.CONTACT_TYPE_NULL})
             return;
         }
+
+        if (req.body.type == "Customer") {
+            updateAccountObject = {
+                name: req.body.name + " Account"
+            }
+            await AccountsModel.update(updateAccountObject, req.body.accountId)
+
+            //also update opening balance
+            await AccountTransactionsController.updateOpeningBalance(req.body.accountId, req.body.openingBalance);
+        }
+
         await Contacts.update(req.body,req.params.id) ? 
         res.send({message: CONTACTS_STRINGS.CONTACT_UPDATED_SUCCESSFULLY}) : 
         res.send({error: `${CONTACTS_STRINGS.ERROR_UPDATING_CONTACT}, id=${req.params.id}`})
@@ -46,8 +102,18 @@ const updateContact = async (req, res) => {
 /** get a contact with id */
 const getContact = async (req, res) => {
     try {
-        const contact = await Contacts.getByID(req.params.id)
-        contact? res.send(contact) : res.send({error: CONTACTS_STRINGS.CONTACT_NOT_FOUND, message: `${CONTACTS_STRINGS.CONTACT_NOT_FOUND} ,id=${req.params.id}`})
+        var contact = await Contacts.getByID(req.params.id)
+        if (contact) {
+            if (contact.type == "Customer") {
+                const opening = (await AccountTransactionsModel.getFirstTransaction(contact.accountId)).amount
+                contact.setDataValue("openingBalance", opening);
+            }
+            
+            res.send(contact)
+        }
+        else {
+            res.send({error: CONTACTS_STRINGS.CONTACT_NOT_FOUND, message: `${CONTACTS_STRINGS.CONTACT_NOT_FOUND} ,id=${req.params.id}`})
+        }
     }
     catch (err) {
         console.log(err)
@@ -124,4 +190,5 @@ module.exports = {
     getAllSuppliers,
     getAllCustomers,
     deleteContact,
+    createContactDBMigration
 }

@@ -1,5 +1,6 @@
-const initialize = (sequelize,Sequelize) => {
+  const initialize = (sequelize,Sequelize) => {
     return sequelize.define('accounts', {
+      createdDate: {type: Sequelize.DATEONLY},
       name: {
         type: Sequelize.STRING,
         unique: true,
@@ -9,8 +10,8 @@ const initialize = (sequelize,Sequelize) => {
         type: Sequelize.STRING,
         allowNull: false
       },
-      openingBalance: {
-          type: Sequelize.INTEGER,
+      openingBalance: {   
+          type: Sequelize.FLOAT,
       },
       description: {
         type: Sequelize.STRING
@@ -18,20 +19,23 @@ const initialize = (sequelize,Sequelize) => {
       bankName: {
         type: Sequelize.STRING,
       },
-      bankAccountNumber: {
+      bankAccountNumber: { 
         type: Sequelize.STRING,
       },
+      isDefault: {
+        type: Sequelize.BOOLEAN,
+        default: false,
+      },
+      referenceId: {
+        type: Sequelize.INTEGER,
+      }
     });
   }
   
   const setAssociations = (db) => {
-    db.accounts.belongsTo(db.companies)
     db.accounts.hasMany(db.accountTransactions)
     db.accounts.hasMany(db.bookings, {
       foreignKey: 'fromAccountId'
-    });
-    db.accounts.hasMany(db.bookings, {
-      foreignKey: 'companyAccountId'
     });
   }
   
@@ -57,8 +61,19 @@ const initialize = (sequelize,Sequelize) => {
   
   const getByID = async(id) => {
     try {
-      const accounts = require('../models').accounts
+      const accounts = require('../models').accounts      
       return await accounts.findByPk(id)
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
+  const getDefaultAccount = async() => {
+    try {
+      const accounts = require('../models').accounts      
+      return await accounts.findOne({where: {isDefault: true}}
+      )
     }
     catch (err) {
       throw err
@@ -76,15 +91,15 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
   
-  const getAll = async() => {
+  const getAll = async(whereConditions, includeArray) => {
     try {
-      const models = require('../models')
       const accounts = require('../models').accounts
-      return await accounts.findAll({
-        include: [
-          {model: models.companies},
-        ]
-      })
+      return await accounts.findAll(
+        {
+          where: whereConditions,
+          include: includeArray
+        }
+      )
     }
     catch (err) {
       throw err
@@ -111,4 +126,5 @@ const initialize = (sequelize,Sequelize) => {
     deleteById,
     setAssociations,
     exists,
+    getDefaultAccount,
   }

@@ -1,7 +1,10 @@
 const ACCOUNTS_STRINGS = require('../constants/accounts.strings');
 const Accounts = require('../models/accounts.model');
 const AccountTransactions = require('../controllers/accountTransactions.controller');
+const AccountTransactionsModel = require('../models/accountTransactions.model');
 const { Op } = require("sequelize");
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
+const AccountTransactionsController = require('../controllers/accountTransactions.controller');
 
 /**creates a new account */
 const createAccount = async (req, res) => {
@@ -9,34 +12,68 @@ const createAccount = async (req, res) => {
         if (!IsAccountBodyValid(req.body, res))
             return;
 
-        const result = await Accounts.exists({name: req.body.name})
-        if (result) {
-            res.status(406).send({message: ACCOUNTS_STRINGS.DUPLICATE_ACCOUNT_NAME})
-            return;
-        }
-
-        var companyDuplicate = await Accounts.exists({companyId: req.body.companyId})
-        if (companyDuplicate) {
-            res.status(406).send({message: ACCOUNTS_STRINGS.DUPLICATE_COMPANY_ACCOUNT})
-            return;
-        }
-
         const account = await Accounts.create({
+            createdDate: new Date(),
             name: req.body.name,
-            description: req.body.description,
             type: req.body.type,
             openingBalance: req.body.openingBalance,
-            companyId: req.body.companyId == 0 ? null : req.body.companyId,
+            description: req.body.description,
             bankName: req.body.bankName,
             bankAccountNumber: req.body.bankAccountNumber,
+            isDefault: false,
+            referenceId: req.body.referenceId == 0 ? null : referenceId,
         })
 
-        await AccountTransactions.createAccountTransaction(req.body.openingBalance, ACCOUNTS_STRINGS.ACCOUNT_CREATED, account.id);
+        await AccountTransactions.createAccountTransaction(
+            new Date(),
+            req.body.openingBalance,
+            ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.ACCOUNT_CREATED,
+            req.body.type,
+            account.id,
+            account.id, 
+            "", 
+            "",
+            "",
+            "");
         res.send(account);
     }
     catch (err) {
         console.log(err)
         res.status(500).send({raw: err.message.toString(), message: ACCOUNTS_STRINGS.ERROR_CREATING_ACCOUNT, stack: err.stack})
+    }
+}
+
+/**creates a new account - FOR DB MIGRATION*/
+const createAccountDBMigration = async (date, name, description, type, openingBalance, referenceId, bankName, bankAccountNumber, isDefault) => {
+    try {
+        const account = await Accounts.create({
+            createdDate: date,
+            name: name,
+            description: description,
+            type: type,
+            openingBalance: openingBalance,
+            referenceId: referenceId == 0 ? null : referenceId,
+            bankName: bankName,
+            bankAccountNumber: bankAccountNumber,
+            isDefault: isDefault,
+        })
+
+        await AccountTransactions.createAccountTransaction(
+            date,
+            openingBalance, 
+            ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.ACCOUNT_CREATED,
+            type,
+            account.id,
+            account.id,
+            "",
+            "",
+            "",
+            "");
+
+        return account;
+    }
+    catch (err) {
+        return err.message.toString();
     }
 }
 
@@ -49,13 +86,16 @@ const updateAccount = async (req, res) => {
         if (result) {
             res.status(406).send({message: ACCOUNTS_STRINGS.DUPLICATE_ACCOUNT_NAME})
             return;
-        }    
+        } 
 
-        if (req.body.companyId == 0) req.body.companyId = null;
-
-        await Accounts.update(req.body,req.params.id) ? 
-        res.send({message: ACCOUNTS_STRINGS.ACCOUNT_UPDATED_SUCCESSFULLY}) : 
-        res.status(406).send({message: `${ACCOUNTS_STRINGS.ERROR_UPDATING_ACCOUNT}, id=${req.params.id}`})
+        const updated = await Accounts.update(req.body, req.params.id);
+        if (updated) {
+            await AccountTransactionsController.updateOpeningBalance(req.params.id, req.body.openingBalance);
+            res.send({message: ACCOUNTS_STRINGS.ACCOUNT_UPDATED_SUCCESSFULLY})
+        }
+        else {
+            res.status(406).send({message: `${ACCOUNTS_STRINGS.ERROR_UPDATING_ACCOUNT}, id=${req.params.id}`})
+        }
     }
     catch (err) {
         console.log(err)
@@ -67,7 +107,76 @@ const updateAccount = async (req, res) => {
 const getAccount = async (req, res) => {
     try {
         const account = await Accounts.getByID(req.params.id)
-        account? res.send(account) : res.status(404).send({message: `${ACCOUNTS_STRINGS.ACCOUNT_NOT_FOUND} ,id=${req.params.id}`})
+        if (account) {
+            let balance = 0.00
+            let lastTransaction = await AccountTransactionsModel.getLastTransaction(account.id);
+            if (lastTransaction) 
+                balance = lastTransaction.closingBalance;
+            account.setDataValue('balance', balance);
+
+            let opening = (await AccountTransactionsModel.getFirstTransaction(account.id)).amount;
+            account.setDataValue("openingBalance", opening);
+            
+            res.send(account)
+        }
+        else {
+            res.status(404).send({message: `${ACCOUNTS_STRINGS.ACCOUNT_NOT_FOUND} ,id=${req.params.id}`})
+        }
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: ACCOUNTS_STRINGS.ERROR_GETTING_ACCOUNT, stack: err.stack})
+    }
+}
+
+/** get account statement against account id */
+const getAccountStatement = async (req, res) => {
+    try {
+        const { Op } = require("sequelize");
+        const models = require('../models');
+
+        const where = {
+            "accountId": req.params.id,
+            "transactionDate" : {
+                [Op.between]: [req.query.from, req.query.to]
+            }
+        }
+
+        const include = [
+            {model: models.accounts}
+        ] 
+
+        const accountTransactions = await AccountTransactionsModel.getAll(
+            where, include
+        );
+
+        res.send(accountTransactions);
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: ACCOUNTS_STRINGS.ERROR_GETTING_ACCOUNT_STATEMENT, stack: err.stack})
+    }
+}
+
+/** get balance of the default account */
+const getDefaultAccountBalance = async (req, res) => {
+    try {
+        const account = await Accounts.getDefaultAccount();
+        if (account) {
+            let balance = 0.00
+            let lastTransaction = await AccountTransactionsModel.getLastTransaction(account.id);
+            if (lastTransaction) 
+                balance = lastTransaction.closingBalance;
+            
+            const amountObject = {
+                amount: balance
+            }
+            
+            res.send(amountObject)
+        }
+        else {
+            res.status(404).send({message: `${ACCOUNTS_STRINGS.ACCOUNT_NOT_FOUND} ,id=${req.params.id}`})
+        }
     }
     catch (err) {
         console.log(err)
@@ -78,7 +187,20 @@ const getAccount = async (req, res) => {
 /** get all accounts */
 const getAllAccounts = async (req, res) => {
     try {
-        res.send(await Accounts.getAll())
+        const where = {}
+        const include = []
+        let allAccounts = await Accounts.getAll(where, include);
+
+        await Promise.all(allAccounts.map(async (account) => {
+            let balance = 0.00
+            let lastTransaction = await AccountTransactionsModel.getLastTransaction(account.id);
+            if (lastTransaction) 
+                balance = lastTransaction.closingBalance;
+            
+            account.setDataValue('balance', balance);
+        }));
+
+        res.send(allAccounts);
     }
     catch (err) {
         console.log(err)
@@ -115,6 +237,9 @@ module.exports = {
     createAccount,
     updateAccount,
     getAccount,
+    getDefaultAccountBalance,
     getAllAccounts,
     deleteAccount,
+    createAccountDBMigration,
+    getAccountStatement
 }

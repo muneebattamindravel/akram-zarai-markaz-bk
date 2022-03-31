@@ -1,5 +1,6 @@
 module.exports = {
     //Purchases
+    ERROR_CREATING_PURCHASE: "Error Creating Purchase",
     ERROR_GETTING_PURCHASES: "Can't Get Purchases",
     INVOICE_NUMBER_NULL: "Invoice Number Can Not Be Null",
     INVOICE_DATE_NULL: "Invoice Number Can Not Be Null",

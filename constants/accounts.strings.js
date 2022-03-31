@@ -7,6 +7,7 @@ module.exports = {
     ACCOUNT_NOT_FOUND: "Account Not Found",
     ERROR_CREATING_ACCOUNT: "Could'nt Create Account",
     ERROR_GETTING_ACCOUNT: "Couldn't Get Account",
+    ERROR_GETTING_ACCOUNT_STATEMENT: "Couldn't Get Account Account Statement",
     ERROR_GETTING_ACCOUNTS: "Can't Fetch All Accounts",
     ACCOUNT_DELETED: "Account Deleted Successfully!",
     ACCOUNT_NOT_DELETED: "Could'nt Delete Account",
@@ -14,7 +15,4 @@ module.exports = {
     ERROR_UPDATING_ACCOUNT: "Could'nt Update Account",
     DUPLICATE_ACCOUNT_NAME: 'ACCOUNT WITH THIS NAME ALREADY EXISTS!',
     DUPLICATE_COMPANY_ACCOUNT: 'ACCOUNT FOR THIS COMPANY ALREADY EXISTS',
-
-    ACCOUNT_CREATED: 'ACCOUNT CREATED',
-    BOOKING: 'BOOKING',
 }

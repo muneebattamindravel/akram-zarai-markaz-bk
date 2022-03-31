@@ -6,7 +6,8 @@ const initialize = (sequelize,Sequelize) => {
       },
       description: {
         type: Sequelize.STRING,
-      }
+      },
+      allowDecimal: {type: Sequelize.BOOLEAN}
     });
   }
   

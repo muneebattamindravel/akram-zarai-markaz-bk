@@ -10,6 +10,12 @@ const users = require('./users.routes');
 const accounts = require('./accounts.routes');
 const accountTransactions = require('./accounts.routes');
 const bookings = require('./bookings.routes');
+const sales = require('./sales.routes');
+const profits = require('./profits.routes');
+const salePayments = require('./salePayments.routes');
+const expenses = require('./expenses.routes');
+const recoveries = require('./recoveries.routes');
+const transfers = require('./transfers.routes');
 
 module.exports = {
     companies,
@@ -24,4 +30,10 @@ module.exports = {
     accounts,
     accountTransactions,
     bookings,
+    sales,
+    profits,
+    salePayments,
+    expenses,
+    recoveries,
+    transfers
 }

@@ -2,28 +2,62 @@ const ACCOUNTTRANSACTIONS_STRINGS = require('../constants/accountTransactions.st
 const AccountTransactions = require('../models/accountTransactions.model');
 
 /**creates a new accountTransaction */
-const createAccountTransaction = async (amount, description, accountId) => {
+const createAccountTransaction = async (date, amount, type, details, accountId, referenceId, bookNumber, billNumber, invoiceNumber, prNumber) => {
     try {
         let lastTransaction = await AccountTransactions.getLastTransaction(accountId);
         if (lastTransaction) {
             await AccountTransactions.create({
+                transactionDate: date,
                 amount: amount,
-                description: description,
+                type: type,
+                details: details,
                 accountId: accountId,
                 closingBalance: (parseFloat(lastTransaction.closingBalance) + parseFloat(amount)),
+                referenceId: referenceId,
+                bookNumber: bookNumber,
+                billNumber: billNumber,
+                invoiceNumber: invoiceNumber,
+                prNumber: prNumber
             })
         }
         else {
             await AccountTransactions.create({
+                transactionDate: date,
                 amount: amount,
-                description: description,
+                type: type,
+                details: details,
                 accountId: accountId,
                 closingBalance: parseFloat(amount),
+                referenceId: referenceId,
+                bookNumber: bookNumber,
+                billNumber: billNumber,
+                invoiceNumber: invoiceNumber,
+                prNumber: prNumber
             })
         }
     }
     catch (err) {
         return err.message.toString();
+    }
+}
+
+const updateOpeningBalance = async(accountId, openingBalance) => {
+    try {
+        let firstTransaction = await AccountTransactions.getFirstTransaction(accountId);
+
+        firstTransaction.setDataValue("amount", openingBalance);
+        firstTransaction.setDataValue("closingBalance", openingBalance);
+
+        const updateObject = {
+            "amount": openingBalance,
+            "closingBalance": openingBalance
+        }
+
+        await AccountTransactions.update(updateObject, firstTransaction.id);
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: "Error Updating Opening Balance", stack: err.stack})
     }
 }
 
@@ -54,4 +88,5 @@ module.exports = {
     createAccountTransaction,
     getAccountTransaction,
     getAllAccountTransactions,
+    updateOpeningBalance
 }

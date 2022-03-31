@@ -2,7 +2,8 @@ const initialize = (sequelize,Sequelize) => {
     return sequelize.define('productStocks', {
         lotNumber: {type: Sequelize.INTEGER, allowNull: false},
         batchNumber: {type: Sequelize.STRING},
-        expiryDate: {type: Sequelize.DATE, allowNull: false},
+        invoiceNumber: {type: Sequelize.STRING , allowNull: false},
+        expiryDate: {type: Sequelize.DATEONLY},
         costPrice: {
           type: Sequelize.FLOAT,
         },
@@ -33,8 +34,8 @@ const initialize = (sequelize,Sequelize) => {
 
   const update = async (body, id) => {
     try {
-      const models = require('../models')
-      return await models.productStocks.update(body, {where: {id:id}}) == 1 ? true : false
+      const ProductStocks = require('../models').productStocks
+      return await ProductStocks.update(body, {where: {id:id}}) == 1 ? true : false
     }
     catch (err) {
       throw err
@@ -51,30 +52,13 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
-  const getAllByID = async(productId) => {
+  const get = async (condition) => {
     try {
-        const models = require('../models')
-        return await models.productStocks.findAll({
-            where: {productId: productId},
-        })
+      const models = require('../models')
+      return await models.productStocks.findOne({where: condition})
     }
     catch (err) {
-        throw err
-    }
-  }
-
-  const getCurrentStock = async(productId) => {
-    try {
-        const models = require('../models')
-        return await models.productStocks.findAll({
-          attributes: ['quantity', [sequelize.fn('sum', sequelize.col('quantity')), 'currentStock']],
-          // group : ['ProductStocks.quantity'],
-          // raw: true,
-          // order: sequelize.literal('total DESC')
-        })
-    }
-    catch (err) {
-        throw err
+      throw err
     }
   }
 
@@ -82,7 +66,7 @@ const initialize = (sequelize,Sequelize) => {
     initialize,
     create,
     setAssociations,
-    getAllByID,
     getByID,
     update,
+    get,
   }

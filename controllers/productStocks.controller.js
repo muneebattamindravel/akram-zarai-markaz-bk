@@ -1,33 +1,52 @@
 const PRODUCT_STOCKS_STRINGS = require('../constants/productStocks.strings');
-const APP_STRINGS = require('../constants/app.strings');
+const STOCK_BOOKS_STRINGS = require('../constants/stockBooks.strings');
 const ProductStocks = require('../models/productStocks.model');
 const productsController = require('../controllers/products.controller');
+const stockBooksController = require('../controllers/stockBooks.controller');
 
 /**creates a new product stock */
 const createProductStock = async (req, res) => {
     try {
         if (!IsProductStockBodyValid(req.body, res))
             return;
-        productNextLotNumber = await productsController.getNextLotNumber(req.body.productId);
 
-        const productStock = await ProductStocks.create({
-            productId: req.body.productId,
-            quantity: req.body.initialQuantity,
-            costPrice: req.body.costPrice,
-            batchNumber: req.body.batchNumber,
-            expiryDate: req.body.expiryDate,
-            lotNumber: productNextLotNumber,
-            purchaseId: req.body.purchaseId == 0 ? null : req.body.purchaseId,
-            initialQuantity: req.body.initialQuantity,
-            notes: req.body.notes,
-        })
-        console.log("product stock created")
+        let insertPurchaseId = req.body.purchaseId == 0 ? null : req.body.purchaseId;
+
+        const productStock = await createProductStockWorker(
+            req.body.productId,
+            req.body.costPrice,
+            req.body.batchNumber,
+            req.body.invoiceNumber,
+            insertPurchaseId,
+            req.body.initialQuantity,
+            req.body.notes,
+            req.body.expiryDate,
+        )
         res.send(productStock);
     }
     catch (err) {
         console.log(err)
         res.status(500).send({error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_CREATING_PRODUCT_STOCK, stack: err.stack})
     }
+}
+
+const createProductStockWorker = async (productId, costPrice, batchNumber, invoiceNumber, purchaseId, initialQuantity, notes, expiryDate) => {
+    productNextLotNumber = await productsController.getNextLotNumber(productId);
+    const productStock = await ProductStocks.create({
+        productId: productId,
+        quantity: initialQuantity,
+        costPrice: costPrice,
+        batchNumber: batchNumber,
+        invoiceNumber: invoiceNumber,
+        lotNumber: productNextLotNumber,
+        purchaseId: purchaseId,
+        initialQuantity: initialQuantity,
+        notes: notes,
+        expiryDate: expiryDate
+    })
+
+    await stockBooksController.addStockBookEntry(new Date(), "", "", invoiceNumber, initialQuantity, STOCK_BOOKS_STRINGS.TYPE.MANUAL_STOCK, "", productId, productStock.id);
+    return productStock;
 }
 
 const updateProductStock = async (req, res) => {
@@ -94,4 +113,5 @@ module.exports = {
     getProductStocks,
     getProductStockByID,
     updateProductStock,
+    createProductStockWorker,
 }

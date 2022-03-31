@@ -19,6 +19,7 @@ const initialize = (sequelize,Sequelize) => {
     db.products.belongsTo(db.units)
     db.products.belongsTo(db.categories)
     db.products.hasMany(db.productStocks, {onDelete: 'RESTRICT'})
+    db.products.hasMany(db.saleItems);
   }
   
   const create = async (product) => {
@@ -43,44 +44,20 @@ const initialize = (sequelize,Sequelize) => {
   
   const getByID = async(id) => {
     try {
-        const models = require('../models')
+      const models = require('../models')
       return await models.products.findByPk(id, {
-        include: [
-          {model: models.companies},
-          {model: models.categories},
-          {model: models.units},
-          {model: models.productStocks},
-        ]
+          include: [
+              {model: models.companies},
+              {model: models.categories},
+              {model: models.units},
+              {model: models.productStocks},
+          ]
       })
-    }
+  }
     catch (err) {
       throw err
     }
   }
-
-// const getAll = async() => {
-//     try {
-//         const models = require('../models')
-//         const countOfProductStocks = await models.productStocks.findAndCountAll({where: {productId:}})
-//         return await models.products.findAll({
-//           attributes: [
-//             'id', 'name', 'salePrice', 'description', 'alertQuantity', 'name',
-//             'imageURL', 'nextLotNumber', 'createdAt', 'updatedAt',
-//             Sequelize.fn('IsNull', [Sequelize.fn('SUM', Sequelize.col('productStocks.quantity')), 'currentStock'])
-//           ],
-//             include: [
-//                 {model: models.companies, attributes: ['id','name','description']},
-//                 {model: models.categories, attributes: ['id','name','description']},
-//                 {model: models.units, attributes: ['id','name','description']},
-//                 {model: models.productStocks, attributes: []},
-//             ],
-//             group: ['products.id']
-//         })
-//     }
-//     catch (err) {
-//         throw err
-//     }
-// }
 
 const getAll = async() => {
   try {

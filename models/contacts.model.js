@@ -1,8 +1,10 @@
 const CONTACTS_STRINGS = require('../constants/contacts.strings')
 const initialize = (sequelize,Sequelize) => {
     return sequelize.define('contacts', {
-      type: {type: Sequelize.ENUM, values: [CONTACTS_STRINGS.SUPPLIER,CONTACTS_STRINGS.CUSTOMER],
-         allowNull: false},
+      type: {
+        type: Sequelize.ENUM, values: [CONTACTS_STRINGS.SUPPLIER, CONTACTS_STRINGS.CUSTOMER],
+        allowNull: false
+      },
       name: {type: Sequelize.STRING, allowNull: false},
       businessName: {type: Sequelize.STRING, defaultValue: ''},
       number: {type: Sequelize.STRING, defaultValue: ''},
@@ -10,6 +12,11 @@ const initialize = (sequelize,Sequelize) => {
       address: {type: Sequelize.STRING, defaultValue: ''},
       notes: {type: Sequelize.STRING, defaultValue: ''},
     });
+  }
+
+  const setAssociations = (db) => {
+    db.contacts.hasMany(db.sales)
+    db.accounts.hasMany(db.contacts)
   }
   
   const create = async (contact) => {
@@ -81,4 +88,5 @@ const initialize = (sequelize,Sequelize) => {
     getAll,
     getAllByType,
     deleteById,
+    setAssociations
   }

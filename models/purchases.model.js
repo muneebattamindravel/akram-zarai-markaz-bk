@@ -1,15 +1,16 @@
 const initialize = (sequelize,Sequelize) => {
     return sequelize.define('purchases', {
-        invoiceDate: {type: Sequelize.DATE},
-        invoiceNumber: {type: Sequelize.STRING},
-        imageURL: {type: Sequelize.STRING},
-        notes: {type: Sequelize.STRING},
-        totalAmount: {type: Sequelize.FLOAT},
+      invoiceNumber: {type: Sequelize.STRING},
+      purchaseType: {type: Sequelize.INTEGER},
+      invoiceDate: {type: Sequelize.DATEONLY},
+      notes: {type: Sequelize.STRING},
+      totalAmount: {type: Sequelize.FLOAT},
     });
   }
 
   const setAssociations = (db) => {
     db.purchases.belongsTo(db.contacts)
+    db.purchases.belongsTo(db.companies)
     db.products.hasMany(db.productStocks, {onDelete: 'RESTRICT'})
   }
   
@@ -28,7 +29,10 @@ const initialize = (sequelize,Sequelize) => {
       const purchases = require('../models').purchases
       const models = require('../models')
       return await purchases.findAll({
-        include: [models.contacts]
+        include: [
+          {model: models.contacts},
+          {model: models.companies}
+        ]
       })
     }
     catch (err) {

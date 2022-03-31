@@ -1,7 +1,9 @@
 const BOOKINGS_STRINGS = require('../constants/bookings.strings');
 const Bookings = require('../models/bookings.model');
 const ACCOUNTS_STRINGS = require('../constants/accounts.strings');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
 const AccountTransactions = require('../controllers/accountTransactions.controller');
+const CompaniesModel = require('../models/companies.model');
 
 /**creates a new booking */
 const createBooking = async (req, res) => {
@@ -11,17 +13,45 @@ const createBooking = async (req, res) => {
 
         const booking = await Bookings.create({
             totalAmount: req.body.totalAmount,
-            draftNumber: req.body.draftNumber,
+            prNumber: req.body.prNumber,
             bookingDate: req.body.bookingDate,
-            draftImageURL: req.body.draftImageURL,
             notes: req.body.notes,
             companyId: req.body.companyId,
             fromAccountId: req.body.fromAccountId,
-            companyAccountId: req.body.companyAccountId,
+            policyName: req.body.policyName,
+            policyPercentage: req.body.policyPercentage,
+            netRate: req.body.netRate,
+            bookingType: req.body.bookingType,
+            policyType: req.body.policyType
         })
 
-        await AccountTransactions.createAccountTransaction((req.body.totalAmount * -1), ACCOUNTS_STRINGS.BOOKING, req.body.fromAccountId);
-        await AccountTransactions.createAccountTransaction((req.body.totalAmount * 1), ACCOUNTS_STRINGS.BOOKING, req.body.companyAccountId);
+        await AccountTransactions.createAccountTransaction(
+            req.body.bookingDate,
+            (req.body.totalAmount * -1), 
+            ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.BOOKING,
+            req.body.bookingType,
+            req.body.fromAccountId,
+            booking.id,
+            "",
+            "",
+            "",
+            req.body.prNumber
+            );
+
+        const company = await CompaniesModel.getByID(req.body.companyId);
+
+        await AccountTransactions.createAccountTransaction(
+            req.body.bookingDate,
+            (req.body.totalAmount * 1), 
+            ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.BOOKING,
+            req.body.bookingType,
+            company.accountId,
+            booking.id,
+            "",
+            "",
+            "",
+            req.body.prNumber
+            );
 
         res.send(booking);
     }

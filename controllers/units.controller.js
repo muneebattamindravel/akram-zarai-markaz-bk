@@ -15,6 +15,7 @@ const createUnit = async (req, res) => {
         const unit = await Units.create({
             name: req.body.name,
             description: req.body.description,
+            allowDecimal: req.body.allowDecimal,
         })
         res.send(unit);
     }
