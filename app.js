@@ -21,11 +21,11 @@ app.get('/', (req, res) => {
 module.exports = app;
 console.log(process.pid)
 
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 80;
 app.set('port', port);
 
 const server = http.createServer(app);
-server.listen(port, "0.0.0.0");
+server.listen(port);
 server.on('listening', () => {console.log(`Server started on port ${port}`)});
 
 require('./routes');
