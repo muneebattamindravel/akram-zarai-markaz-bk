@@ -32,7 +32,7 @@ require('./routes');
 
 const migrationScript = require('./migration-scripts/db-migration');
 const db = require('./models');
-force = true;
+force = false;
 db.sequelize.sync({force}).then(() => {
   if (force)
     migrationScript.RunMigration();
