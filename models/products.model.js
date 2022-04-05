@@ -2,13 +2,9 @@ const Sequelize = require('sequelize');
 const initialize = (sequelize,Sequelize) => {
     return sequelize.define('products', {
         name: {type: Sequelize.STRING, allowNull: false},
-        salePrice: {
-          type: Sequelize.FLOAT,
-        },
+        salePrice: {type: Sequelize.FLOAT,},
         description: {type: Sequelize.STRING, allowNull: false},
-        alertQuantity: {
-          type: Sequelize.FLOAT,
-        },
+        alertQuantity: {type: Sequelize.FLOAT,},
         imageURL: {type: Sequelize.STRING, allowNull: false},
         nextLotNumber: {type: Sequelize.INTEGER, defaultValue: 1, allowNull: false}
     });

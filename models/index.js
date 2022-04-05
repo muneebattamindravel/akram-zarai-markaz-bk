@@ -1,5 +1,39 @@
-const dbConfig = require('../config/database.config');
 const Sequelize = require('sequelize');
+
+const dbnName = process.env.DB_NAME || 'akram-zarai-markaz';
+const dbUser = process.env.DB_USER || 'root';
+const dbPassword = process.env.DB_PASS || 'root';
+const dbInstance = process.env.DB_INSTANCE || 'localhost';
+const includeDialectOptions = process.env.INCLUDE_DIALECT_OPTIONS || false;
+
+let sequelize = null;
+if (includeDialectOptions) {
+  sequelize = new Sequelize(
+    dbnName, 
+    dbUser, 
+    dbPassword, 
+    {
+      host: dbInstance,
+      dialect: 'mysql',
+      dialectOptions: {
+        socketPath: dbInstance,
+      },
+    });
+}
+else {
+  sequelize = new Sequelize(
+    dbnName, 
+    dbUser, 
+    dbPassword, 
+    {
+      host: dbInstance,
+      dialect: 'mysql',
+    });
+}
+
+const db = {};
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
 
 const Companies = require('./companies.model');
 const Categories = require('./categories.model');
@@ -20,26 +54,6 @@ const StockBooks = require('./stockBooks.model');
 const Expenses = require('./expenses.model');
 const Recoveries = require('./recoveries.model');
 const Transfers = require('./transfers.model');
-
-const sequelize = new Sequelize(
-  dbConfig.DB, 
-  dbConfig.USER, 
-  dbConfig.PASSWORD, 
-  {
-    host: dbConfig.HOST,dialect: dbConfig.dialect,
-    pool: {max: dbConfig.pool.max,min: dbConfig.pool.min,acquire: dbConfig.pool.acquire,idle: dbConfig.pool.idle},
-    
-    dialectOptions: {
-      useUTC: false //for reading from database
-    },
-
-    timezone: '+05:00' //for writing to database
-  },
-);
-
-const db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
 
 db.companies = Companies.initialize(sequelize,Sequelize);
 db.categories = Categories.initialize(sequelize,Sequelize);

@@ -4,15 +4,9 @@ const initialize = (sequelize,Sequelize) => {
         batchNumber: {type: Sequelize.STRING},
         invoiceNumber: {type: Sequelize.STRING , allowNull: false},
         expiryDate: {type: Sequelize.DATEONLY},
-        costPrice: {
-          type: Sequelize.FLOAT,
-        },
-        quantity: {
-          type: Sequelize.FLOAT,
-        },
-        initialQuantity: {
-          type: Sequelize.FLOAT,
-        },
+        costPrice: {type: Sequelize.FLOAT,},
+        quantity: {type: Sequelize.FLOAT,},
+        initialQuantity: {type: Sequelize.FLOAT,},
         notes: {type: Sequelize.STRING},
     });
   }

@@ -6,7 +6,7 @@ const initialize = (sequelize,Sequelize) => {
         allowNull: false,
       },
       closingBalance: {
-        type: Sequelize.STRING,
+        type: Sequelize.FLOAT,
         allowNull: false
       },
       type: {

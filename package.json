@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Node Express Backend Engine for Akram Zarai Markaz. Powerful REST APIs",
   "main": "app.js",
-  "bin": "./bin/www.js",
   "scripts": {
     "start": "node app.js"
   },

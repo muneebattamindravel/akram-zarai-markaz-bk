@@ -1,8 +1,6 @@
 const http = require('http');
 const express = require('express');
 const app = express();
-const db = require('./models');
-const migrationScript = require('./migration-scripts/db-migration');
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', req.header('origin')
@@ -20,17 +18,10 @@ app.get('/', (req, res) => {
   res.send('OK');
 });
 
-//force drops everything in database and creates everything new
-force = false;
-db.sequelize.sync({force}).then(() => {
-  if (force)
-    migrationScript.RunMigration();
-})
-
 module.exports = app;
 console.log(process.pid)
 
-const port = 4000;
+const port = process.env.PORT || 8080;
 app.set('port', port);
 
 const server = http.createServer(app);
@@ -38,3 +29,11 @@ server.listen(port);
 server.on('listening', () => {console.log(`Server started on port ${port}`)});
 
 require('./routes');
+
+const migrationScript = require('./migration-scripts/db-migration');
+const db = require('./models');
+force = false;
+db.sequelize.sync({force}).then(() => {
+  if (force)
+    migrationScript.RunMigration();
+})
