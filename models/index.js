@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 
 const dbnName = process.env.DB_NAME || 'akram-zarai-markaz';
 const dbUser = process.env.DB_USER || 'root';
-const dbPassword = process.env.DB_PASS || 'root';
+const dbPassword = process.env.DB_PASS || '';
 const dbInstance = process.env.DB_INSTANCE || 'localhost';
 // const includeDialectOptions = process.env.INCLUDE_DIALECT_OPTIONS || false;
 
