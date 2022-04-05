@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 module.exports = app;
 console.log(process.pid)
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 4000;
 app.set('port', port);
 
 const server = http.createServer(app);

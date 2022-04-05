@@ -4,10 +4,23 @@ const dbnName = process.env.DB_NAME || 'akram-zarai-markaz';
 const dbUser = process.env.DB_USER || 'root';
 const dbPassword = process.env.DB_PASS || 'root';
 const dbInstance = process.env.DB_INSTANCE || 'localhost';
-const includeDialectOptions = process.env.INCLUDE_DIALECT_OPTIONS || false;
+// const includeDialectOptions = process.env.INCLUDE_DIALECT_OPTIONS || false;
 
 let sequelize = null;
-if (includeDialectOptions) {
+// if (includeDialectOptions) {
+//   sequelize = new Sequelize(
+//     dbnName, 
+//     dbUser, 
+//     dbPassword, 
+//     {
+//       host: dbInstance,
+//       dialect: 'mysql',
+//       dialectOptions: {
+//         socketPath: dbInstance,
+//       },
+//     });
+// }
+// else {
   sequelize = new Sequelize(
     dbnName, 
     dbUser, 
@@ -15,21 +28,8 @@ if (includeDialectOptions) {
     {
       host: dbInstance,
       dialect: 'mysql',
-      dialectOptions: {
-        socketPath: dbInstance,
-      },
     });
-}
-else {
-  sequelize = new Sequelize(
-    dbnName, 
-    dbUser, 
-    dbPassword, 
-    {
-      host: dbInstance,
-      dialect: 'mysql',
-    });
-}
+// }
 
 const db = {};
 db.Sequelize = Sequelize;
