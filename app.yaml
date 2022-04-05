@@ -2,6 +2,6 @@ runtime: nodejs14
 env_variables:
   DB_USER: "root"
   DB_NAME: "akram-zarai-markaz"
-  DB_PASS: "root"
+  DB_PASS: ""
   # DB_INSTANCE: "/cloudsql/akram-zarai-markaz:asia-east1:akram-zarai-markaz-instance"
   # INCLUDE_DIALECT_OPTIONS: true
