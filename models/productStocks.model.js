@@ -1,5 +1,5 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('productStocks', {
+    return sequelize.define('productstocks', {
         lotNumber: {type: Sequelize.INTEGER, allowNull: false},
         batchNumber: {type: Sequelize.STRING},
         invoiceNumber: {type: Sequelize.STRING , allowNull: false},

@@ -1,5 +1,5 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('stockBooks', {
+    return sequelize.define('stockbooks', {
         date: {type: Sequelize.DATEONLY},
         bookNumber: {type: Sequelize.STRING},
         billNumber: {type: Sequelize.STRING},
