@@ -1,5 +1,5 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('saleprofits', {
+    return sequelize.define('saleProfits', {
         amount: {type: Sequelize.FLOAT},
         date: {type: Sequelize.DATEONLY},
     });

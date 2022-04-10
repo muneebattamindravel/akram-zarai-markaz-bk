@@ -3,6 +3,7 @@ const STOCK_BOOKS_STRINGS = require('../constants/stockBooks.strings');
 const ProductStocks = require('../models/productStocks.model');
 const productsController = require('../controllers/products.controller');
 const stockBooksController = require('../controllers/stockBooks.controller');
+const stockBooksModel = require('../models/stockBooks.model');
 
 /**creates a new product stock */
 const createProductStock = async (req, res) => {
@@ -59,6 +60,13 @@ const updateProductStock = async (req, res) => {
         req.body.quantity = existingStock.quantity + diff;
 
         req.body.purchaseId = req.body.purchaseId == 0 ? null : req.body.purchaseId
+
+        const stockBookEntry = await stockBooksModel.getByReference(req.params.id, STOCK_BOOKS_STRINGS.TYPE.MANUAL_STOCK);
+        await stockBooksModel.update({
+            amount: req.body.quantity
+        }, stockBookEntry.id);
+
+        stockBooksController.consolidateStockBook(stockBookEntry.productId);
 
         await ProductStocks.update(req.body, req.params.id) ? 
         res.send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY}) : 

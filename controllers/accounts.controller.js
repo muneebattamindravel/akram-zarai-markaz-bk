@@ -82,7 +82,9 @@ const updateAccount = async (req, res) => {
     try {
         if (!IsAccountBodyValid(req.body, res))
             return;
-        const result = await Accounts.exists({name: req.body.name, id: {[Op.not]: req.params.id}})
+        const result = await Accounts.exists(
+            {name: req.body.name, type: req.body.type ,  id: {[Op.not]: req.params.id}}
+        )
         if (result) {
             res.status(406).send({message: ACCOUNTS_STRINGS.DUPLICATE_ACCOUNT_NAME})
             return;
@@ -147,7 +149,7 @@ const getAccountStatement = async (req, res) => {
         ] 
 
         const accountTransactions = await AccountTransactionsModel.getAll(
-            where, include
+            where, include,
         );
 
         res.send(accountTransactions);
@@ -156,6 +158,34 @@ const getAccountStatement = async (req, res) => {
         console.log(err)
         res.status(500).send({raw: err.message.toString(), message: ACCOUNTS_STRINGS.ERROR_GETTING_ACCOUNT_STATEMENT, stack: err.stack})
     }
+}
+
+/** consolidateAccountStatementRoute */
+const consolidateAccountStatement = async (req, res) => {
+    try {
+        res.send(await consolidateAccountStatementWorker(req.params.id));
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: 'Error Consolidating', stack: err.stack})
+    }
+}
+
+const consolidateAccountStatementWorker = async(accountId) => {
+    const where = {"accountId": accountId}
+    const include = []
+    const accountTransactions = await AccountTransactionsModel.getAll(where, include,);
+    let closingBalance = accountTransactions[0].amount;
+    accountTransactions.shift();
+    await Promise.all(accountTransactions.map(async (accountTransaction) => {
+        closingBalance = closingBalance + accountTransaction.amount;
+        const updateBody = {
+            'closingBalance': closingBalance
+        }
+        await AccountTransactionsModel.update(updateBody, accountTransaction.id);
+    }));
+
+    return accountTransactions;
 }
 
 /** get balance of the default account */
@@ -241,5 +271,7 @@ module.exports = {
     getAllAccounts,
     deleteAccount,
     createAccountDBMigration,
-    getAccountStatement
+    getAccountStatement,
+    consolidateAccountStatementWorker,
+    consolidateAccountStatement
 }

@@ -1,5 +1,5 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('stockbooks', {
+    return sequelize.define('stockBooks', {
         date: {type: Sequelize.DATEONLY},
         bookNumber: {type: Sequelize.STRING},
         billNumber: {type: Sequelize.STRING},
@@ -42,7 +42,7 @@ const initialize = (sequelize,Sequelize) => {
       return await models.stockBooks.findAll(
         {
           where: whereConditions,
-          include: includeArray
+          include: includeArray,
         }
       )
     }
@@ -64,6 +64,29 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const update = async (body, id) => {
+    try {
+      const stockBooks = require('../models').stockBooks
+      return await stockBooks.update(body, {where: {id:id}}) == 1 ? true : false
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
+  const getByReference = async(referenceId, referenceType) => {
+    try {
+      const model = require('../models').stockBooks
+
+      return model.findOne({
+        where: {referenceId: referenceId, type: referenceType},
+      });
+    }
+    catch (err) {
+      throw err;
+    }
+  }
+
   const setAssociations = (db) => {
     db.stockBooks.belongsTo(db.products)
   } 
@@ -74,5 +97,7 @@ const initialize = (sequelize,Sequelize) => {
     getAll,
     setAssociations,
     getLastTransaction,
-    deleteByReference
+    deleteByReference,
+    update,
+    getByReference
   }

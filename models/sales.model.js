@@ -35,7 +35,7 @@ const initialize = (sequelize,Sequelize) => {
             where : {
               "saleDate" : {[Op.between] : [from , to ]}
             },
-            order: [['saleDate', 'DESC']],
+            order: [['id', 'ASC']],
           }
         )
     }

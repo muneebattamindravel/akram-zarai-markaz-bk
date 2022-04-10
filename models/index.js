@@ -7,7 +7,7 @@ const dbInstance = process.env.DB_INSTANCE || 'localhost';
 // const includeDialectOptions = process.env.INCLUDE_DIALECT_OPTIONS || false;
 
 let sequelize = null;
-// if (includeDialectOptions) {
+// if (includeDialectOptions) {npm 
 //   sequelize = new Sequelize(
 //     dbnName, 
 //     dbUser, 

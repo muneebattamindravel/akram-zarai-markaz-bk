@@ -1,5 +1,5 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('accounttransactions', {
+    return sequelize.define('accountTransactions', {
       transactionDate: {type: Sequelize.DATEONLY},
       amount: {
         type: Sequelize.FLOAT,
@@ -39,13 +39,13 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
-  const getAll = async (whereConditions, includeArray) => {
+  const getAll = async (whereConditions, includeArray, order = 'ASC') => {
     try {
       const models = require('../models')
       return await models.accountTransactions.findAll(
         {
           where: whereConditions,
-          include: includeArray
+          include: includeArray,
         }
       )
     }

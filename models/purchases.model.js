@@ -32,7 +32,8 @@ const initialize = (sequelize,Sequelize) => {
         include: [
           {model: models.contacts},
           {model: models.companies}
-        ]
+        ],
+        order: [['invoiceDate', 'DESC']],
       })
     }
     catch (err) {

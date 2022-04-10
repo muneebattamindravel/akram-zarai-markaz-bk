@@ -13,6 +13,7 @@ const AccountTransactions = require('../controllers/accountTransactions.controll
 const AccountTransactionsModel = require('../models/accountTransactions.model');
 const stockBooksController = require('../controllers/stockBooks.controller');
 const stockBooksModel = require('../models/stockBooks.model');
+const accountsController = require('../controllers/accounts.controller');
 
 /**creates a new sale */
 const createSale = async (req, res) => {
@@ -284,6 +285,12 @@ const deleteSale = async (req, res) => {
         await AccountTransactionsModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE)
         await AccountTransactionsModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT)
         await stockBooksModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE)
+
+        const defaultAccount = await Accounts.getDefaultAccount();
+        await accountsController.consolidateAccountStatementWorker(defaultAccount.id)
+        if (sale.contact != null) {
+            await accountsController.consolidateAccountStatementWorker(sale.contact.accountId);
+        }
 
         res.status(200).send();
     }

@@ -38,7 +38,7 @@ const initialize = (sequelize,Sequelize) => {
               {model: models.accounts},
               {model: models.contacts}
             ],
-            order: [['date', 'DESC']],
+            order: [['id', 'DESC']],
           }
         )
     }
@@ -57,10 +57,25 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const deleteById = async(id) => {
+    try {
+      const recoveries = require('../models').recoveries
+      return await recoveries.destroy(
+          {
+            where: {id: id}
+          }
+        )
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
   module.exports = {
     initialize,
     setAssociations,
     create,
     getAll,
-    getByID
+    getByID,
+    deleteById,
   }

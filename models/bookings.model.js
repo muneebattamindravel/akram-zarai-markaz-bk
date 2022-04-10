@@ -43,7 +43,8 @@ const getAll = async() => {
     
     return await bookings.findAll(
       {
-        include: [{model: models.companies}]
+        include: [{model: models.companies}],
+        order: [['bookingDate', 'DESC']],
       }
     )
   }

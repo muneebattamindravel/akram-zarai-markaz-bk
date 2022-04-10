@@ -8,3 +8,4 @@ app.get('/accounts/statement/:id',accountsController.getAccountStatement);
 app.get('/accounts/:id',accountsController.getAccount);
 app.get('/accounts/defaultAccount/balance',accountsController.getDefaultAccountBalance);
 app.delete('/accounts/:id',accountsController.deleteAccount);
+app.post('/accounts/consolidate/:id',accountsController.consolidateAccountStatement);

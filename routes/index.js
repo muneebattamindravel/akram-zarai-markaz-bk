@@ -16,6 +16,7 @@ const salePayments = require('./salePayments.routes');
 const expenses = require('./expenses.routes');
 const recoveries = require('./recoveries.routes');
 const transfers = require('./transfers.routes');
+const data = require('./data.routes');
 
 module.exports = {
     companies,
@@ -35,5 +36,6 @@ module.exports = {
     salePayments,
     expenses,
     recoveries,
-    transfers
+    transfers,
+    data
 }

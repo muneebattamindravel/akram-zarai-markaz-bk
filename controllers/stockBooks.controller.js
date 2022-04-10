@@ -64,11 +64,7 @@ const getStockBook = async (req, res) => {
             }
         ] 
 
-        const stockBook = await stockBooksModel.getAll(
-            where, []
-        );
-
-        res.send(stockBook);
+        res.send(await getStockBookWorker(where, include));
     }
     catch (err) {
         console.log(err)
@@ -76,7 +72,48 @@ const getStockBook = async (req, res) => {
     }
 }
 
+const getStockBookWorker = async(where, include) => {
+    const stockBook = await stockBooksModel.getAll(
+        where, include
+    );
+
+    return stockBook;
+}
+
+const consolidateStockBook = async(productId) => {
+    const where = {
+        "productId": productId,
+    }
+    const models = require('../models');
+
+    const include = [
+        {
+            model: models.products,
+            include: [
+                {
+                    model: models.companies
+                }
+            ]
+        }
+    ] 
+
+    const stockBookTransactions = await getStockBookWorker(where, include)
+
+    let closingBalance = stockBookTransactions[0].amount;
+    stockBookTransactions.shift();
+    await Promise.all(stockBookTransactions.map(async (stockBookTransaction) => {
+        closingBalance = closingBalance + stockBookTransaction.amount;
+        const updateBody = {
+            'closing': closingBalance
+        }
+        await stockBooksModel.update(updateBody, stockBookTransaction.id);
+    }));
+
+    return stockBookTransactions;
+}
+
 module.exports = {
     addStockBookEntry,
-    getStockBook
+    getStockBook,
+    consolidateStockBook
 }
