@@ -1,34 +1,32 @@
 const backup = async (req, res) => {
-    try {
-        const fs = require('fs')
-        const spawn = require('child_process').spawn
-        const dumpFileName = `${Math.round(Date.now() / 1000)}.dump.sql`
-        const writeStream = fs.createWriteStream(dumpFileName)
-        const dump = spawn('mysqldump', [
-            '-u',
-            'azmuser1',
-            '-pazmuser1',
-            'akram-zarai-markaz',
-        ])
+    //mysql -h localhost -uroot -p7SlQOqaDnfEp akram-zarai-markaz-restore < dump.sql
 
-        dump
-        .stdout
-        .pipe(writeStream)
-        .on('finish', function () {
-            console.log('Completed')
-            res.status(200).send();
-        })
-        .on('error', function (err) {
-            console.log(err)
+    const { exec } = require('child_process');
+    const date = req.body.date;
+    const dumpFileName = `${date}.dump.sql`
+    let exportFrom = {
+        host: "localhost",
+        user: "azmuser1",
+        password: "azmuser1",
+        database: "akram-zarai-markaz"
+    }
+
+    console.log(`Starting exporting data from the ${exportFrom.database} database`);
+    // Execute a MySQL Dump and redirect the output to the file in dumpFile variable.
+    exec(`/Applications/MAMP/Library/bin/mysqldump --add-drop-table -u${exportFrom.user} -p${exportFrom.password} -h${exportFrom.host} ${exportFrom.database} > ${dumpFileName}`, 
+    (err, stdout, stderr) => {
+        if (err) 
+        { 
+            console.error(`exec error: ${err}`); 
             res.status(500).send();
-        })
-    }
-    catch (err) {
-        console.log(err)
-        res.status(500).send({error: err.message.toString(), message: 'Erorr Taking Backup', stack: err.stack})
-    }
+            return; 
+        }
+    });
 }
 
 module.exports = {
     backup,
 }
+
+
+       
