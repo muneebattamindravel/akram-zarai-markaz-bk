@@ -3,7 +3,7 @@ const restore = async (req, res) => {
     const fileName = req.body.fileName;
 
     let importTo = {
-        host: "http://13.213.139.143",
+        host: "localhost",
         user: "root",
         password: "7SlQOqaDnfEp",
         database: "akram-zarai-markaz-restore"
