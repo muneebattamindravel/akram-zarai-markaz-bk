@@ -16,28 +16,30 @@ const upload = async (req, res) => {
             dumpFile.mv('../data-backups/' + dumpFile.name);
             responseObject.fileUploaded = true;
 
-            const { exec } = require('child_process');
-            const fileName = '../data-backups/' + dumpFile.name;
+            res.status(200).send(responseObject);
 
-            let importTo = {
-                host: "localhost",
-                user: "root",
-                password: "7SlQOqaDnfEp",
-                database: "akram-zarai-markaz"
-            }
+            // const { exec } = require('child_process');
+            // const fileName = '../data-backups/' + dumpFile.name;
 
-            exec(`mysql -h ${importTo.host} -u${importTo.user} -p${importTo.password} ${importTo.database} < ${fileName}`, 
-            (err, stdout, stderr) => {
-                if (err) { 
-                    responseObject.fileRestored = false;
-                    responseObject.message = `${err}`;
-                    res.status(500).send(responseObject);
-                    return; 
-                }
+            // let importTo = {
+            //     host: "localhost",
+            //     user: "root",
+            //     password: "7SlQOqaDnfEp",
+            //     database: "akram-zarai-markaz"
+            // }
 
-                responseObject.fileRestored = true;
-                res.status(200).send(responseObject);
-            });
+            // exec(`mysql -h ${importTo.host} -u${importTo.user} -p${importTo.password} ${importTo.database} < ${fileName}`, 
+            // (err, stdout, stderr) => {
+            //     if (err) { 
+            //         responseObject.fileRestored = false;
+            //         responseObject.message = `${err}`;
+            //         res.status(500).send(responseObject);
+            //         return; 
+            //     }
+
+            //     responseObject.fileRestored = true;
+            //     res.status(200).send(responseObject);
+            // });
         }
     } catch (err) {
         console.log(err)
@@ -92,6 +94,7 @@ const backup = async (req, res) => {
             if (err) {
                 console.error(`exec error: ${error}`);
                 responseObject.fileUploaded = false;
+                responseObject.fileRestored = false;
                 responseObject.message = error;
                 res.status(500).send(responseObject);
             }
