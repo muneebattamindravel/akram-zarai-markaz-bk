@@ -21,7 +21,7 @@ const upload = async (req, res) => {
             responseObject.message = `File Uploaded`;
 
             console.log(responseObject);
-            res.status(200).send(json.stringify(responseObject));
+            res.status(200).send(JSON.stringify(responseObject));
 
             // const { exec } = require('child_process');
             // const fileName = '../data-backups/' + dumpFile.name;
