@@ -1,18 +1,18 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('saleProfits', {
+    return sequelize.define('saleprofits', {
         amount: {type: Sequelize.FLOAT},
         date: {type: Sequelize.DATEONLY},
     });
   }
   
   const setAssociations = (db) => {
-    db.saleProfits.belongsTo(db.sales)
-    db.saleProfits.belongsTo(db.saleItems)
+    db.saleprofits.belongsTo(db.sales)
+    db.saleprofits.belongsTo(db.saleitems)
   }
   
   const create = async (saleProfit) => {
     try {
-      const SaleProfits = require('../models').saleProfits
+      const SaleProfits = require('../models').saleprofits
       return await SaleProfits.create(saleProfit);
     }
     catch(err) {
@@ -23,7 +23,7 @@ const initialize = (sequelize,Sequelize) => {
   //delete all profits posted of a particular sale
   const deleteSaleProfits = async (saleId) => {
     try {
-      const SaleProfits = require('../models').saleProfits
+      const SaleProfits = require('../models').saleprofits
       return await SaleProfits.destroy(
           {
             where: {
@@ -39,7 +39,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getCounterSalesProfit = async (from, to) => {
     try {
-      const SaleProfits = require('../models').saleProfits
+      const SaleProfits = require('../models').saleprofits
       const Sequelize = require('sequelize');
       const { Op } = require("sequelize");
 
@@ -60,7 +60,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getAll = async (where) => {
     try {
-      const SaleProfits = require('../models').saleProfits
+      const SaleProfits = require('../models').saleprofits
       return await SaleProfits.findAll(where);
     }
     catch(err) {
@@ -70,7 +70,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getTotalProfitAmountBySaleId = async (saleId) => {
     try {
-      const SaleProfits = require('../models').saleProfits
+      const SaleProfits = require('../models').saleprofits
       const Sequelize = require('sequelize');
       
       const response = await SaleProfits.findAll(
@@ -92,7 +92,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getSaleProfits = async (from, to) => {
     try {
-      const SaleProfits = require('../models').saleProfits
+      const SaleProfits = require('../models').saleprofits
       const models = require('../models')
       const { Op } = require("sequelize");
 
@@ -104,7 +104,7 @@ const initialize = (sequelize,Sequelize) => {
               model: models.sales
             },
             {
-              model: models.saleItems,
+              model: models.saleitems,
               include: [
                 {
                   model: models.products,

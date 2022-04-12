@@ -102,8 +102,8 @@ const createSale = async (req, res) => {
             );
         }
 
-        for (let i = 0; i < req.body.saleItems.length; i++) {
-            let saleItem = req.body.saleItems[i];
+        for (let i = 0; i < req.body.saleitems.length; i++) {
+            let saleItem = req.body.saleitems[i];
             // Get The Product
             const product = await Products.getByID(saleItem.product.id);
 
@@ -124,9 +124,9 @@ const createSale = async (req, res) => {
             var quantityRemaining = saleItem.quantity;
             var lotsUsed = [];
             // Loop Through the Stocks and Post Profits
-            for (let j = 0; j < product.productStocks.length; j++) {
+            for (let j = 0; j < product.productstocks.length; j++) {
 
-                let productStock = product.productStocks[j];
+                let productStock = product.productstocks[j];
                 if (productStock.quantity > 0 && quantityRemaining > 0) {
                     //Case 1 - Existing Stock >= To Sold Stock
                     if (productStock.quantity >= quantityRemaining) {
@@ -247,8 +247,8 @@ const getSaleObject = async(saleId, isComplete = false) => {
         );
         const saleProfits = await SaleProfits.getAll({where: {saleId: saleId}});
 
-        saleObject.saleItems = saleItems;
-        saleObject.saleProfits = saleProfits;
+        saleObject.saleitems = saleItems;
+        saleObject.saleprofits = saleProfits;
     }
 
     return saleObject;
@@ -259,8 +259,8 @@ const deleteSale = async (req, res) => {
     try {
         //First Of All, Add Product Stocks Back
         sale = await getSaleObject(req.params.id, true);
-        for (let i = 0; i < sale.saleItems.length; i++) {
-            const saleItem = sale.saleItems[i];
+        for (let i = 0; i < sale.saleitems.length; i++) {
+            const saleItem = sale.saleitems[i];
             // Get The Product
             const product = await Products.getByID(saleItem.productId);
             // Loop Through The Lots Used JSON

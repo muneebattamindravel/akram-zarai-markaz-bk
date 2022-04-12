@@ -1,5 +1,5 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('accountTransactions', {
+    return sequelize.define('accounttransactions', {
       transactionDate: {type: Sequelize.DATEONLY},
       amount: {
         type: Sequelize.FLOAT,
@@ -26,12 +26,12 @@ const initialize = (sequelize,Sequelize) => {
   }
   
   const setAssociations = (db) => {
-    db.accountTransactions.belongsTo(db.accounts)
+    db.accounttransactions.belongsTo(db.accounts)
   }
   
   const create = async (accountTransaction) => {
     try {
-      const model = require('.').accountTransactions
+      const model = require('.').accounttransactions
       return await model.create(accountTransaction);
     }
     catch(err) {
@@ -42,7 +42,7 @@ const initialize = (sequelize,Sequelize) => {
   const getAll = async (whereConditions, includeArray, order = 'ASC') => {
     try {
       const models = require('../models')
-      return await models.accountTransactions.findAll(
+      return await models.accounttransactions.findAll(
         {
           where: whereConditions,
           include: includeArray,
@@ -56,7 +56,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getLastTransaction = async(accountId) => {
     try {
-      const model = require('../models').accountTransactions
+      const model = require('../models').accounttransactions
 
       return model.findOne({
         where: {accountId: accountId},
@@ -70,7 +70,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getFirstTransaction = async(accountId) => {
     try {
-      const model = require('../models').accountTransactions
+      const model = require('../models').accounttransactions
 
       return model.findOne({
         where: {accountId: accountId},
@@ -84,7 +84,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const update = async (body, id) => {
     try {
-      const model = require('../models').accountTransactions
+      const model = require('../models').accounttransactions
       return await model.update(body, {where: {id:id}}) == 1 ? true : false
     }
     catch (err) {
@@ -94,7 +94,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const deleteByReference = async(referenceId, referenceType) => {
     try {
-      const model = require('../models').accountTransactions
+      const model = require('../models').accounttransactions
 
       return model.destroy({
         where: {referenceId: referenceId, type: referenceType},

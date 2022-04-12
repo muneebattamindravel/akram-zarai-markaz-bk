@@ -10,9 +10,9 @@ const initialize = (sequelize,Sequelize) => {
   
   const setAssociations = (db) => {
     db.sales.belongsTo(db.contacts)
-    db.sales.hasMany(db.saleItems);
-    db.sales.hasMany(db.saleProfits, {onDelete: 'RESTRICT'})
-    db.sales.hasMany(db.salePayments, {onDelete: 'RESTRICT'})
+    db.sales.hasMany(db.saleitems);
+    db.sales.hasMany(db.saleprofits, {onDelete: 'RESTRICT'})
+    db.sales.hasMany(db.salepayments, {onDelete: 'RESTRICT'})
   }
   
   const create = async (sale) => {
@@ -67,7 +67,7 @@ const initialize = (sequelize,Sequelize) => {
             where: {id: id},
             include: [
               {
-                model: Models.saleItems
+                model: Models.saleitems
               }
             ]
           }

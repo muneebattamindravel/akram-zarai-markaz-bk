@@ -1,5 +1,5 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('stockBooks', {
+    return sequelize.define('stockbooks', {
         date: {type: Sequelize.DATEONLY},
         bookNumber: {type: Sequelize.STRING},
         billNumber: {type: Sequelize.STRING},
@@ -14,7 +14,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const create = async (stockBook) => {
     try {
-      const stockBooksModel = require('../models').stockBooks
+      const stockBooksModel = require('../models').stockbooks
       return await stockBooksModel.create(stockBook);
     }
     catch(err) {
@@ -24,7 +24,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getLastTransaction = async(productId) => {
     try {
-      const model = require('../models').stockBooks
+      const model = require('../models').stockbooks
 
       return model.findOne({
         where: {productId: productId},
@@ -39,7 +39,7 @@ const initialize = (sequelize,Sequelize) => {
   const getAll = async (whereConditions, includeArray) => {
     try {
       const models = require('../models')
-      return await models.stockBooks.findAll(
+      return await models.stockbooks.findAll(
         {
           where: whereConditions,
           include: includeArray,
@@ -53,7 +53,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const deleteByReference = async(referenceId, referenceType) => {
     try {
-      const model = require('../models').stockBooks
+      const model = require('../models').stockbooks
 
       return model.destroy({
         where: {referenceId: referenceId, type: referenceType},
@@ -66,7 +66,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const update = async (body, id) => {
     try {
-      const stockBooks = require('../models').stockBooks
+      const stockBooks = require('../models').stockbooks
       return await stockBooks.update(body, {where: {id:id}}) == 1 ? true : false
     }
     catch (err) {
@@ -76,7 +76,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getByReference = async(referenceId, referenceType) => {
     try {
-      const model = require('../models').stockBooks
+      const model = require('../models').stockbooks
 
       return model.findOne({
         where: {referenceId: referenceId, type: referenceType},
@@ -88,8 +88,8 @@ const initialize = (sequelize,Sequelize) => {
   }
 
   const setAssociations = (db) => {
-    db.stockBooks.belongsTo(db.products)
-  } 
+    db.stockbooks.belongsTo(db.products)
+  }
   
   module.exports = {
     initialize,

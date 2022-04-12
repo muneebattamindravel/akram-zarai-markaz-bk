@@ -1,5 +1,5 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('salePayments', {
+    return sequelize.define('salepayments', {
         receivedAmount: {type: Sequelize.FLOAT},
         receivedDate: {type: Sequelize.DATEONLY},
         paymentType: {type: Sequelize.STRING},
@@ -10,7 +10,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const create = async (salePayment) => {
     try {
-      const salePaymentModel = require('../models').salePayments
+      const salePaymentModel = require('../models').salepayments
       return await salePaymentModel.create(salePayment);
     }
     catch(err) {
@@ -21,7 +21,7 @@ const initialize = (sequelize,Sequelize) => {
   const getAll = async (whereConditions, includeArray) => {
     try {
       const models = require('../models')
-      return await models.salePayments.findAll(
+      return await models.salepayments.findAll(
         {
           where: whereConditions,
           include: includeArray
@@ -36,7 +36,7 @@ const initialize = (sequelize,Sequelize) => {
    //delete all payments posted of a particular sale
    const deleteSalePayments = async (saleId) => {
     try {
-      const SalePayments = require('../models').salePayments
+      const SalePayments = require('../models').salepayments
       return await SalePayments.destroy(
           {
             where: {
@@ -52,7 +52,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getTotalPaymentsReceivedAmount = async (saleId) => {
     try {
-      const SalePayments = require('../models').salePayments
+      const SalePayments = require('../models').salepayments
       const Sequelize = require('sequelize');
 
       return await SalePayments.findAll(
@@ -71,7 +71,7 @@ const initialize = (sequelize,Sequelize) => {
   }
 
   const setAssociations = (db) => {
-    db.salePayments.belongsTo(db.accounts)
+    db.salepayments.belongsTo(db.accounts)
   } 
   
   module.exports = {

@@ -1,5 +1,5 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('productStocks', {
+    return sequelize.define('productstocks', {
         lotNumber: {type: Sequelize.INTEGER, allowNull: false},
         batchNumber: {type: Sequelize.STRING},
         invoiceNumber: {type: Sequelize.STRING , allowNull: false},
@@ -12,14 +12,14 @@ const initialize = (sequelize,Sequelize) => {
   }
 
   const setAssociations = (db) => {
-    db.productStocks.belongsTo(db.products, {onDelete: 'RESTRICT'})
-    db.productStocks.belongsTo(db.purchases,  {onDelete: 'RESTRICT'})
+    db.productstocks.belongsTo(db.products, {onDelete: 'RESTRICT'})
+    db.productstocks.belongsTo(db.purchases,  {onDelete: 'RESTRICT'})
   }
   
   const create = async (productStock) => {
     try { 
-      const productStocks = require('.').productStocks
-      return await productStocks.create(productStock);
+      const productStocks = require('.').productstocks
+      return await productStocks.create(productstock);
     }
     catch(err) {
       throw err
@@ -28,7 +28,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const update = async (body, id) => {
     try {
-      const ProductStocks = require('../models').productStocks
+      const ProductStocks = require('../models').productstocks
       return await ProductStocks.update(body, {where: {id:id}}) == 1 ? true : false
     }
     catch (err) {
@@ -39,7 +39,7 @@ const initialize = (sequelize,Sequelize) => {
   const getByID = async(id) => {
     try {
       const models = require('../models')
-      return await models.productStocks.findByPk(id)
+      return await models.productstocks.findByPk(id)
     }
     catch (err) {
       throw err
@@ -49,7 +49,7 @@ const initialize = (sequelize,Sequelize) => {
   const get = async (condition) => {
     try {
       const models = require('../models')
-      return await models.productStocks.findOne({where: condition})
+      return await models.productstocks.findOne({where: condition})
     }
     catch (err) {
       throw err

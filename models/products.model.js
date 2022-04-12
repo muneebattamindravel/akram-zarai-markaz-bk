@@ -14,8 +14,8 @@ const initialize = (sequelize,Sequelize) => {
     db.products.belongsTo(db.companies)
     db.products.belongsTo(db.units)
     db.products.belongsTo(db.categories)
-    db.products.hasMany(db.productStocks, {onDelete: 'RESTRICT'})
-    db.products.hasMany(db.saleItems);
+    db.products.hasMany(db.productstocks, {onDelete: 'RESTRICT'})
+    db.products.hasMany(db.saleitems);
   }
   
   const create = async (product) => {
@@ -46,7 +46,7 @@ const initialize = (sequelize,Sequelize) => {
               {model: models.companies},
               {model: models.categories},
               {model: models.units},
-              {model: models.productStocks},
+              {model: models.productstocks},
           ]
       })
   }
@@ -63,7 +63,7 @@ const getAll = async() => {
               {model: models.companies},
               {model: models.categories},
               {model: models.units},
-              {model: models.productStocks},
+              {model: models.productstocks},
           ]
       })
   }

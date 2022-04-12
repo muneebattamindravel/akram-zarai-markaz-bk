@@ -1,5 +1,5 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('saleItems', {
+    return sequelize.define('saleitems', {
         salePrice: {type: Sequelize.FLOAT},
         lotsUsedJson: {type: Sequelize.TEXT},
         quantity: {type: Sequelize.FLOAT},
@@ -7,14 +7,14 @@ const initialize = (sequelize,Sequelize) => {
   }
   
   const setAssociations = (db) => {
-    db.saleItems.belongsTo(db.sales,  {onDelete: 'RESTRICT'})
-    db.saleItems.belongsTo(db.products,  {onDelete: 'RESTRICT'})
-    db.saleItems.hasMany(db.saleProfits, {onDelete: 'RESTRICT'})
+    db.saleitems.belongsTo(db.sales,  {onDelete: 'RESTRICT'})
+    db.saleitems.belongsTo(db.products,  {onDelete: 'RESTRICT'})
+    db.saleitems.hasMany(db.saleprofits, {onDelete: 'RESTRICT'})
   }
   
   const create = async (saleItem) => {
     try {
-      const saleItems = require('../models').saleItems
+      const saleItems = require('../models').saleitems
       return await saleItems.create(saleItem);
     }
     catch(err) {
@@ -25,7 +25,7 @@ const initialize = (sequelize,Sequelize) => {
   //delete all sale items of a particular sale
   const deleteSaleItems = async (saleId) => {
     try {
-      const SaleItems = require('../models').saleItems
+      const SaleItems = require('../models').saleitems
       return await SaleItems.destroy(
           {
             where: {
@@ -41,7 +41,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const update = async (body, id) => {
     try {
-      const saleItems = require('../models').saleItems
+      const saleItems = require('../models').saleitems
       return await saleItems.update(body, {where: {id:id}}) == 1 ? true : false
     }
     catch (err) {
@@ -52,7 +52,7 @@ const initialize = (sequelize,Sequelize) => {
   const getAll = async (whereConditions, includeArray) => {
     try {
       const models = require('../models')
-      return await models.saleItems.findAll(
+      return await models.saleitems.findAll(
         {
           where: whereConditions,
           include: includeArray

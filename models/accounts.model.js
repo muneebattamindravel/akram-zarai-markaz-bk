@@ -33,7 +33,7 @@
   }
   
   const setAssociations = (db) => {
-    db.accounts.hasMany(db.accountTransactions)
+    db.accounts.hasMany(db.accounttransactions)
     db.accounts.hasMany(db.bookings, {
       foreignKey: 'fromAccountId'
     });

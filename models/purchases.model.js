@@ -11,7 +11,7 @@ const initialize = (sequelize,Sequelize) => {
   const setAssociations = (db) => {
     db.purchases.belongsTo(db.contacts)
     db.purchases.belongsTo(db.companies)
-    db.products.hasMany(db.productStocks, {onDelete: 'RESTRICT'})
+    db.products.hasMany(db.productstocks, {onDelete: 'RESTRICT'})
   }
   
   const create = async (purchase) => {
