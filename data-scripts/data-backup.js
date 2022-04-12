@@ -20,6 +20,7 @@ const upload = async (req, res) => {
             responseObject.fileRestored = false;
             responseObject.message = `File Uploaded`;
 
+            console.log(responseObject);
             res.status(200).send(responseObject);
 
             // const { exec } = require('child_process');
