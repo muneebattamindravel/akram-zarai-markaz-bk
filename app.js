@@ -1,6 +1,22 @@
 const http = require('http');
 const express = require('express');
+const fileUpload = require('express-fileupload');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const _ = require('lodash');
+
 const app = express();
+
+app.use(fileUpload({
+  createParentPath: true
+}));
+
+//add other middleware
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(morgan('dev'));
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', req.header('origin')
@@ -18,9 +34,6 @@ app.get('/', (req, res) => {
   res.send('OK');
 });
 
-module.exports = app;
-console.log(process.pid)
-
 const port = process.env.PORT || 4000;
 app.set('port', port);
 
@@ -37,3 +50,6 @@ db.sequelize.sync({force}).then(() => {
   if (force)
     migrationScript.RunMigration();
 })
+
+module.exports = app;
+console.log(process.pid)

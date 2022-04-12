@@ -1,6 +1,7 @@
 const app = require('../app');
-const dbBackup = require('../data-scripts/db-backup.js');
-const dbRestore = require('../data-scripts/db-restore.js');
+const dataBackUp = require('../data-scripts/data-backup.js');
+const dataRestore = require('../data-scripts/data-restore.js');
 
-app.post('/data/backup/',dbBackup.backup);
-app.post('/data/restore/',dbRestore.restore);
+app.post('/data/backup/',dataBackUp.backup);
+app.post('/data/upload/',dataBackUp.upload);
+app.post('/data/restore/',dataRestore.restore);
