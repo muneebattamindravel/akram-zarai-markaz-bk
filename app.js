@@ -7,12 +7,14 @@ const morgan = require('morgan');
 const _ = require('lodash');
 
 const app = express();
+module.exports = app;
+console.log(process.pid)
 
 app.use(fileUpload({
   createParentPath: true
 }));
 
-//add other middleware
+// add other middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -50,6 +52,3 @@ db.sequelize.sync({force}).then(() => {
   if (force)
     migrationScript.RunMigration();
 })
-
-module.exports = app;
-console.log(process.pid)
