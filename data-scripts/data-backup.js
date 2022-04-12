@@ -41,7 +41,10 @@ const upload = async (req, res) => {
         }
     } catch (err) {
         console.log(err)
-        res.status(500).send(err);
+        responseObject.fileUploaded = false;
+        responseObject.fileRestored = false;
+        responseObject.message = err;
+        res.status(500).send(responseObject);
     }
 }
 
