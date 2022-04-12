@@ -1,10 +1,13 @@
 const upload = async (req, res) => {
     try {
         if(!req.files) {
+            console.log('no file received')
             res.status(500).send('No file uploaded');
         } else {
-            let dumpFile = req.files.dumpFile;            
+            let dumpFile = req.files.dumpFile;
+            console.log("file received = " + dumpFile.name)           
             dumpFile.mv('.../data-backups/' + dumpFile.name);
+            console.log("here");
 
             res.send({
                 status: true,
@@ -17,6 +20,7 @@ const upload = async (req, res) => {
             });
         }
     } catch (err) {
+        console.log(err)
         res.status(500).send(err);
     }
 }
