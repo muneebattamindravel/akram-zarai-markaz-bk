@@ -1,20 +1,42 @@
 const upload = async (req, res) => {
     try {
+        let responseObject = {
+            fileUploaded: false,
+            fileRestored: false,
+            message: ''
+        }
+
         if(!req.files) {
-            console.log('no file received')
-            res.status(500).send('No file uploaded');
+            console.log('No File Received')
+            responseObject.fileUploaded = false;
+            responseObject.message = `No File Received`;
+            res.status(500).send(responseObject);
         } else {
             let dumpFile = req.files.dumpFile;
             dumpFile.mv('../data-backups/' + dumpFile.name);
+            responseObject.fileUploaded = true;
 
-            res.send({
-                status: true,
-                message: 'File is uploaded',
-                data: {
-                    name: dumpFile.name,
-                    mimetype: dumpFile.mimetype,
-                    size: dumpFile.size
+            const { exec } = require('child_process');
+            const fileName = '../data-backups/' + dumpFile.name;
+
+            let importTo = {
+                host: "localhost",
+                user: "root",
+                password: "7SlQOqaDnfEp",
+                database: "akram-zarai-markaz"
+            }
+
+            exec(`mysql -h ${importTo.host} -u${importTo.user} -p${importTo.password} ${importTo.database} < ${fileName}`, 
+            (err, stdout, stderr) => {
+                if (err) { 
+                    responseObject.fileRestored = false;
+                    responseObject.message = `${err}`;
+                    res.status(500).send(responseObject);
+                    return; 
                 }
+
+                responseObject.fileRestored = true;
+                res.status(200).send(responseObject);
             });
         }
     } catch (err) {
@@ -36,7 +58,9 @@ const backup = async (req, res) => {
 
     let responseObject = {
         fileCreated: false,
-        fileUploaded: false
+        fileUploaded: false,
+        fileRestored: false,
+        message: ''
     }
 
     exec(`/Applications/MAMP/Library/bin/mysqldump --add-drop-table -u${exportFrom.user} -p${exportFrom.password} -h${exportFrom.host} ${exportFrom.database} > ${dumpFileName}`, 
@@ -44,6 +68,7 @@ const backup = async (req, res) => {
         if (err) 
         { 
             console.error(`exec error: ${err}`);
+            responseObject.message = err;
             res.status(500).send(responseObject);
             return; 
         }
@@ -64,11 +89,14 @@ const backup = async (req, res) => {
             if (err) {
                 console.error(`exec error: ${error}`);
                 responseObject.fileUploaded = false;
+                responseObject.message = error;
                 res.status(500).send(responseObject);
             }
 
-            console.log(response)
-            responseObject.fileUploaded = true;
+            responseObject.fileUploaded = response.fileUploaded;
+            responseObject.fileRestored = response.fileRestored;
+            responseObject.message = response.message;
+
             res.status(200).send(responseObject)
         });
     });

@@ -6,7 +6,7 @@ const restore = async (req, res) => {
         host: "localhost",
         user: "root",
         password: "7SlQOqaDnfEp",
-        database: "akram-zarai-markaz-restore"
+        database: "akram-zarai-markaz"
     }
 
     exec(`mysql -h ${importTo.host} -u${importTo.user} -p${importTo.password} ${importTo.database} < ${fileName}`, 
