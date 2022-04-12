@@ -5,7 +5,6 @@ const upload = async (req, res) => {
             res.status(500).send('No file uploaded');
         } else {
             let dumpFile = req.files.dumpFile;
-            console.log("file received = " + dumpFile.name)           
             dumpFile.mv('.../data-backups/' + dumpFile.name);
             console.log("here");
 
@@ -36,35 +35,42 @@ const backup = async (req, res) => {
         database: "akram-zarai-markaz"
     }
 
+    let responseObject = {
+        fileCreated: false,
+        fileUploaded: false
+    }
+
     exec(`/Applications/MAMP/Library/bin/mysqldump --add-drop-table -u${exportFrom.user} -p${exportFrom.password} -h${exportFrom.host} ${exportFrom.database} > ${dumpFileName}`, 
     (err, stdout, stderr) => {
         if (err) 
         { 
-            console.error(`exec error: ${err}`); 
-            res.status(500).send();
+            console.error(`exec error: ${err}`);
+            res.status(500).send(responseObject);
             return; 
         }
 
-        console.log(`dump file created`); 
+        responseObject.fileCreated = false;
 
         var FormData = require('form-data');
         var fs = require('fs');
         var form = new FormData();
-        const buffer = fs.createReadStream(`${dumpFileName}`);
+        var buffer = fs.createReadStream(`${dumpFileName}`);
 
         form.append('dumpFile', buffer, {
             contentType: 'multipart/form-data',
             filename: `${dumpFileName}`,
         });
 
-        form.submit('http://13.213.139.143:4000/data/upload/', function(err, res) {
+        form.submit('http://13.213.139.143:4000/data/upload/', function(error, response) {
             if (err) {
-                console.error(err);
+                console.error(`exec error: ${error}`);
+                responseObject.fileUploaded = false;
+                res.status(500).send(responseObject);
             }
 
-            console.log("no error");
-            // console.log(res);
-            res.resume();
+            console.log(response)
+            responseObject.fileUploaded = true;
+            res.status(200).send(responseObject)
         });
     });
 }
