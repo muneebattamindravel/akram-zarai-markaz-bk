@@ -6,20 +6,20 @@ const upload = async (req, res) => {
             let dumpFile = req.files.dumpFile;
             dumpFile.mv('../data-backups/' + dumpFile.name);
 
-            // const { exec } = require('child_process');
-            // const fileName = '../data-backups/' + dumpFile.name;
+            const { exec } = require('child_process');
+            const fileName = '../data-backups/' + dumpFile.name;
 
-            // exec(`mysql -hlocalhost -uroot -p7SlQOqaDnfEp akram-zarai-markaz < ${fileName}`, 
-            // (err, stdout, stderr) => {
-            //     if (err) { 
-            //         console.log(err);
-            //         res.status(500).send(err);
-            //         return; 
-            //     }
+            exec(`mysql -hlocalhost -uroot -p7SlQOqaDnfEp akram-zarai-markaz < ${fileName}`, 
+            (err, stdout, stderr) => {
+                if (err) { 
+                    console.log(err);
+                    res.status(500).send(err);
+                    return; 
+                }
 
-            //     console.log('File Restored');
-            //     res.status(200).send('File Restored');
-            // });
+                console.log('File Restored');
+                res.status(200).send();
+            });
         }
     } catch (err) {
         res.status(500).send(err);
