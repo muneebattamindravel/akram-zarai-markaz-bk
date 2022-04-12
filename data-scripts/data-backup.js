@@ -5,8 +5,7 @@ const upload = async (req, res) => {
             res.status(500).send('No file uploaded');
         } else {
             let dumpFile = req.files.dumpFile;
-            dumpFile.mv('.../data-backups/' + dumpFile.name);
-            console.log("here");
+            dumpFile.mv('../data-backups/' + dumpFile.name);
 
             res.send({
                 status: true,
@@ -49,7 +48,7 @@ const backup = async (req, res) => {
             return; 
         }
 
-        responseObject.fileCreated = false;
+        responseObject.fileCreated = true;
 
         var FormData = require('form-data');
         var fs = require('fs');
