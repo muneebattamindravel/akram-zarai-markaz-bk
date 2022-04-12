@@ -19,7 +19,7 @@ const upload = async (req, res) => {
                 }
 
                 console.log('File Restored');
-                res.status(200).send(responseObject);
+                res.status(200).send('File Restored');
             });
         }
     } catch (err) {
