@@ -8,13 +8,17 @@ const upload = async (req, res) => {
 
         if(!req.files) {
             console.log('No File Received')
+            responseObject.fileRestored = false;
             responseObject.fileUploaded = false;
             responseObject.message = `No File Received`;
             res.status(500).send(responseObject);
         } else {
             let dumpFile = req.files.dumpFile;
             dumpFile.mv('../data-backups/' + dumpFile.name);
+
             responseObject.fileUploaded = true;
+            responseObject.fileRestored = false;
+            responseObject.message = `File Uploaded`;
 
             res.status(200).send(responseObject);
 
@@ -103,6 +107,7 @@ const backup = async (req, res) => {
             responseObject.fileRestored = response.fileRestored;
             responseObject.message = response.message;
 
+            console.log(responseObject);
             res.status(200).send(responseObject)
         });
     });
