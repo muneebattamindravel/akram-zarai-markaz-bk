@@ -13,9 +13,9 @@ const upload = async (req, res) => {
                 status: true,
                 message: 'File is uploaded',
                 data: {
-                    name: avatar.name,
-                    mimetype: avatar.mimetype,
-                    size: avatar.size
+                    name: dumpFile.name,
+                    mimetype: dumpFile.mimetype,
+                    size: dumpFile.size
                 }
             });
         }
