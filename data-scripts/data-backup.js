@@ -7,28 +7,27 @@ const upload = async (req, res) => {
             dumpFile.mv('../data-backups/' + dumpFile.name);
             res.status(200).send(`File Uploaded`);
 
-            // const { exec } = require('child_process');
-            // const fileName = '../data-backups/' + dumpFile.name;
+            const { exec } = require('child_process');
+            const fileName = '../data-backups/' + dumpFile.name;
 
-            // let importTo = {
-            //     host: "localhost",
-            //     user: "root",
-            //     password: "7SlQOqaDnfEp",
-            //     database: "akram-zarai-markaz"
-            // }
+            let importTo = {
+                host: "localhost",
+                user: "root",
+                password: "7SlQOqaDnfEp",
+                database: "akram-zarai-markaz"
+            }
 
-            // exec(`mysql -h ${importTo.host} -u${importTo.user} -p${importTo.password} ${importTo.database} < ${fileName}`, 
-            // (err, stdout, stderr) => {
-            //     if (err) { 
-            //         responseObject.fileRestored = false;
-            //         responseObject.message = `${err}`;
-            //         res.status(500).send(responseObject);
-            //         return; 
-            //     }
+            exec(`mysql -h ${importTo.host} -u${importTo.user} -p${importTo.password} ${importTo.database} < ${fileName}`, 
+            (err, stdout, stderr) => {
+                if (err) { 
+                    console.log(err);
+                    res.status(500).send(err);
+                    return; 
+                }
 
-            //     responseObject.fileRestored = true;
-            //     res.status(200).send(responseObject);
-            // });
+                console.log('File Restored');
+                res.status(200).send(responseObject);
+            });
         }
     } catch (err) {
         res.status(500).send(err);
