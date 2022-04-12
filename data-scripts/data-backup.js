@@ -5,7 +5,6 @@ const upload = async (req, res) => {
         } else {
             let dumpFile = req.files.dumpFile;
             dumpFile.mv('../data-backups/' + dumpFile.name);
-            res.status(200).send(`File Uploaded`);
 
             const { exec } = require('child_process');
             const fileName = '../data-backups/' + dumpFile.name;
