@@ -41,10 +41,11 @@ const backup = async (req, res) => {
             return; 
         }
 
-        const {FormData} = require('form-data');
-        const fetch = require('node-fetch');
-        const fs = require('fs');
-        const form = new FormData();
+        console.log(`dump file created`); 
+
+        var FormData = require('form-data');
+        var fs = require('fs');
+        var form = new FormData();
         const buffer = fs.createReadStream(`${dumpFileName}`);
 
         form.append('dumpFile', buffer, {
@@ -52,18 +53,15 @@ const backup = async (req, res) => {
             filename: `${dumpFileName}`,
         });
 
-        // form.submit('http://example.org/', function(err, res) {
-        //     res.resume();
-        // });
+        form.submit('http://13.213.139.143:4000/data/upload/', function(err, res) {
+            if (err) {
+                console.error(err);
+            }
 
-        //return fetch(`13.213.139.143:4000/data/upload/`, { method: 'POST', body: form })
-
-        fetch('13.213.139.143:4000/data/upload/', {
-            method: 'POST',
-            body: form,
-            headers: { 'Content-Type': 'multipart/form-data' }
-        }).then(res => res.json())
-        .then(json => console.log(json));
+            console.log("no error");
+            // console.log(res);
+            res.resume();
+        });
     });
 }
 
