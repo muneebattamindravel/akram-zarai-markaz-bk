@@ -104,9 +104,11 @@ const backup = async (req, res) => {
                 res.status(500).send(responseObject);
             }
 
-            responseObject.fileUploaded = response.fileUploaded;
-            responseObject.fileRestored = response.fileRestored;
-            responseObject.message = response.message;
+            console.log(response);
+
+            // responseObject.fileUploaded = response.fileUploaded;
+            // responseObject.fileRestored = response.fileRestored;
+            // responseObject.message = response.message;
 
             console.log(responseObject);
             res.status(200).send(responseObject)
