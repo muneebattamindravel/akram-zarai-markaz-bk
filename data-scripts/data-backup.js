@@ -1,31 +1,11 @@
 const upload = async (req, res) => {
     try {
-        let responseObject = {
-            fileUploaded: false,
-            fileRestored: false,
-            message: ''
-        }
-
         if(!req.files) {
-            console.log('No File Received')
-            responseObject.fileRestored = false;
-            responseObject.fileUploaded = false;
-            responseObject.message = `No File Received`;
-            res.status(500).send(responseObject);
+            res.status(500).send(`No File Received`);
         } else {
             let dumpFile = req.files.dumpFile;
             dumpFile.mv('../data-backups/' + dumpFile.name);
-
-            responseObject.fileUploaded = true;
-            responseObject.fileRestored = false;
-            responseObject.message = `File Uploaded`;
-
-            console.log(responseObject);
-            res.send({
-                status: true,
-                message: 'File is uploaded',
-                data: responseObject
-            });
+            res.status(200).send(`File Uploaded`);
 
             // const { exec } = require('child_process');
             // const fileName = '../data-backups/' + dumpFile.name;
@@ -51,11 +31,7 @@ const upload = async (req, res) => {
             // });
         }
     } catch (err) {
-        console.log(err)
-        responseObject.fileUploaded = false;
-        responseObject.fileRestored = false;
-        responseObject.message = err;
-        res.status(500).send(responseObject);
+        res.status(500).send(err);
     }
 }
 
@@ -73,7 +49,6 @@ const backup = async (req, res) => {
     let responseObject = {
         fileCreated: false,
         fileUploaded: false,
-        fileRestored: false,
         message: ''
     }
 
@@ -103,16 +78,12 @@ const backup = async (req, res) => {
             if (err) {
                 console.error(`exec error: ${error}`);
                 responseObject.fileUploaded = false;
-                responseObject.fileRestored = false;
                 responseObject.message = error;
                 res.status(500).send(responseObject);
             }
 
-            console.log(response);
-
-            // responseObject.fileUploaded = response.fileUploaded;
-            // responseObject.fileRestored = response.fileRestored;
-            // responseObject.message = response.message;
+            responseObject.fileUploaded = true;
+            responseObject.message = 'File Uploaded';
 
             console.log(responseObject);
             res.status(200).send(responseObject)
