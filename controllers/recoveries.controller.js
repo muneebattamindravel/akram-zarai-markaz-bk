@@ -1,9 +1,9 @@
 /**creates a new recovery */
 const Accounts = require('../models/accounts.model');
 const recoveriesModel = require('../models/recoveries.model');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
-const AccountTransactions = require('../controllers/accountTransactions.controller');
-const AccountTransactionsModel = require('../models/accountTransactions.model');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
+const accounttransactions = require('../controllers/accounttransactions.controller');
+const accounttransactionsModel = require('../models/accounttransactions.model');
 const accountsController = require('../controllers/accounts.controller');
 
 const addRecovery = async (req, res) => {
@@ -25,7 +25,7 @@ const addRecovery = async (req, res) => {
             const include = []
             const cutomerAccount = (await Accounts.getAll(where, include))[0];
 
-            await AccountTransactions.createAccountTransaction(
+            await accounttransactions.createaccounttransaction(
                 req.body.date,
                 (req.body.amount * -1), 
                 ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY,
@@ -39,7 +39,7 @@ const addRecovery = async (req, res) => {
             );
 
             if (req.body.paymentType == 0) {
-                await AccountTransactions.createAccountTransaction(
+                await accounttransactions.createaccounttransaction(
                     req.body.date,
                     req.body.amount, 
                     ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY, 
@@ -53,7 +53,7 @@ const addRecovery = async (req, res) => {
                 );
             }
             else if (req.body.paymentType == 1) {
-                await AccountTransactions.createAccountTransaction(
+                await accounttransactions.createaccounttransaction(
                     req.body.date,
                     req.body.amount, 
                     ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY, 
@@ -79,7 +79,7 @@ const deleteRecovery = async (req, res) => {
     try {        
         const recovery = await recoveriesModel.getByID(req.params.id)
         await recoveriesModel.deleteById(recovery.id);
-        await AccountTransactionsModel.deleteByReference(recovery.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY)
+        await accounttransactionsModel.deleteByReference(recovery.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY)
         await accountsController.consolidateAccountStatementWorker(recovery.accountId)
         await accountsController.consolidateAccountStatementWorker(recovery.contact.accountId)
 

@@ -1,9 +1,9 @@
 /**creates a new transfer */
 const transfersModel = require('../models/transfers.model');
 const accountsModel = require('../models/accounts.model');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
-const AccountTransactions = require('../controllers/accountTransactions.controller');
-const AccountTransactionsModel = require('../models/accountTransactions.model');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
+const accounttransactions = require('../controllers/accounttransactions.controller');
+const accounttransactionsModel = require('../models/accounttransactions.model');
 
 const addTransfer = async (req, res) => {
     try {
@@ -32,7 +32,7 @@ const createTransferWorker = async (date, fromAccountId, toAccountId, bookNumber
         notes: notes,
     });
 
-    await AccountTransactions.createAccountTransaction(
+    await accounttransactions.createaccounttransaction(
         date,
         (amount * -1), 
         ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.TRANSFER,
@@ -45,7 +45,7 @@ const createTransferWorker = async (date, fromAccountId, toAccountId, bookNumber
         ""
     );
 
-    await AccountTransactions.createAccountTransaction(
+    await accounttransactions.createaccounttransaction(
         date,
         (amount * 1), 
         ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.TRANSFER,
@@ -101,7 +101,7 @@ const updateTransfer = async (req, res) => {
     try {
         const transferId = req.params.id;
         await transfersModel.deleteById(transferId);
-        await AccountTransactionsModel.deleteByReference(transferId, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.TRANSFER)
+        await accounttransactionsModel.deleteByReference(transferId, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.TRANSFER)
 
         res.send(createTransferWorker(
             req.body.date,

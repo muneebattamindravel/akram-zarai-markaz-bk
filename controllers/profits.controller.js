@@ -1,11 +1,11 @@
-const SaleProfits = require('../models/saleProfits.model');
+const saleprofits = require('../models/saleprofits.model');
 
-const getCounterSaleProfitAmount = async (req, res) => {
+const getCountersaleprofitAmount = async (req, res) => {
     try {
         const from = req.query.from;
         const to = req.query.to;
 
-        let profit = await SaleProfits.getCounterSalesProfit(from, to);
+        let profit = await saleprofits.getCounterSalesProfit(from, to);
         profit = profit[0];
         if (profit.amount == null) 
             profit.amount = 0.00;
@@ -24,9 +24,9 @@ const getCounterSaleProfitAmount = async (req, res) => {
     }
 }
 
-const getSaleProfits = async (req, res) => {
+const getsaleprofits = async (req, res) => {
     try {
-        res.send(await SaleProfits.getSaleProfits(req.query.from, req.query.to));
+        res.send(await saleprofits.getsaleprofits(req.query.from, req.query.to));
     }
     catch (err) {
         console.log(err)
@@ -35,6 +35,6 @@ const getSaleProfits = async (req, res) => {
 }
 
 module.exports = {
-    getSaleProfits,
-    getCounterSaleProfitAmount,
+    getsaleprofits,
+    getCountersaleprofitAmount,
 }

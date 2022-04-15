@@ -1,5 +1,5 @@
 const app = require('..');
 const profitsController = require('../controllers/profits.controller');
 
-app.get('/profits/saleProfits',profitsController.getSaleProfits);
-app.get('/profits/counterSalesProfit',profitsController.getCounterSaleProfitAmount);
+app.get('/profits/saleprofits',profitsController.getsaleprofits);
+app.get('/profits/counterSalesProfit',profitsController.getCountersaleprofitAmount);

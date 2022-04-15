@@ -4,15 +4,15 @@ const units = require('./units.routes');
 const contacts = require('./contacts.routes');
 const products = require('./products.routes');
 const images = require('./images.routes');
-const productStocks = require('./productStocks.routes');
+const productstocks = require('./productstocks.routes');
 const purchases = require('./purchases.routes');
 const users = require('./users.routes');
 const accounts = require('./accounts.routes');
-const accountTransactions = require('./accounts.routes');
+const accounttransactions = require('./accounts.routes');
 const bookings = require('./bookings.routes');
 const sales = require('./sales.routes');
 const profits = require('./profits.routes');
-const salePayments = require('./salePayments.routes');
+const salepayments = require('./salepayments.routes');
 const expenses = require('./expenses.routes');
 const recoveries = require('./recoveries.routes');
 const transfers = require('./transfers.routes');
@@ -25,15 +25,15 @@ module.exports = {
     contacts,
     products,
     images,
-    productStocks,
+    productstocks,
     purchases,
     users,
     accounts,
-    accountTransactions,
+    accounttransactions,
     bookings,
     sales,
     profits,
-    salePayments,
+    salepayments,
     expenses,
     recoveries,
     transfers,

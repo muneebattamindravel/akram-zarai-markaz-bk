@@ -1,8 +1,8 @@
 module.exports = {
-    //AccountTransactions
-    ERROR_CREATING_ACCOUNTTRANSACTION: "Could'nt Create AccountTransaction",
-    ERROR_GETTING_ACCOUNTTRANSACTION: "Couldn't Get AccountTransaction",
-    ERROR_GETTING_ACCOUNTTRANSACTIONS: "Can't Fetch All AccountTransactions",
+    //accounttransactions
+    ERROR_CREATING_ACCOUNTTRANSACTION: "Could'nt Create accounttransaction",
+    ERROR_GETTING_ACCOUNTTRANSACTION: "Couldn't Get accounttransaction",
+    ERROR_GETTING_ACCOUNTTRANSACTIONS: "Can't Fetch All accounttransactions",
 
     ACCOUNT_TRANSACTION_TYPE : {
         ACCOUNT_CREATED: 'ACCOUNT_CREATED',

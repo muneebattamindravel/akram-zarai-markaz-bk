@@ -29,10 +29,10 @@ const initialize = (sequelize,Sequelize) => {
     db.accounttransactions.belongsTo(db.accounts)
   }
   
-  const create = async (accountTransaction) => {
+  const create = async (accounttransaction) => {
     try {
       const model = require('.').accounttransactions
-      return await model.create(accountTransaction);
+      return await model.create(accounttransaction);
     }
     catch(err) {
       throw err
@@ -41,7 +41,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getAll = async (whereConditions, includeArray, order = 'ASC') => {
     try {
-      const models = require('../models')
+      const models = require('.')
       return await models.accounttransactions.findAll(
         {
           where: whereConditions,
@@ -56,7 +56,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getLastTransaction = async(accountId) => {
     try {
-      const model = require('../models').accounttransactions
+      const model = require('.').accounttransactions
 
       return model.findOne({
         where: {accountId: accountId},
@@ -70,7 +70,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getFirstTransaction = async(accountId) => {
     try {
-      const model = require('../models').accounttransactions
+      const model = require('.').accounttransactions
 
       return model.findOne({
         where: {accountId: accountId},
@@ -84,7 +84,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const update = async (body, id) => {
     try {
-      const model = require('../models').accounttransactions
+      const model = require('.').accounttransactions
       return await model.update(body, {where: {id:id}}) == 1 ? true : false
     }
     catch (err) {
@@ -94,7 +94,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const deleteByReference = async(referenceId, referenceType) => {
     try {
-      const model = require('../models').accounttransactions
+      const model = require('.').accounttransactions
 
       return model.destroy({
         where: {referenceId: referenceId, type: referenceType},

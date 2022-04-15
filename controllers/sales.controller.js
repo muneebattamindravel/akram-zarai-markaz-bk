@@ -1,18 +1,18 @@
 const SALES_STRINGS = require('../constants/sales.strings');
-const STOCK_BOOKS_STRINGS = require('../constants/stockBooks.strings');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
+const STOCK_BOOKS_STRINGS = require('../constants/stockbooks.strings');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
 const Sales = require('../models/sales.model');
-const SalePayments = require('../models/salePayments.model');
+const salepayments = require('../models/salepayments.model');
 const Products = require('../models/products.model');
-const ProductStocks = require('../models/productStocks.model');
-const SaleItems = require('../models/saleItems.model');
-const SaleProfits = require('../models/saleProfits.model');
+const productstocks = require('../models/productstocks.model');
+const saleitemsmodel = require('../models/saleitems.model');
+const saleprofitsmodel = require('../models/saleprofits.model');
 const Accounts = require('../models/accounts.model');
 const Contacts = require('../models/contacts.model');
-const AccountTransactions = require('../controllers/accountTransactions.controller');
-const AccountTransactionsModel = require('../models/accountTransactions.model');
-const stockBooksController = require('../controllers/stockBooks.controller');
-const stockBooksModel = require('../models/stockBooks.model');
+const accounttransactions = require('./accounttransactions.controller');
+const accounttransactionsModel = require('../models/accounttransactions.model');
+const stockbooksController = require('../controllers/stockbooks.controller');
+const stockbooksModel = require('../models/stockbooks.model');
 const accountsController = require('../controllers/accounts.controller');
 
 /**creates a new sale */
@@ -31,14 +31,14 @@ const createSale = async (req, res) => {
 
         const defaultAccount = await Accounts.getDefaultAccount();
 
-        await SalePayments.create({
-            receivedAmount: req.body.salePayment.receivedAmount,
-            receivedDate: req.body.salePayment.receivedDate,
-            paymentType: req.body.salePayment.paymentType,
+        await salepayments.create({
+            receivedAmount: req.body.salepayment.receivedAmount,
+            receivedDate: req.body.salepayment.receivedDate,
+            paymentType: req.body.salepayment.paymentType,
             bookNumber: req.body.bookNumber,
             billNumber: req.body.billNumber,
             saleId: createdSale.id,
-            accountId: req.body.salePayment.accountId == 0 ? defaultAccount.id : req.body.salePayment.accountId,
+            accountId: req.body.salepayment.accountId == 0 ? defaultAccount.id : req.body.salepayment.accountId,
         });
 
         if (createdSale.contactId != null) {
@@ -46,7 +46,7 @@ const createSale = async (req, res) => {
             const include = []
             const cutomerAccount = (await Accounts.getAll(where, include))[0];
 
-            await AccountTransactions.createAccountTransaction(
+            await accounttransactions.createaccounttransaction(
                 saleDate,
                 (req.body.totalAmount), 
                 ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE,
@@ -59,9 +59,9 @@ const createSale = async (req, res) => {
                 ""
             );
 
-            await AccountTransactions.createAccountTransaction(
+            await accounttransactions.createaccounttransaction(
                 saleDate,
-                (req.body.salePayment.receivedAmount * -1), 
+                (req.body.salepayment.receivedAmount * -1), 
                 ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT,
                 "",
                 cutomerAccount.id,
@@ -73,10 +73,10 @@ const createSale = async (req, res) => {
             );
         }
 
-        if (req.body.salePayment.paymentType == 0) {
-            await AccountTransactions.createAccountTransaction(
+        if (req.body.salepayment.paymentType == 0) {
+            await accounttransactions.createaccounttransaction(
                 saleDate,
-                req.body.salePayment.receivedAmount, 
+                req.body.salepayment.receivedAmount, 
                 ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT, 
                 "",
                 defaultAccount.id,
@@ -87,13 +87,13 @@ const createSale = async (req, res) => {
                 ""
             );
         }
-        else if (req.body.salePayment.paymentType == 1) {
-            await AccountTransactions.createAccountTransaction(
+        else if (req.body.salepayment.paymentType == 1) {
+            await accounttransactions.createaccounttransaction(
                 saleDate,
-                req.body.salePayment.receivedAmount, 
+                req.body.salepayment.receivedAmount, 
                 ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT, 
                 "",
-                req.body.salePayment.accountId,
+                req.body.salepayment.accountId,
                 createdSale.id,
                 req.body.bookNumber,
                 req.body.billNumber,
@@ -103,82 +103,82 @@ const createSale = async (req, res) => {
         }
 
         for (let i = 0; i < req.body.saleitems.length; i++) {
-            let saleItem = req.body.saleitems[i];
+            let saleitem = req.body.saleitems[i];
             // Get The Product
-            const product = await Products.getByID(saleItem.product.id);
+            const product = await Products.getByID(saleitem.product.id);
 
             //entry into the stock books
-            await stockBooksController.
-                addStockBookEntry
-                (saleDate, req.body.bookNumber, req.body.billNumber, "", saleItem.quantity * -1, 
+            await stockbooksController.
+                addstockbookEntry
+                (saleDate, req.body.bookNumber, req.body.billNumber, "", saleitem.quantity * -1, 
                 STOCK_BOOKS_STRINGS.TYPE.SALE, "", product.id, createdSale.id);
 
             // Create Sale Item
-            const saleItemCreated = await SaleItems.create({
-                salePrice: saleItem.salePrice,
-                quantity: saleItem.quantity,
+            const saleitemCreated = await saleitemsmodel.create({
+                salePrice: saleitem.salePrice,
+                quantity: saleitem.quantity,
                 productId: product.id, 
                 saleId: createdSale.id,
             });
 
-            var quantityRemaining = saleItem.quantity;
+            var quantityRemaining = saleitem.quantity;
             var lotsUsed = [];
             // Loop Through the Stocks and Post Profits
             for (let j = 0; j < product.productstocks.length; j++) {
 
-                let productStock = product.productstocks[j];
-                if (productStock.quantity > 0 && quantityRemaining > 0) {
+                let productstock = product.productstocks[j];
+                if (productstock.quantity > 0 && quantityRemaining > 0) {
                     //Case 1 - Existing Stock >= To Sold Stock
-                    if (productStock.quantity >= quantityRemaining) {
+                    if (productstock.quantity >= quantityRemaining) {
                         let stockAmountUsed = quantityRemaining;
-                        productStock.quantity -= stockAmountUsed;
+                        productstock.quantity -= stockAmountUsed;
                         quantityRemaining = 0;
-                        lotsUsed.push({lotNumber: productStock.lotNumber, quantity: stockAmountUsed})
+                        lotsUsed.push({lotNumber: productstock.lotNumber, quantity: stockAmountUsed})
                         
-                        await ProductStocks.update({
-                            quantity: productStock.quantity,
-                        }, productStock.id);
+                        await productstocks.update({
+                            quantity: productstock.quantity,
+                        }, productstock.id);
     
                         // Profit Calculation
-                        let costPriceTotal = productStock.costPrice * stockAmountUsed;
-                        let salePriceTotal = saleItem.salePrice * stockAmountUsed;
+                        let costPriceTotal = productstock.costPrice * stockAmountUsed;
+                        let salePriceTotal = saleitem.salePrice * stockAmountUsed;
                         let profit = salePriceTotal - costPriceTotal;
     
-                        await SaleProfits.create({
+                        await saleprofitsmodel.create({
                             amount: profit,
                             date: saleDate,
                             saleId: createdSale.id,
-                            saleItemId: saleItemCreated.id
+                            saleitemId: saleitemCreated.id
                         })
                     }
                     //Case 2 - Existing Stock Doesn't Fulfil
                     else {
-                        let stockAmountUsed = productStock.quantity;
+                        let stockAmountUsed = productstock.quantity;
                         quantityRemaining -= stockAmountUsed;
-                        lotsUsed.push({lotNumber: productStock.lotNumber, quantity: stockAmountUsed})
-                        productStock.quantity = 0;
+                        lotsUsed.push({lotNumber: productstock.lotNumber, quantity: stockAmountUsed})
+                        productstock.quantity = 0;
 
-                        await ProductStocks.update({
-                            quantity: productStock.quantity,
-                        }, productStock.id);
+                        await productstocks.update({
+                            quantity: productstock.quantity,
+                        }, productstock.id);
     
                         // Profit Calculation
-                        let costPriceTotal = productStock.costPrice * stockAmountUsed;
-                        let salePriceTotal = saleItem.salePrice * stockAmountUsed;
+                        let costPriceTotal = productstock.costPrice * stockAmountUsed;
+                        let salePriceTotal = saleitem.salePrice * stockAmountUsed;
                         let profit = salePriceTotal - costPriceTotal;
     
-                        await SaleProfits.create({
+                        await saleprofitsmodel.create({
                             amount: profit,
                             date: saleDate,
                             saleId: createdSale.id,
-                            saleItemId: saleItemCreated.id
+                            saleitemId: saleitemCreated.id
                         })
                     }
                 }
             }
 
-            saleItemCreated.lotsUsedJson = JSON.stringify(lotsUsed);
-            await SaleItems.update({lotsUsedJson: saleItemCreated.lotsUsedJson}, saleItemCreated.id);
+            saleitemCreated.lotsUsedJson = JSON.stringify(lotsUsed);
+            await saleitemsmodel.update({lotsUsedJson: saleitemCreated.lotsUsedJson}, saleitemCreated.id);
         }
         
         res.send(createdSale);
@@ -214,14 +214,14 @@ const getSale = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: COMPANIES_STRINGS.ERROR_GETTING_COMPANIES, stack: err.stack})
+        res.status(500).send({raw: err.message.toString(), message: SALES_STRINGS.ERROR_GETTING_SALE, stack: err.stack})
     }
 }
 
 const getSaleObject = async(saleId, isComplete = false) => {
     const sale = await Sales.getById(saleId);
-    const totalProfit = await SaleProfits.getTotalProfitAmountBySaleId(sale.id);
-    const salePaymentsAmount = await SalePayments.getTotalPaymentsReceivedAmount(sale.id);
+    const totalProfit = await saleprofitsmodel.getTotalProfitAmountBySaleId(sale.id);
+    const salepaymentsAmount = await salepayments.getTotalPaymentsReceivedAmount(sale.id);
     const contact = await Contacts.getByID(sale.contactId);
 
      var saleObject = {
@@ -236,19 +236,19 @@ const getSaleObject = async(saleId, isComplete = false) => {
         contactId: sale.contactId,
         contact: contact,
         profitAmount: totalProfit,
-        receivedAmount: salePaymentsAmount[0].receivedAmount
+        receivedAmount: salepaymentsAmount[0].receivedAmount
     }
 
     if (isComplete) {
         const models = require('../models')
-        const saleItems = await SaleItems.getAll(
+        const saleitems = await saleitemsmodel.getAll(
             {saleId: saleId},
             [{model: models.products}]
         );
-        const saleProfits = await SaleProfits.getAll({where: {saleId: saleId}});
+        const saleprofits = await saleprofitsmodel.getAll({where: {saleId: saleId}});
 
-        saleObject.saleitems = saleItems;
-        saleObject.saleprofits = saleProfits;
+        saleObject.saleitems = saleitems;
+        saleObject.saleprofits = saleprofits;
     }
 
     return saleObject;
@@ -260,31 +260,31 @@ const deleteSale = async (req, res) => {
         //First Of All, Add Product Stocks Back
         sale = await getSaleObject(req.params.id, true);
         for (let i = 0; i < sale.saleitems.length; i++) {
-            const saleItem = sale.saleitems[i];
+            const saleitem = sale.saleitems[i];
             // Get The Product
-            const product = await Products.getByID(saleItem.productId);
+            const product = await Products.getByID(saleitem.productId);
             // Loop Through The Lots Used JSON
-            const lotsUsed = JSON.parse(saleItem.lotsUsedJson);
+            const lotsUsed = JSON.parse(saleitem.lotsUsedJson);
             for (let j = 0; j < lotsUsed.length; j++) {
                 const lotUsed = lotsUsed[j];
-                // Get The Particular ProductStock of the Product
-                const productStock = await ProductStocks.get({productId: product.id, lotNumber: lotUsed.lotNumber})
+                // Get The Particular productstock of the Product
+                const productstock = await productstocks.get({productId: product.id, lotNumber: lotUsed.lotNumber})
                 // Put the stock back into the relevant lot
-                productStock.quantity = (lotUsed.quantity + productStock.quantity);
+                productstock.quantity = (lotUsed.quantity + productstock.quantity);
                 // Update the stock quantity again
-                await ProductStocks.update({quantity: productStock.quantity}, productStock.id)
+                await productstocks.update({quantity: productstock.quantity}, productstock.id)
             }
         }
 
         //Now delete from other tables
-        await SalePayments.deleteSalePayments(req.params.id);
-        await SaleProfits.deleteSaleProfits(req.params.id);
-        await SaleItems.deleteSaleItems(req.params.id);
+        await salepayments.deletesalepayments(req.params.id);
+        await saleprofitsmodel.deletesaleprofits(req.params.id);
+        await saleitemsmodel.deletesaleitems(req.params.id);
         await Sales.deleteById(req.params.id);
         //Delete the account transactions as well
-        await AccountTransactionsModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE)
-        await AccountTransactionsModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT)
-        await stockBooksModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE)
+        await accounttransactionsModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE)
+        await accounttransactionsModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT)
+        await stockbooksModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE)
 
         const defaultAccount = await Accounts.getDefaultAccount();
         await accountsController.consolidateAccountStatementWorker(defaultAccount.id)

@@ -1,7 +1,7 @@
-const app = require('..');
-const productStocksController = require('../controllers/productStocks.controller');
+const app = require('../app');
+const productstocksController = require('../controllers/productstocks.controller');
 
-app.post('/productStocks',productStocksController.createProductStock);
-app.get('/productStocks/:productId',productStocksController.getProductStocks);
-app.get('/productStock/:id',productStocksController.getProductStockByID);
-app.patch('/productStock/:id',productStocksController.updateProductStock);
+app.post('/productstocks',productstocksController.createproductstock);
+app.get('/productstocks/:productId',productstocksController.getproductstocks);
+app.get('/productstock/:id',productstocksController.getproductstockByID);
+app.patch('/productstock/:id',productstocksController.updateproductstock);

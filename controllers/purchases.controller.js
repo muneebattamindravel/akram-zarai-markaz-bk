@@ -1,12 +1,12 @@
 const PURCHASES_STRINGS = require('../constants/purchases.strings');
-const STOCK_BOOKS_STRINGS = require('../constants/stockBooks.strings');
+const STOCK_BOOKS_STRINGS = require('../constants/stockbooks.strings');
 const Purchases = require('../models/purchases.model');
-const ProductStocks = require('../models/productStocks.model');
+const productstocks = require('../models/productstocks.model');
 const ProductsController = require('../controllers/products.controller');
-const AccountTransactions = require('../controllers/accountTransactions.controller');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
+const accounttransactions = require('../controllers/accounttransactions.controller');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
 const CompaniesModel = require('../models/companies.model');
-const stockBooksController = require('../controllers/stockBooks.controller');
+const stockbooksController = require('../controllers/stockbooks.controller');
 
 /**creates a new purchase */
 const createPurchase = async (req, res) => {
@@ -24,26 +24,26 @@ const createPurchase = async (req, res) => {
             totalAmount: req.body.totalAmount,
         })
 
-        Promise.all(req.body.purchasedProductStocks.map(async (productStock) => {
-            const productNextLotNumber = await ProductsController.getNextLotNumber(productStock.productId);
-            await ProductStocks.create({
+        Promise.all(req.body.purchasedproductstocks.map(async (productstock) => {
+            const productNextLotNumber = await ProductsController.getNextLotNumber(productstock.productId);
+            await productstocks.create({
                 lotNumber: productNextLotNumber,
-                batchNumber: productStock.batchNumber,
-                expiryDate: productStock.expiryDate,
+                batchNumber: productstock.batchNumber,
+                expiryDate: productstock.expiryDate,
                 invoiceNumber: req.body.invoiceNumber,
-                costPrice: productStock.costPrice,
-                quantity: productStock.initialQuantity,
-                initialQuantity: productStock.initialQuantity,
-                notes: productStock.notes,
-                productId: productStock.productId,
+                costPrice: productstock.costPrice,
+                quantity: productstock.initialQuantity,
+                initialQuantity: productstock.initialQuantity,
+                notes: productstock.notes,
+                productId: productstock.productId,
                 purchaseId: createdPurchase.id,
             })
 
-            await stockBooksController.addStockBookEntry(req.body.invoiceDate, "", "", req.body.invoiceNumber, productStock.initialQuantity, STOCK_BOOKS_STRINGS.TYPE.PURCHASE_STOCK, productStock.notes, productStock.productId, createdPurchase.id);
+            await stockbooksController.addstockbookEntry(req.body.invoiceDate, "", "", req.body.invoiceNumber, productstock.initialQuantity, STOCK_BOOKS_STRINGS.TYPE.PURCHASE_STOCK, productstock.notes, productstock.productId, createdPurchase.id);
         }));
 
         const company = await CompaniesModel.getByID(req.body.companyId);
-        await AccountTransactions.createAccountTransaction(
+        await accounttransactions.createaccounttransaction(
             req.body.invoiceDate,
             (req.body.totalAmount * -1), 
             ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.PURCHASE,
@@ -88,7 +88,7 @@ const IsPurchaseBodyValid = (body, res) => {
         res.status(406).send({message: PURCHASES_STRINGS.INVOICE_DATE_NULL});
         return false;
     }
-    if (body.purchasedProductStocks.length <= 0) {
+    if (body.purchasedproductstocks.length <= 0) {
         res.status(406).send({message: PURCHASES_STRINGS.PURCHASE_PRODUCT_STOCKS_EMPTY});
         return false;
     }

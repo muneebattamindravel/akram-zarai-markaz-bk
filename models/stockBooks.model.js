@@ -12,10 +12,10 @@ const initialize = (sequelize,Sequelize) => {
     });
   }
 
-  const create = async (stockBook) => {
+  const create = async (stockbook) => {
     try {
-      const stockBooksModel = require('../models').stockbooks
-      return await stockBooksModel.create(stockBook);
+      const stockbooksModel = require('.').stockbooks
+      return await stockbooksModel.create(stockbook);
     }
     catch(err) {
       throw err
@@ -24,7 +24,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getLastTransaction = async(productId) => {
     try {
-      const model = require('../models').stockbooks
+      const model = require('.').stockbooks
 
       return model.findOne({
         where: {productId: productId},
@@ -38,7 +38,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getAll = async (whereConditions, includeArray) => {
     try {
-      const models = require('../models')
+      const models = require('.')
       return await models.stockbooks.findAll(
         {
           where: whereConditions,
@@ -53,7 +53,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const deleteByReference = async(referenceId, referenceType) => {
     try {
-      const model = require('../models').stockbooks
+      const model = require('.').stockbooks
 
       return model.destroy({
         where: {referenceId: referenceId, type: referenceType},
@@ -66,8 +66,8 @@ const initialize = (sequelize,Sequelize) => {
 
   const update = async (body, id) => {
     try {
-      const stockBooks = require('../models').stockbooks
-      return await stockBooks.update(body, {where: {id:id}}) == 1 ? true : false
+      const stockbooks = require('.').stockbooks
+      return await stockbooks.update(body, {where: {id:id}}) == 1 ? true : false
     }
     catch (err) {
       throw err
@@ -76,7 +76,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getByReference = async(referenceId, referenceType) => {
     try {
-      const model = require('../models').stockbooks
+      const model = require('.').stockbooks
 
       return model.findOne({
         where: {referenceId: referenceId, type: referenceType},

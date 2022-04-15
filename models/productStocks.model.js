@@ -16,10 +16,10 @@ const initialize = (sequelize,Sequelize) => {
     db.productstocks.belongsTo(db.purchases,  {onDelete: 'RESTRICT'})
   }
   
-  const create = async (productStock) => {
+  const create = async (productstock) => {
     try { 
-      const productStocks = require('.').productstocks
-      return await productStocks.create(productstock);
+      const productstocks = require('.').productstocks
+      return await productstocks.create(productstock);
     }
     catch(err) {
       throw err
@@ -28,8 +28,8 @@ const initialize = (sequelize,Sequelize) => {
 
   const update = async (body, id) => {
     try {
-      const ProductStocks = require('../models').productstocks
-      return await ProductStocks.update(body, {where: {id:id}}) == 1 ? true : false
+      const productstocks = require('.').productstocks
+      return await productstocks.update(body, {where: {id:id}}) == 1 ? true : false
     }
     catch (err) {
       throw err
@@ -38,7 +38,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getByID = async(id) => {
     try {
-      const models = require('../models')
+      const models = require('.')
       return await models.productstocks.findByPk(id)
     }
     catch (err) {
@@ -48,7 +48,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const get = async (condition) => {
     try {
-      const models = require('../models')
+      const models = require('.')
       return await models.productstocks.findOne({where: condition})
     }
     catch (err) {

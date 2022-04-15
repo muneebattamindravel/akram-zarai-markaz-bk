@@ -1,5 +1,5 @@
-const app = require('..');
-const salePaymentsController = require('../controllers/salePayments.controller');
+const app = require('../app');
+const salepaymentsController = require('../controllers/salepayments.controller');
 
-app.post('/salePayments',salePaymentsController.createSalePayment);
-app.get('/salePayments/:saleId',salePaymentsController.getSalePayments);
+app.post('/salepayments',salepaymentsController.createsalepayment);
+app.get('/salepayments/:saleId',salepaymentsController.getsalepayments);

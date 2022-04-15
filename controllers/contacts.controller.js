@@ -1,9 +1,9 @@
 const CONTACTS_STRINGS = require('../constants/contacts.strings')
 const Contacts = require('../models/contacts.model')
 const AccountsModel = require('../models/accounts.model')
-const AccountTransactionsModel = require('../models/accountTransactions.model')
+const accounttransactionsModel = require('../models/accounttransactions.model')
 const AccountsController = require('../controllers/accounts.controller');
-const AccountTransactionsController = require('../controllers/accountTransactions.controller');
+const accounttransactionsController = require('../controllers/accounttransactions.controller');
 
 /**creates a new contact */
 const createContact = async (req, res) => {
@@ -86,7 +86,7 @@ const updateContact = async (req, res) => {
             await AccountsModel.update(updateAccountObject, req.body.accountId)
 
             //also update opening balance
-            await AccountTransactionsController.updateOpeningBalance(req.body.accountId, req.body.openingBalance);
+            await accounttransactionsController.updateOpeningBalance(req.body.accountId, req.body.openingBalance);
         }
 
         await Contacts.update(req.body,req.params.id) ? 
@@ -105,7 +105,7 @@ const getContact = async (req, res) => {
         var contact = await Contacts.getByID(req.params.id)
         if (contact) {
             if (contact.type == "Customer") {
-                const opening = (await AccountTransactionsModel.getFirstTransaction(contact.accountId)).amount
+                const opening = (await accounttransactionsModel.getFirstTransaction(contact.accountId)).amount
                 contact.setDataValue("openingBalance", opening);
             }
             

@@ -10,10 +10,10 @@ const initialize = (sequelize,Sequelize) => {
     db.saleprofits.belongsTo(db.saleitems)
   }
   
-  const create = async (saleProfit) => {
+  const create = async (saleprofit) => {
     try {
-      const SaleProfits = require('../models').saleprofits
-      return await SaleProfits.create(saleProfit);
+      const saleprofits = require('.').saleprofits
+      return await saleprofits.create(saleprofit);
     }
     catch(err) {
       throw err
@@ -21,10 +21,10 @@ const initialize = (sequelize,Sequelize) => {
   }
 
   //delete all profits posted of a particular sale
-  const deleteSaleProfits = async (saleId) => {
+  const deletesaleprofits = async (saleId) => {
     try {
-      const SaleProfits = require('../models').saleprofits
-      return await SaleProfits.destroy(
+      const saleprofits = require('.').saleprofits
+      return await saleprofits.destroy(
           {
             where: {
               saleId: saleId
@@ -39,11 +39,11 @@ const initialize = (sequelize,Sequelize) => {
 
   const getCounterSalesProfit = async (from, to) => {
     try {
-      const SaleProfits = require('../models').saleprofits
+      const saleprofits = require('.').saleprofits
       const Sequelize = require('sequelize');
       const { Op } = require("sequelize");
 
-      return await SaleProfits.findAll(
+      return await saleprofits.findAll(
         {
           attributes: [
             [Sequelize.fn('sum', Sequelize.col('amount')), 'amount'],
@@ -60,8 +60,8 @@ const initialize = (sequelize,Sequelize) => {
 
   const getAll = async (where) => {
     try {
-      const SaleProfits = require('../models').saleprofits
-      return await SaleProfits.findAll(where);
+      const saleprofits = require('.').saleprofits
+      return await saleprofits.findAll(where);
     }
     catch(err) {
       throw err
@@ -70,10 +70,10 @@ const initialize = (sequelize,Sequelize) => {
 
   const getTotalProfitAmountBySaleId = async (saleId) => {
     try {
-      const SaleProfits = require('../models').saleprofits
+      const saleprofits = require('.').saleprofits
       const Sequelize = require('sequelize');
       
-      const response = await SaleProfits.findAll(
+      const response = await saleprofits.findAll(
         {
           attributes: [
             [Sequelize.fn('sum', Sequelize.col('amount')), 'amount'],
@@ -90,13 +90,13 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
-  const getSaleProfits = async (from, to) => {
+  const getsaleprofits = async (from, to) => {
     try {
-      const SaleProfits = require('../models').saleprofits
-      const models = require('../models')
+      const saleprofits = require('.').saleprofits
+      const models = require('.')
       const { Op } = require("sequelize");
 
-      return await SaleProfits.findAll(
+      return await saleprofits.findAll(
         {
           where : {"date" : {[Op.between] : [from , to ]}},
           include : [
@@ -129,8 +129,8 @@ const initialize = (sequelize,Sequelize) => {
     create,
     setAssociations,
     getCounterSalesProfit,
-    deleteSaleProfits,
+    deletesaleprofits,
     getTotalProfitAmountBySaleId,
     getAll,
-    getSaleProfits
+    getsaleprofits
   }

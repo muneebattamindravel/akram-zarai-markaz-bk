@@ -1,7 +1,7 @@
 const expensesModel = require('../models/expenses.model');
-const AccountTransactions = require('../controllers/accountTransactions.controller');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
-const AccountTransactionsModel = require('../models/accountTransactions.model');
+const accounttransactions = require('../controllers/accounttransactions.controller');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
+const accounttransactionsModel = require('../models/accounttransactions.model');
 
 /**creates a new expense */
 const createExpense = async (req, res) => {
@@ -32,7 +32,7 @@ const createExpenseWorker = async (date, type, description, bookNumber, billNumb
         amount: amount,
     })
 
-    await AccountTransactions.createAccountTransaction(
+    await accounttransactions.createaccounttransaction(
         date,
         (amount * -1), 
         ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.EXPENSE,
@@ -53,7 +53,7 @@ const updateExpense = async (req, res) => {
     try {        
         const expenseId = req.params.id;
         await expensesModel.deleteById(expenseId);
-        await AccountTransactionsModel.deleteByReference(expenseId, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.EXPENSE)
+        await accounttransactionsModel.deleteByReference(expenseId, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.EXPENSE)
 
         res.send(createExpenseWorker(
             req.body.date,

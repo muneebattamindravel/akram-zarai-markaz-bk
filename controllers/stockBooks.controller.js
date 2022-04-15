@@ -1,13 +1,13 @@
-const stockBooksModel = require('../models/stockBooks.model');
-const STOCK_BOOKS_STRINGS = require('../constants/stockBooks.strings');
+const stockbooksModel = require('../models/stockbooks.model');
+const STOCK_BOOKS_STRINGS = require('../constants/stockbooks.strings');
 
 /**creates a new stock book entry */
-const addStockBookEntry = async (date, bookNumber, billNumber, invoiceNumber, amount, type, notes, productId, referenceId) => {
+const addstockbookEntry = async (date, bookNumber, billNumber, invoiceNumber, amount, type, notes, productId, referenceId) => {
     try {
 
-        let lastTransaction = await stockBooksModel.getLastTransaction(productId);
+        let lastTransaction = await stockbooksModel.getLastTransaction(productId);
         if (lastTransaction) {
-            await stockBooksModel.create({
+            await stockbooksModel.create({
                 date: date,
                 bookNumber: bookNumber,
                 billNumber: billNumber,
@@ -21,7 +21,7 @@ const addStockBookEntry = async (date, bookNumber, billNumber, invoiceNumber, am
             })
         }
         else {
-            await stockBooksModel.create({
+            await stockbooksModel.create({
                 date: date,
                 bookNumber: bookNumber,
                 billNumber: billNumber,
@@ -40,8 +40,8 @@ const addStockBookEntry = async (date, bookNumber, billNumber, invoiceNumber, am
     }
 }
 
-/** get stockBook by productId */
-const getStockBook = async (req, res) => {
+/** get stockbook by productId */
+const getstockbook = async (req, res) => {
     try {
         const { Op } = require("sequelize");
         const models = require('../models');
@@ -64,7 +64,7 @@ const getStockBook = async (req, res) => {
             }
         ] 
 
-        res.send(await getStockBookWorker(where, include));
+        res.send(await getstockbookWorker(where, include));
     }
     catch (err) {
         console.log(err)
@@ -72,15 +72,15 @@ const getStockBook = async (req, res) => {
     }
 }
 
-const getStockBookWorker = async(where, include) => {
-    const stockBook = await stockBooksModel.getAll(
+const getstockbookWorker = async(where, include) => {
+    const stockbook = await stockbooksModel.getAll(
         where, include
     );
 
-    return stockBook;
+    return stockbook;
 }
 
-const consolidateStockBook = async(productId) => {
+const consolidatestockbook = async(productId) => {
     const where = {
         "productId": productId,
     }
@@ -97,23 +97,23 @@ const consolidateStockBook = async(productId) => {
         }
     ] 
 
-    const stockBookTransactions = await getStockBookWorker(where, include)
+    const stockbookTransactions = await getstockbookWorker(where, include)
 
-    let closingBalance = stockBookTransactions[0].amount;
-    stockBookTransactions.shift();
-    await Promise.all(stockBookTransactions.map(async (stockBookTransaction) => {
-        closingBalance = closingBalance + stockBookTransaction.amount;
+    let closingBalance = stockbookTransactions[0].amount;
+    stockbookTransactions.shift();
+    await Promise.all(stockbookTransactions.map(async (stockbookTransaction) => {
+        closingBalance = closingBalance + stockbookTransaction.amount;
         const updateBody = {
             'closing': closingBalance
         }
-        await stockBooksModel.update(updateBody, stockBookTransaction.id);
+        await stockbooksModel.update(updateBody, stockbookTransaction.id);
     }));
 
-    return stockBookTransactions;
+    return stockbookTransactions;
 }
 
 module.exports = {
-    addStockBookEntry,
-    getStockBook,
-    consolidateStockBook
+    addstockbookEntry,
+    getstockbook,
+    consolidatestockbook
 }

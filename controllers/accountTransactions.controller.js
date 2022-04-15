@@ -1,12 +1,12 @@
-const ACCOUNTTRANSACTIONS_STRINGS = require('../constants/accountTransactions.strings');
-const AccountTransactions = require('../models/accountTransactions.model');
+const ACCOUNTTRANSACTIONS_STRINGS = require('../constants/accounttransactions.strings');
+const accounttransactions = require('../models/accounttransactions.model');
 
-/**creates a new accountTransaction */
-const createAccountTransaction = async (date, amount, type, details, accountId, referenceId, bookNumber, billNumber, invoiceNumber, prNumber) => {
+/**creates a new accounttransaction */
+const createaccounttransaction = async (date, amount, type, details, accountId, referenceId, bookNumber, billNumber, invoiceNumber, prNumber) => {
     try {
-        let lastTransaction = await AccountTransactions.getLastTransaction(accountId);
+        let lastTransaction = await accounttransactions.getLastTransaction(accountId);
         if (lastTransaction) {
-            await AccountTransactions.create({
+            await accounttransactions.create({
                 transactionDate: date,
                 amount: amount,
                 type: type,
@@ -21,7 +21,7 @@ const createAccountTransaction = async (date, amount, type, details, accountId, 
             })
         }
         else {
-            await AccountTransactions.create({
+            await accounttransactions.create({
                 transactionDate: date,
                 amount: amount,
                 type: type,
@@ -43,7 +43,7 @@ const createAccountTransaction = async (date, amount, type, details, accountId, 
 
 const updateOpeningBalance = async(accountId, openingBalance) => {
     try {
-        let firstTransaction = await AccountTransactions.getFirstTransaction(accountId);
+        let firstTransaction = await accounttransactions.getFirstTransaction(accountId);
 
         firstTransaction.setDataValue("amount", openingBalance);
         firstTransaction.setDataValue("closingBalance", openingBalance);
@@ -53,7 +53,7 @@ const updateOpeningBalance = async(accountId, openingBalance) => {
             "closingBalance": openingBalance
         }
 
-        await AccountTransactions.update(updateObject, firstTransaction.id);
+        await accounttransactions.update(updateObject, firstTransaction.id);
     }
     catch (err) {
         console.log(err)
@@ -61,11 +61,11 @@ const updateOpeningBalance = async(accountId, openingBalance) => {
     }
 }
 
-/** get a accountTransaction with id */
-const getAccountTransaction = async (req, res) => {
+/** get a accounttransaction with id */
+const getaccounttransaction = async (req, res) => {
     try {
-        const accountTransaction = await AccountTransactions.getByID(req.params.id)
-        accountTransaction? res.send(accountTransaction) : res.status(404).send({message: `${ACCOUNTTRANSACTIONS_STRINGS.ACCOUNTTRANSACTION_NOT_FOUND} ,id=${req.params.id}`})
+        const accounttransaction = await accounttransactions.getByID(req.params.id)
+        accounttransaction? res.send(accounttransaction) : res.status(404).send({message: `${ACCOUNTTRANSACTIONS_STRINGS.ACCOUNTTRANSACTION_NOT_FOUND} ,id=${req.params.id}`})
     }
     catch (err) {
         console.log(err)
@@ -73,10 +73,10 @@ const getAccountTransaction = async (req, res) => {
     }
 }
 
-/** get all accountTransactions */
-const getAllAccountTransactions = async (req, res) => {
+/** get all accounttransactions */
+const getAllaccounttransactions = async (req, res) => {
     try {
-        res.send(await AccountTransactions.getAll())
+        res.send(await accounttransactions.getAll())
     }
     catch (err) {
         console.log(err)
@@ -85,8 +85,8 @@ const getAllAccountTransactions = async (req, res) => {
 }
 
 module.exports = {
-    createAccountTransaction,
-    getAccountTransaction,
-    getAllAccountTransactions,
+    createaccounttransaction,
+    getaccounttransaction,
+    getAllaccounttransactions,
     updateOpeningBalance
 }

@@ -12,10 +12,10 @@ const initialize = (sequelize,Sequelize) => {
     db.saleitems.hasMany(db.saleprofits, {onDelete: 'RESTRICT'})
   }
   
-  const create = async (saleItem) => {
+  const create = async (saleitem) => {
     try {
-      const saleItems = require('../models').saleitems
-      return await saleItems.create(saleItem);
+      const saleitems = require('.').saleitems
+      return await saleitems.create(saleitem);
     }
     catch(err) {
       throw err
@@ -23,10 +23,10 @@ const initialize = (sequelize,Sequelize) => {
   }
 
   //delete all sale items of a particular sale
-  const deleteSaleItems = async (saleId) => {
+  const deletesaleitems = async (saleId) => {
     try {
-      const SaleItems = require('../models').saleitems
-      return await SaleItems.destroy(
+      const saleitems = require('.').saleitems
+      return await saleitems.destroy(
           {
             where: {
               saleId: saleId
@@ -41,8 +41,8 @@ const initialize = (sequelize,Sequelize) => {
 
   const update = async (body, id) => {
     try {
-      const saleItems = require('../models').saleitems
-      return await saleItems.update(body, {where: {id:id}}) == 1 ? true : false
+      const saleitems = require('.').saleitems
+      return await saleitems.update(body, {where: {id:id}}) == 1 ? true : false
     }
     catch (err) {
       throw err
@@ -51,7 +51,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getAll = async (whereConditions, includeArray) => {
     try {
-      const models = require('../models')
+      const models = require('.')
       return await models.saleitems.findAll(
         {
           where: whereConditions,
@@ -70,7 +70,7 @@ const initialize = (sequelize,Sequelize) => {
     initialize,
     create,
     update,
-    deleteSaleItems,
+    deletesaleitems,
     setAssociations,
     getAll,
   }

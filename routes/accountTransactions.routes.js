@@ -1,5 +1,5 @@
 const app = require('../app');
-const accountTransactionsController = require('../controllers/accountTransactions.controller');
+const accounttransactionsController = require('../controllers/accounttransactions.controller');
 
-app.get('/accountTransactions',accountTransactionsController.getAllAccountTransactions);
-app.get('/accountTransactions/:id',accountTransactionsController.getAccountTransaction);
+app.get('/accounttransactions',accounttransactionsController.getAllaccounttransactions);
+app.get('/accounttransactions/:id',accounttransactionsController.getaccounttransaction);

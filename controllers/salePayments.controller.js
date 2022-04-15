@@ -1,16 +1,16 @@
 const SALES_STRINGS = require('../constants/sales.strings');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
-const SalePayments = require('../models/salePayments.model');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
+const salepayments = require('../models/salepayments.model');
 const Accounts = require('../models/accounts.model');
-const AccountTransactions = require('../controllers/accountTransactions.controller');
+const accounttransactions = require('./accounttransactions.controller');
 const Sales = require('../models/sales.model');
 
 /**creates a new sale payment */
-const createSalePayment = async (req, res) => {
+const createsalepayment = async (req, res) => {
     try {
         const defaultAccount = await Accounts.getDefaultAccount();
 
-        const createdSalePayment = await SalePayments.create({
+        const createdsalepayment = await salepayments.create({
             receivedAmount: req.body.receivedAmount,
             receivedDate: req.body.receivedDate,
             paymentType: req.body.paymentType,
@@ -26,7 +26,7 @@ const createSalePayment = async (req, res) => {
             const include = []
             const cutomerAccount = (await Accounts.getAll(where, include))[0];
 
-            await AccountTransactions.createAccountTransaction(
+            await accounttransactions.createaccounttransaction(
                 req.body.receivedDate,
                 (req.body.receivedAmount * -1), 
                 ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT,
@@ -41,7 +41,7 @@ const createSalePayment = async (req, res) => {
         }
 
         if (req.body.paymentType == 0) {
-            await AccountTransactions.createAccountTransaction(
+            await accounttransactions.createaccounttransaction(
                 req.body.receivedDate,
                 req.body.receivedAmount, 
                 ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT, 
@@ -55,7 +55,7 @@ const createSalePayment = async (req, res) => {
             );
         }
         else if (req.body.paymentType == 1) {
-            await AccountTransactions.createAccountTransaction(
+            await accounttransactions.createaccounttransaction(
                 req.body.receivedDate,
                 req.body.receivedAmount, 
                 ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT, 
@@ -69,7 +69,7 @@ const createSalePayment = async (req, res) => {
             );
         }
 
-        res.send(createdSalePayment);
+        res.send(createdsalepayment);
     }
     catch (err) {
         console.log(err)
@@ -78,7 +78,7 @@ const createSalePayment = async (req, res) => {
 }
 
 /** get sale payments */
-const getSalePayments = async (req, res) => {
+const getsalepayments = async (req, res) => {
     try {
         const models = require('../models');
         const where = {"saleId": req.params.saleId}
@@ -86,7 +86,7 @@ const getSalePayments = async (req, res) => {
             {model: models.accounts}
         ]
 
-        res.send(await SalePayments.getAll(where, include));
+        res.send(await salepayments.getAll(where, include));
     }
     catch (err) {
         console.log(err)
@@ -95,6 +95,6 @@ const getSalePayments = async (req, res) => {
 }
 
 module.exports = {
-    createSalePayment,
-    getSalePayments
+    createsalepayment,
+    getsalepayments
 }

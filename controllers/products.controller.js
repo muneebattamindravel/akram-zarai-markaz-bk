@@ -1,7 +1,7 @@
 const PRODUCTS_STRINGS = require('../constants/products.strings');
 const APP_STRINGS = require('../constants/app.strings');
 const Products = require('../models/products.model');
-const ProductStocks = require('../models/productStocks.model');
+const productstocksmodel = require('../models/productstocks.model');
 const imagesController = require('../controllers/images.controller');
 
 /**creates a new product */
@@ -55,7 +55,7 @@ const getProduct = async (req, res) => {
     }
 }
 
-const getProductStocks = async (req, res) => {
+const getproducttocks = async (req, res) => {
     try {
         const product = await Products.getByID(req.params.id)
         product? res.send(product) : res.send({error: PRODUCTS_STRINGS.PRODUCT_NOT_FOUND, message: `${PRODUCTS_STRINGS.PRODUCT_NOT_FOUND} ,id=${req.params.id}`})

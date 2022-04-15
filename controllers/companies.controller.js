@@ -3,8 +3,8 @@ const Companies = require('../models/companies.model');
 const Accounts = require('../models/accounts.model');
 const AccountsController = require('../controllers/accounts.controller');
 const { Op } = require("sequelize");
-const AccountTransactionsController = require('../controllers/accountTransactions.controller');
-const AccountTransactionsModel = require('../models/accountTransactions.model');
+const accounttransactionsController = require('../controllers/accounttransactions.controller');
+const accounttransactionsModel = require('../models/accounttransactions.model');
 
 /**creates a new company */
 const createCompany = async (req, res) => {
@@ -83,7 +83,7 @@ const updateCompany = async (req, res) => {
 
         const updated = await Companies.update(req.body,req.params.id)
         if (updated) {
-            await AccountTransactionsController.updateOpeningBalance(req.body.accountId, req.body.openingBalance);
+            await accounttransactionsController.updateOpeningBalance(req.body.accountId, req.body.openingBalance);
             res.send({message: COMPANIES_STRINGS.COMPANY_UPDATED_SUCCESSFULLY})
         }
         else {
@@ -101,7 +101,7 @@ const getCompany = async (req, res) => {
     try {
         let company = await Companies.getByID(req.params.id)
         if (company) {
-            let opening = (await AccountTransactionsModel.getFirstTransaction(company.accountId)).amount;
+            let opening = (await accounttransactionsModel.getFirstTransaction(company.accountId)).amount;
             company.setDataValue("openingBalance", opening);
 
             res.send(company)

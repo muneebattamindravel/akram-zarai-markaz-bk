@@ -8,10 +8,10 @@ const initialize = (sequelize,Sequelize) => {
     });
   }
 
-  const create = async (salePayment) => {
+  const create = async (salepayment) => {
     try {
-      const salePaymentModel = require('../models').salepayments
-      return await salePaymentModel.create(salePayment);
+      const salepaymentModel = require('.').salepayments
+      return await salepaymentModel.create(salepayment);
     }
     catch(err) {
       throw err
@@ -20,7 +20,7 @@ const initialize = (sequelize,Sequelize) => {
 
   const getAll = async (whereConditions, includeArray) => {
     try {
-      const models = require('../models')
+      const models = require('.')
       return await models.salepayments.findAll(
         {
           where: whereConditions,
@@ -34,10 +34,10 @@ const initialize = (sequelize,Sequelize) => {
   }
   
    //delete all payments posted of a particular sale
-   const deleteSalePayments = async (saleId) => {
+   const deletesalepayments = async (saleId) => {
     try {
-      const SalePayments = require('../models').salepayments
-      return await SalePayments.destroy(
+      const salepayments = require('.').salepayments
+      return await salepayments.destroy(
           {
             where: {
               saleId: saleId
@@ -52,10 +52,10 @@ const initialize = (sequelize,Sequelize) => {
 
   const getTotalPaymentsReceivedAmount = async (saleId) => {
     try {
-      const SalePayments = require('../models').salepayments
+      const salepayments = require('.').salepayments
       const Sequelize = require('sequelize');
 
-      return await SalePayments.findAll(
+      return await salepayments.findAll(
         {
           attributes: [
             [Sequelize.fn('sum', Sequelize.col('receivedAmount')), 'receivedAmount'],
@@ -78,7 +78,7 @@ const initialize = (sequelize,Sequelize) => {
     initialize,
     create,
     setAssociations,
-    deleteSalePayments,
+    deletesalepayments,
     getTotalPaymentsReceivedAmount,
     getAll
   }

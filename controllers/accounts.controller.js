@@ -1,10 +1,9 @@
 const ACCOUNTS_STRINGS = require('../constants/accounts.strings');
 const Accounts = require('../models/accounts.model');
-const AccountTransactions = require('../controllers/accountTransactions.controller');
-const AccountTransactionsModel = require('../models/accountTransactions.model');
+const accounttransactionsModel = require('../models/accounttransactions.model');
 const { Op } = require("sequelize");
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
-const AccountTransactionsController = require('../controllers/accountTransactions.controller');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
+const accounttransactionsController = require('./accounttransactions.controller');
 
 /**creates a new account */
 const createAccount = async (req, res) => {
@@ -24,7 +23,7 @@ const createAccount = async (req, res) => {
             referenceId: req.body.referenceId == 0 ? null : referenceId,
         })
 
-        await AccountTransactions.createAccountTransaction(
+        await accounttransactionsController.createaccounttransaction(
             new Date(),
             req.body.openingBalance,
             ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.ACCOUNT_CREATED,
@@ -58,7 +57,7 @@ const createAccountDBMigration = async (date, name, description, type, openingBa
             isDefault: isDefault,
         })
 
-        await AccountTransactions.createAccountTransaction(
+        await accounttransactionsController.createaccounttransaction(
             date,
             openingBalance, 
             ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.ACCOUNT_CREATED,
@@ -92,7 +91,7 @@ const updateAccount = async (req, res) => {
 
         const updated = await Accounts.update(req.body, req.params.id);
         if (updated) {
-            await AccountTransactionsController.updateOpeningBalance(req.params.id, req.body.openingBalance);
+            await accounttransactionsController.updateOpeningBalance(req.params.id, req.body.openingBalance);
             res.send({message: ACCOUNTS_STRINGS.ACCOUNT_UPDATED_SUCCESSFULLY})
         }
         else {
@@ -111,12 +110,12 @@ const getAccount = async (req, res) => {
         const account = await Accounts.getByID(req.params.id)
         if (account) {
             let balance = 0.00
-            let lastTransaction = await AccountTransactionsModel.getLastTransaction(account.id);
+            let lastTransaction = await accounttransactionsModel.getLastTransaction(account.id);
             if (lastTransaction) 
                 balance = lastTransaction.closingBalance;
             account.setDataValue('balance', balance);
 
-            let opening = (await AccountTransactionsModel.getFirstTransaction(account.id)).amount;
+            let opening = (await accounttransactionsModel.getFirstTransaction(account.id)).amount;
             account.setDataValue("openingBalance", opening);
             
             res.send(account)
@@ -148,11 +147,11 @@ const getAccountStatement = async (req, res) => {
             {model: models.accounts}
         ] 
 
-        const accountTransactions = await AccountTransactionsModel.getAll(
+        const accounttransactions = await accounttransactionsModel.getAll(
             where, include,
         );
 
-        res.send(accountTransactions);
+        res.send(accounttransactions);
     }
     catch (err) {
         console.log(err)
@@ -174,18 +173,18 @@ const consolidateAccountStatement = async (req, res) => {
 const consolidateAccountStatementWorker = async(accountId) => {
     const where = {"accountId": accountId}
     const include = []
-    const accountTransactions = await AccountTransactionsModel.getAll(where, include,);
-    let closingBalance = accountTransactions[0].amount;
-    accountTransactions.shift();
-    await Promise.all(accountTransactions.map(async (accountTransaction) => {
-        closingBalance = closingBalance + accountTransaction.amount;
+    const accounttransactions = await accounttransactionsModel.getAll(where, include,);
+    let closingBalance = accounttransactions[0].amount;
+    accounttransactions.shift();
+    await Promise.all(accounttransactions.map(async (accounttransaction) => {
+        closingBalance = closingBalance + accounttransaction.amount;
         const updateBody = {
             'closingBalance': closingBalance
         }
-        await AccountTransactionsModel.update(updateBody, accountTransaction.id);
+        await accounttransactionsModel.update(updateBody, accounttransaction.id);
     }));
 
-    return accountTransactions;
+    return accounttransactions;
 }
 
 /** get balance of the default account */
@@ -194,7 +193,7 @@ const getDefaultAccountBalance = async (req, res) => {
         const account = await Accounts.getDefaultAccount();
         if (account) {
             let balance = 0.00
-            let lastTransaction = await AccountTransactionsModel.getLastTransaction(account.id);
+            let lastTransaction = await accounttransactionsModel.getLastTransaction(account.id);
             if (lastTransaction) 
                 balance = lastTransaction.closingBalance;
             
@@ -223,7 +222,7 @@ const getAllAccounts = async (req, res) => {
 
         await Promise.all(allAccounts.map(async (account) => {
             let balance = 0.00
-            let lastTransaction = await AccountTransactionsModel.getLastTransaction(account.id);
+            let lastTransaction = await accounttransactionsModel.getLastTransaction(account.id);
             if (lastTransaction) 
                 balance = lastTransaction.closingBalance;
             

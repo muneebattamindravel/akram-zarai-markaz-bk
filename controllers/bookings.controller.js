@@ -1,8 +1,8 @@
 const BOOKINGS_STRINGS = require('../constants/bookings.strings');
 const Bookings = require('../models/bookings.model');
 const ACCOUNTS_STRINGS = require('../constants/accounts.strings');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
-const AccountTransactions = require('../controllers/accountTransactions.controller');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
+const accounttransactionsController = require('../controllers/accounttransactions.controller');
 const CompaniesModel = require('../models/companies.model');
 
 /**creates a new booking */
@@ -25,7 +25,7 @@ const createBooking = async (req, res) => {
             policyType: req.body.policyType
         })
 
-        await AccountTransactions.createAccountTransaction(
+        await accounttransactionsController.createaccounttransaction(
             req.body.bookingDate,
             (req.body.totalAmount * -1), 
             ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.BOOKING,
@@ -40,7 +40,7 @@ const createBooking = async (req, res) => {
 
         const company = await CompaniesModel.getByID(req.body.companyId);
 
-        await AccountTransactions.createAccountTransaction(
+        await accounttransactionsController.createaccounttransaction(
             req.body.bookingDate,
             (req.body.totalAmount * 1), 
             ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.BOOKING,
