@@ -66,6 +66,7 @@ const backup = async (req, res) => {
                 responseObject.fileUploaded = false;
                 responseObject.message = error;
                 res.status(500).send(responseObject);
+                return; 
             }
 
             responseObject.fileUploaded = true;
