@@ -1,6 +1,6 @@
 const ACCOUNTS_STRINGS = require('../constants/accounts.strings');
 const Accounts = require('../models/accounts.model');
-const accounttransactionsModel = require('../models/accounttransactions.model');
+const accounttransactionsModel = require('../models/accounttransactions.model.js');
 const { Op } = require("sequelize");
 const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
 const accounttransactionsController = require('./accounttransactions.controller');
