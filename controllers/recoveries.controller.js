@@ -1,9 +1,9 @@
 /**creates a new recovery */
 const Accounts = require('../models/accounts.model');
 const recoveriesModel = require('../models/recoveries.model');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
-const accounttransactions = require('../controllers/accounttransactions.controller');
-const accounttransactionsModel = require('../models/accounttransactions.model');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
+const accounttransactions = require('./accountTransactions.controller');
+const accounttransactionsModel = require('../models/accountTransactions.model');
 const accountsController = require('../controllers/accounts.controller');
 
 const addRecovery = async (req, res) => {

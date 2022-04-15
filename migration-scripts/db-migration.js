@@ -2,7 +2,7 @@ const moment = require('moment')
 const sequelize = require('../models').sequelize;
 const Accounts = require('../controllers/accounts.controller');
 const Contacts = require('../controllers/contacts.controller');
-const productstocks = require('../controllers/productstocks.controller');
+const productstocks = require('../controllers/productStocks.controller');
 const Companies = require('../controllers/companies.controller');
 
 /**DB Querries*/ 

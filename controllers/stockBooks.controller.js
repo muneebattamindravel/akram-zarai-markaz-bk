@@ -1,5 +1,5 @@
-const stockbooksModel = require('../models/stockbooks.model');
-const STOCK_BOOKS_STRINGS = require('../constants/stockbooks.strings');
+const stockbooksModel = require('../models/stockBooks.model');
+const STOCK_BOOKS_STRINGS = require('../constants/stockBooks.strings');
 
 /**creates a new stock book entry */
 const addstockbookEntry = async (date, bookNumber, billNumber, invoiceNumber, amount, type, notes, productId, referenceId) => {

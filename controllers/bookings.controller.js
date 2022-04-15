@@ -1,8 +1,8 @@
 const BOOKINGS_STRINGS = require('../constants/bookings.strings');
 const Bookings = require('../models/bookings.model');
 const ACCOUNTS_STRINGS = require('../constants/accounts.strings');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
-const accounttransactionsController = require('../controllers/accounttransactions.controller');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
+const accounttransactionsController = require('./accountTransactions.controller');
 const CompaniesModel = require('../models/companies.model');
 
 /**creates a new booking */

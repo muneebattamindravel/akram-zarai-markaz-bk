@@ -1,9 +1,9 @@
-const PRODUCT_STOCKS_STRINGS = require('../constants/productstocks.strings');
-const STOCK_BOOKS_STRINGS = require('../constants/stockbooks.strings');
-const productstocks = require('../models/productstocks.model');
+const PRODUCT_STOCKS_STRINGS = require('../constants/productStocks.strings');
+const STOCK_BOOKS_STRINGS = require('../constants/stockBooks.strings');
+const productstocks = require('../models/productStocks.model');
 const productsController = require('./products.controller');
-const stockbooksController = require('./stockbooks.controller');
-const stockbooksModel = require('../models/stockbooks.model');
+const stockbooksController = require('./stockBooks.controller');
+const stockbooksModel = require('../models/stockBooks.model');
 
 /**creates a new product stock */
 const createproductstock = async (req, res) => {

@@ -1,7 +1,7 @@
 const expensesModel = require('../models/expenses.model');
-const accounttransactions = require('../controllers/accounttransactions.controller');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
-const accounttransactionsModel = require('../models/accounttransactions.model');
+const accounttransactions = require('./accountTransactions.controller');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
+const accounttransactionsModel = require('../models/accountTransactions.model');
 
 /**creates a new expense */
 const createExpense = async (req, res) => {

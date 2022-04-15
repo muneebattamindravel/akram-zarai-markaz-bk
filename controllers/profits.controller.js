@@ -1,4 +1,4 @@
-const saleprofits = require('../models/saleprofits.model');
+const saleprofits = require('../models/saleProfits.model');
 
 const getCountersaleprofitAmount = async (req, res) => {
     try {

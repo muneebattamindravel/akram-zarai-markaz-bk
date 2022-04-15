@@ -1,6 +1,6 @@
 const USERS_STRINGS = require('../constants/users.strings');
 const User = require('../models/users.model');
-const accounttransactions = require('./accounttransactions.controller')
+const accounttransactions = require('./accountTransactions.controller')
 
 /**validate login credentials */
 const validateCredentials = async (req, res) => {

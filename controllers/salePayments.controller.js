@@ -1,8 +1,8 @@
 const SALES_STRINGS = require('../constants/sales.strings');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
-const salepayments = require('../models/salepayments.model');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
+const salepayments = require('../models/salePayments.model');
 const Accounts = require('../models/accounts.model');
-const accounttransactions = require('./accounttransactions.controller');
+const accounttransactions = require('./accountTransactions.controller');
 const Sales = require('../models/sales.model');
 
 /**creates a new sale payment */

@@ -1,7 +1,7 @@
 const PRODUCTS_STRINGS = require('../constants/products.strings');
 const APP_STRINGS = require('../constants/app.strings');
 const Products = require('../models/products.model');
-const productstocksmodel = require('../models/productstocks.model');
+const productstocksmodel = require('../models/productStocks.model');
 const imagesController = require('../controllers/images.controller');
 
 /**creates a new product */

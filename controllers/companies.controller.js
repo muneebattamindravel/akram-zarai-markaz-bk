@@ -3,8 +3,8 @@ const Companies = require('../models/companies.model');
 const Accounts = require('../models/accounts.model');
 const AccountsController = require('../controllers/accounts.controller');
 const { Op } = require("sequelize");
-const accounttransactionsController = require('../controllers/accounttransactions.controller');
-const accounttransactionsModel = require('../models/accounttransactions.model');
+const accounttransactionsController = require('./accountTransactions.controller');
+const accounttransactionsModel = require('../models/accountTransactions.model');
 
 /**creates a new company */
 const createCompany = async (req, res) => {

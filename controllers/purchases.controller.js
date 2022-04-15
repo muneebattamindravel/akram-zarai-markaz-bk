@@ -1,12 +1,12 @@
 const PURCHASES_STRINGS = require('../constants/purchases.strings');
-const STOCK_BOOKS_STRINGS = require('../constants/stockbooks.strings');
+const STOCK_BOOKS_STRINGS = require('../constants/stockBooks.strings');
 const Purchases = require('../models/purchases.model');
-const productstocks = require('../models/productstocks.model');
+const productstocks = require('../models/productStocks.model');
 const ProductsController = require('../controllers/products.controller');
-const accounttransactions = require('../controllers/accounttransactions.controller');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
+const accounttransactions = require('./accountTransactions.controller');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
 const CompaniesModel = require('../models/companies.model');
-const stockbooksController = require('../controllers/stockbooks.controller');
+const stockbooksController = require('./stockBooks.controller');
 
 /**creates a new purchase */
 const createPurchase = async (req, res) => {

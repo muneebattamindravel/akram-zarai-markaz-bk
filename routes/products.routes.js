@@ -1,6 +1,6 @@
 const app = require('..');
 const productsController = require('../controllers/products.controller');
-const stockbooksController = require('../controllers/stockbooks.controller');
+const stockbooksController = require('../controllers/stockBooks.controller');
 
 app.post('/products',productsController.createProduct);
 app.patch('/products/:id',productsController.updateProduct);

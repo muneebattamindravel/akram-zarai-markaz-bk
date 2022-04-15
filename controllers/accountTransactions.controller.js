@@ -1,5 +1,5 @@
-const ACCOUNTTRANSACTIONS_STRINGS = require('../constants/accounttransactions.strings');
-const accounttransactions = require('../models/accounttransactions.model');
+const ACCOUNTTRANSACTIONS_STRINGS = require('../constants/accountTransactions.strings');
+const accounttransactions = require('../models/accountTransactions.model');
 
 /**creates a new accounttransaction */
 const createaccounttransaction = async (date, amount, type, details, accountId, referenceId, bookNumber, billNumber, invoiceNumber, prNumber) => {

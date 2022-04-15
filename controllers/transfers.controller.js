@@ -1,9 +1,9 @@
 /**creates a new transfer */
 const transfersModel = require('../models/transfers.model');
 const accountsModel = require('../models/accounts.model');
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
-const accounttransactions = require('../controllers/accounttransactions.controller');
-const accounttransactionsModel = require('../models/accounttransactions.model');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
+const accounttransactions = require('./accountTransactions.controller');
+const accounttransactionsModel = require('../models/accountTransactions.model');
 
 const addTransfer = async (req, res) => {
     try {

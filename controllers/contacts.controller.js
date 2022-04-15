@@ -1,9 +1,9 @@
 const CONTACTS_STRINGS = require('../constants/contacts.strings')
 const Contacts = require('../models/contacts.model')
 const AccountsModel = require('../models/accounts.model')
-const accounttransactionsModel = require('../models/accounttransactions.model')
+const accounttransactionsModel = require('../models/accountTransactions.model')
 const AccountsController = require('../controllers/accounts.controller');
-const accounttransactionsController = require('../controllers/accounttransactions.controller');
+const accounttransactionsController = require('./accountTransactions.controller');
 
 /**creates a new contact */
 const createContact = async (req, res) => {

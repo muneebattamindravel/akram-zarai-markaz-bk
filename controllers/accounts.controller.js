@@ -2,8 +2,8 @@ const ACCOUNTS_STRINGS = require('../constants/accounts.strings');
 const Accounts = require('../models/accounts.model');
 const accounttransactionsModel = require('../models/accountTransactions.model');
 const { Op } = require("sequelize");
-const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accounttransactions.strings');
-const accounttransactionsController = require('./accounttransactions.controller');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
+const accounttransactionsController = require('./accountTransactions.controller');
 
 /**creates a new account */
 const createAccount = async (req, res) => {

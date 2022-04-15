@@ -1,5 +1,5 @@
 const app = require('../app');
-const productstocksController = require('../controllers/productstocks.controller');
+const productstocksController = require('../controllers/productStocks.controller');
 
 app.post('/productstocks',productstocksController.createproductstock);
 app.get('/productstocks/:productId',productstocksController.getproductstocks);
