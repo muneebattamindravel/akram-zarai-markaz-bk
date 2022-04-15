@@ -37,8 +37,8 @@ const backup = async (req, res) => {
         message: ''
     }
 
-    //exec(`/Applications/MAMP/Library/bin/mysqldump --add-drop-table -uazmuser1 -pazmuser1 -hlocalhost akram-zarai-markaz > ${dumpFileName}`, 
-    exec(`C:\MAMP\bin\mysql\bin\mysqldump --add-drop-table -uazmuser1 -pazmuser1 -hlocalhost akram-zarai-markaz > ${dumpFileName}`, 
+    exec(`/Applications/MAMP/Library/bin/mysqldump --add-drop-table -uazmuser1 -pazmuser1 -hlocalhost akram-zarai-markaz > ${dumpFileName}`, 
+    //exec(`C:\MAMP\bin\mysql\bin\mysqldump --add-drop-table -uazmuser1 -pazmuser1 -hlocalhost akram-zarai-markaz > ${dumpFileName}`, 
     (err, stdout, stderr) => {
         if (err) 
         { 
