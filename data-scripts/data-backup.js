@@ -61,7 +61,7 @@ const backup = async (req, res) => {
         });
 
         form.submit('http://13.213.139.143:4000/data/upload/', function(error, response) {
-            if (err) {
+            if (error) {
                 console.error(`exec error: ${error}`);
                 responseObject.fileUploaded = false;
                 responseObject.message = error;
