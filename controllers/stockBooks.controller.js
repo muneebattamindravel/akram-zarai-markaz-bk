@@ -1,4 +1,5 @@
 const stockbooksModel = require('../models/stockBooks.model');
+const productsModel = require('../models/products.model');
 const STOCK_BOOKS_STRINGS = require('../constants/stockBooks.strings');
 
 /**creates a new stock book entry */
@@ -112,8 +113,53 @@ const consolidatestockbook = async(productId) => {
     return stockbookTransactions;
 }
 
+const conslidateStockBooksForAll = async (req, res) => {
+    try {
+        let allProducts = await productsModel.getAll();
+        
+
+        await Promise.all(allProducts.map(async (product) => {
+            console.log(product.id)
+            await consolidateStockBookWorker(product.id)
+        }));
+
+        console.log("Products Length = " + allProducts.length)
+        res.send('Success');
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: 'Error Consolidating Stock Book For All Products', stack: err.stack})
+    }
+}
+
+const consolidateStockBookWorker = async(productId) => {
+    const where = {"productId": productId}
+    const include = []
+    const stockBookTransactions = await stockbooksModel.getAll(where, include);
+    if (stockBookTransactions.length > 0) {
+        let closingBalance = stockBookTransactions[0].amount;
+        const updateBody = {
+            'closing': closingBalance
+        }
+        await stockbooksModel.update(updateBody, stockBookTransactions[0].id);
+
+        stockBookTransactions.shift();
+        await Promise.all(stockBookTransactions.map(async (stockBookTransaction) => {
+            closingBalance = closingBalance + stockBookTransaction.amount;
+            const updateBody = {
+                'closing': closingBalance
+            }
+            await stockbooksModel.update(updateBody, stockBookTransaction.id);
+        }));
+    }
+
+    return stockBookTransactions;
+}
+
 module.exports = {
     addstockbookEntry,
     getstockbook,
-    consolidatestockbook
+    consolidatestockbook,
+    consolidateStockBookWorker,
+    conslidateStockBooksForAll,
 }

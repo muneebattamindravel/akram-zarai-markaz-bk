@@ -54,6 +54,8 @@ const stockbooks = require('./stockBooks.model');
 const Expenses = require('./expenses.model');
 const Recoveries = require('./recoveries.model');
 const Transfers = require('./transfers.model');
+const Loans = require('./loans.model');
+const Incentives = require('./incentives.model');
 
 db.companies = Companies.initialize(sequelize,Sequelize);
 db.categories = Categories.initialize(sequelize,Sequelize);
@@ -74,6 +76,8 @@ db.stockbooks = stockbooks.initialize(sequelize,Sequelize);
 db.expenses = Expenses.initialize(sequelize,Sequelize);
 db.recoveries = Recoveries.initialize(sequelize,Sequelize);
 db.transfers = Transfers.initialize(sequelize,Sequelize);
+db.loans = Loans.initialize(sequelize,Sequelize);
+db.incentives = Incentives.initialize(sequelize,Sequelize);
 
 //Associations
 Companies.setAssociations(db)
@@ -94,5 +98,7 @@ stockbooks.setAssociations(db)
 Expenses.setAssociations(db)
 Recoveries.setAssociations(db)
 Transfers.setAssociations(db)
+Loans.setAssociations(db)
+Incentives.setAssociations(db)
 
 module.exports = db;

@@ -1,5 +1,5 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('recoveries', {
+    return sequelize.define('loans', {
         date: {type: Sequelize.DATEONLY},
         isReceived: {type: Sequelize.BOOLEAN},
         bookNumber: {type: Sequelize.STRING},
@@ -9,14 +9,14 @@ const initialize = (sequelize,Sequelize) => {
   }
 
   const setAssociations = (db) => {
-    db.recoveries.belongsTo(db.contacts)
-    db.recoveries.belongsTo(db.accounts)
+    db.loans.belongsTo(db.contacts)
+    db.loans.belongsTo(db.accounts)
   }
 
-  const create = async (recovery) => {
+  const create = async (loan) => {
     try {
-      const recoveries = require('../models').recoveries
-      return await recoveries.create(recovery);
+      const loans = require('../models').loans
+      return await loans.create(loan);
     }
     catch(err) {
       throw err
@@ -26,10 +26,10 @@ const initialize = (sequelize,Sequelize) => {
   const getAll = async(from, to) => {
     try {
       const { Op } = require("sequelize");
-      const recoveries = require('../models').recoveries
+      const loans = require('../models').loans
       const models = require('../models')
 
-      return await recoveries.findAll(
+      return await loans.findAll(
           {
             where : {
               "date" : {[Op.between] : [from , to ]}
@@ -50,7 +50,7 @@ const initialize = (sequelize,Sequelize) => {
   const getByID = async(id) => {
     try {
       const models = require('../models')
-      return await models.recoveries.findByPk(id, {include: [{model: models.contacts}]})
+      return await models.loans.findByPk(id, {include: [{model: models.contacts}]})
     }
     catch (err) {
       throw err
@@ -59,8 +59,8 @@ const initialize = (sequelize,Sequelize) => {
 
   const deleteById = async(id) => {
     try {
-      const recoveries = require('../models').recoveries
-      return await recoveries.destroy(
+      const loans = require('../models').loans
+      return await loans.destroy(
           {
             where: {id: id}
           }
@@ -70,6 +70,7 @@ const initialize = (sequelize,Sequelize) => {
       throw err
     }
   }
+  
 
   module.exports = {
     initialize,

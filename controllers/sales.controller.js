@@ -257,6 +257,9 @@ const getSaleObject = async(saleId, isComplete = false) => {
 /** delete sale */
 const deleteSale = async (req, res) => {
     try {
+
+        let productIds = [];
+
         //First Of All, Add Product Stocks Back
         sale = await getSaleObject(req.params.id, true);
         for (let i = 0; i < sale.saleitems.length; i++) {
@@ -274,6 +277,8 @@ const deleteSale = async (req, res) => {
                 // Update the stock quantity again
                 await productstocks.update({quantity: productstock.quantity}, productstock.id)
             }
+
+            productIds.push(product.id);   
         }
 
         //Now delete from other tables
@@ -292,6 +297,10 @@ const deleteSale = async (req, res) => {
             await accountsController.consolidateAccountStatementWorker(sale.contact.accountId);
         }
 
+        await Promise.all(productIds.map(async (prId) => {
+            await stockbooksController.consolidateStockBookWorker(prId);
+        }));
+        
         res.status(200).send();
     }
     catch (err) {

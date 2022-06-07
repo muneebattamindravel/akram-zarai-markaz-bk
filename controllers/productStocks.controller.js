@@ -50,6 +50,7 @@ const createproductstockWorker = async (productId, costPrice, batchNumber, invoi
     return productstock;
 }
 
+//this is buggy mess of shit, check all sceanrios
 const updateproductstock = async (req, res) => {
     try {
         if (!IsproductstockBodyValid(req.body, res))
@@ -57,18 +58,23 @@ const updateproductstock = async (req, res) => {
 
         const existingStock = await productstocks.getByID(req.params.id)
         const diff = req.body.initialQuantity - existingStock.initialQuantity;
-        req.body.quantity = existingStock.quantity + diff;
+        const newQuantity = existingStock.quantity + diff;
 
         req.body.purchaseId = req.body.purchaseId == 0 ? null : req.body.purchaseId
 
         const stockbookEntry = await stockbooksModel.getByReference(req.params.id, STOCK_BOOKS_STRINGS.TYPE.MANUAL_STOCK);
         await stockbooksModel.update({
-            amount: req.body.quantity
+            amount: newQuantity
         }, stockbookEntry.id);
 
-        stockbooksController.consolidatestockbook(stockbookEntry.productId);
+        await stockbooksController.consolidateStockBookWorker(req.params.id)
 
-        await productstocks.update(req.body, req.params.id) ? 
+        let updateBody = {
+            "quantity": newQuantity,
+            "initialQuantity": req.body.initialQuantity
+        }
+
+        await productstocks.update(updateBody, req.params.id) ? 
         res.send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY}) : 
         res.status(406).send({message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}`})
     }

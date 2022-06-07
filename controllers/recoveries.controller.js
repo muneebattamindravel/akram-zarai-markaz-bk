@@ -12,12 +12,12 @@ const addRecovery = async (req, res) => {
 
         const createdRecovery = await recoveriesModel.create({
             date: req.body.date,
-            paymentType: req.body.paymentType,
             bookNumber: req.body.bookNumber,
             billNumber: req.body.billNumber,
             amount: req.body.amount,
             contactId: req.body.contactId,
-            accountId: req.body.accountId == 0 ? defaultAccount.id : req.body.accountId,
+            isReceived: req.body.isReceived,
+            accountId: req.body.accountId,
         });
 
         if (req.body.contactId != null) {
@@ -25,10 +25,24 @@ const addRecovery = async (req, res) => {
             const include = []
             const cutomerAccount = (await Accounts.getAll(where, include))[0];
 
+            let contactAmount = req.body.amount;
+            let amount = req.body.amount;
+            let contactTransactionString = ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY_GIVEN;
+            let transactionString = ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY_GIVEN;
+
+            if (req.body.isReceived) {
+                contactAmount = contactAmount * -1;
+                transactionString = ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY_TAKEN;
+            }
+            else {
+                amount = amount * -1;
+                contactTransactionString = ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY_GIVEN;
+            }
+
             await accounttransactions.createaccounttransaction(
                 req.body.date,
-                (req.body.amount * -1), 
-                ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY,
+                contactAmount, 
+                contactTransactionString,
                 "",
                 cutomerAccount.id,
                 createdRecovery.id,
@@ -38,34 +52,18 @@ const addRecovery = async (req, res) => {
                 ""
             );
 
-            if (req.body.paymentType == 0) {
-                await accounttransactions.createaccounttransaction(
-                    req.body.date,
-                    req.body.amount, 
-                    ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY, 
-                    "",
-                    defaultAccount.id,
-                    createdRecovery.id,
-                    req.body.bookNumber,
-                    req.body.billNumber,
-                    "",
-                    ""
-                );
-            }
-            else if (req.body.paymentType == 1) {
-                await accounttransactions.createaccounttransaction(
-                    req.body.date,
-                    req.body.amount, 
-                    ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY, 
-                    "",
-                    req.body.accountId,
-                    createdRecovery.id,
-                    req.body.bookNumber,
-                    req.body.billNumber,
-                    "",
-                    ""
-                );
-            }
+            await accounttransactions.createaccounttransaction(
+                req.body.date,
+                amount, 
+                transactionString, 
+                "",
+                req.body.accountId,
+                createdRecovery.id,
+                req.body.bookNumber,
+                req.body.billNumber,
+                "",
+                ""
+            );
         }
 
         res.send(createdRecovery);
@@ -79,7 +77,8 @@ const deleteRecovery = async (req, res) => {
     try {        
         const recovery = await recoveriesModel.getByID(req.params.id)
         await recoveriesModel.deleteById(recovery.id);
-        await accounttransactionsModel.deleteByReference(recovery.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY)
+        await accounttransactionsModel.deleteByReference(recovery.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY_GIVEN)
+        await accounttransactionsModel.deleteByReference(recovery.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY_TAKEN)
         await accountsController.consolidateAccountStatementWorker(recovery.accountId)
         await accountsController.consolidateAccountStatementWorker(recovery.contact.accountId)
 

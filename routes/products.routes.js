@@ -8,3 +8,6 @@ app.get('/products',productsController.getAllProducts);
 app.get('/products/:id',productsController.getProduct);
 app.delete('/products/:id',productsController.deleteProduct);
 app.get('/products/stockbook/:id',stockbooksController.getstockbook);
+
+
+app.get('/products/consolidate/stockbooks',stockbooksController.conslidateStockBooksForAll);

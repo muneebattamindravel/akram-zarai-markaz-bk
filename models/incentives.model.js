@@ -1,22 +1,20 @@
 const initialize = (sequelize,Sequelize) => {
-    return sequelize.define('recoveries', {
+    return sequelize.define('incentives', {
         date: {type: Sequelize.DATEONLY},
-        isReceived: {type: Sequelize.BOOLEAN},
-        bookNumber: {type: Sequelize.STRING},
-        billNumber: {type: Sequelize.STRING},
+        type: {type: Sequelize.STRING},
+        notes: {type: Sequelize.STRING},
         amount: {type: Sequelize.FLOAT},
     });
   }
 
   const setAssociations = (db) => {
-    db.recoveries.belongsTo(db.contacts)
-    db.recoveries.belongsTo(db.accounts)
+    db.incentives.belongsTo(db.companies)
   }
 
-  const create = async (recovery) => {
+  const create = async (incentive) => {
     try {
-      const recoveries = require('../models').recoveries
-      return await recoveries.create(recovery);
+      const incentives = require('../models').incentives
+      return await incentives.create(incentive);
     }
     catch(err) {
       throw err
@@ -26,17 +24,16 @@ const initialize = (sequelize,Sequelize) => {
   const getAll = async(from, to) => {
     try {
       const { Op } = require("sequelize");
-      const recoveries = require('../models').recoveries
+      const incentives = require('../models').incentives
       const models = require('../models')
 
-      return await recoveries.findAll(
+      return await incentives.findAll(
           {
             where : {
               "date" : {[Op.between] : [from , to ]}
             },
             include: [
-              {model: models.accounts},
-              {model: models.contacts}
+              {model: models.companies}
             ],
             order: [['id', 'DESC']],
           }
@@ -50,7 +47,7 @@ const initialize = (sequelize,Sequelize) => {
   const getByID = async(id) => {
     try {
       const models = require('../models')
-      return await models.recoveries.findByPk(id, {include: [{model: models.contacts}]})
+      return await models.incentives.findByPk(id, {include: [{model: models.companies}]})
     }
     catch (err) {
       throw err
@@ -59,8 +56,8 @@ const initialize = (sequelize,Sequelize) => {
 
   const deleteById = async(id) => {
     try {
-      const recoveries = require('../models').recoveries
-      return await recoveries.destroy(
+      const incentives = require('../models').incentives
+      return await incentives.destroy(
           {
             where: {id: id}
           }
@@ -70,6 +67,7 @@ const initialize = (sequelize,Sequelize) => {
       throw err
     }
   }
+  
 
   module.exports = {
     initialize,

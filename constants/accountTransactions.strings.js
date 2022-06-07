@@ -10,7 +10,11 @@ module.exports = {
         BOOKING: 'BOOKING',
         PURCHASE: 'PURCHASE',
         EXPENSE: 'EXPENSE',
-        RECOVERY: 'RECOVERY',
+        RECOVERY_GIVEN: 'RECOVERY_GIVEN',
+        RECOVERY_TAKEN: 'RECOVERY_TAKEN',
         TRANSFER: 'TRANSFER',
+        LOAN_GIVEN:'LOAN_GIVEN',
+        LOAN_TAKEN:'LOAN_TAKEN',
+        INCENTIVE: 'INCENTIVE',
     },
 }
