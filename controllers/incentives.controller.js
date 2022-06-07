@@ -1,7 +1,7 @@
 /**creates a new Incentive */
 const accountsModel = require('../models/accounts.model');
 const companiesModel = require('../models/companies.model');
-const incentivesModel = require('../models/Incentives.model');
+const incentivesModel = require('../models/incentives.model');
 const accountTransactionsController = require('./accountTransactions.controller');
 const accounttransactionsModel = require('../models/accountTransactions.model');
 const accountsController = require('../controllers/accounts.controller');
