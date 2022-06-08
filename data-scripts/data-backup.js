@@ -18,6 +18,17 @@ const upload = async (req, res) => {
                 }
 
                 console.log('File Restored');
+
+                const accountSid = "ACdf5c9432da07c1cf6d977ca89ae084c9";
+                const authToken = "c1758fdbe027c386a19eb4361ce863e9";
+                const client = require('twilio')(accountSid, authToken);
+
+                const messageBody = 'Akram Zarai Markaz - Data Uploaded';
+                const fromNumber = '+18289291293';
+
+                toNumber = '+923324405112';
+                client.messages.create({body: messageBody,from: fromNumber,to: toNumber}).then((message) => {});
+
                 res.status(200).send();
             });
         }
@@ -85,9 +96,28 @@ const backup = async (req, res) => {
     });
 }
 
+const sendSMS = async (req, res) => {
+    try {
+        const accountSid = "ACdf5c9432da07c1cf6d977ca89ae084c9";
+        const authToken = "c1758fdbe027c386a19eb4361ce863e9";
+        const client = require('twilio')(accountSid, authToken);
+
+        const messageBody = 'Hello Muneeb';
+        const fromNumber = '+18289291293';
+
+        toNumber = '+923324405112';
+        client.messages.create({body: messageBody,from: fromNumber,to: toNumber}).then((message) => {});
+
+        res.send(message);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
 module.exports = {
     backup,
     upload,
+    sendSMS
 }
 
 
