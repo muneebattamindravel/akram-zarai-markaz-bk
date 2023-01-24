@@ -170,6 +170,25 @@ const consolidateAccountStatement = async (req, res) => {
     }
 }
 
+/** consolidateAccountStatementsForAllRoute */
+const consolidateAccountStatementForAll = async (req, res) => {
+    try {
+        let allAccounts = await Accounts.getAll();
+        
+        await Promise.all(allAccounts.map(async (account) => {
+            console.log(account.id)
+            await consolidateAccountStatementWorker(account.id)
+        }));
+
+        console.log("Accounts Length = " + allAccounts.length)
+        res.send('Success');
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: 'Error Consolidating', stack: err.stack})
+    }
+}
+
 const consolidateAccountStatementWorker = async(accountId) => {
     const where = {"accountId": accountId}
     const include = []
@@ -190,6 +209,16 @@ const consolidateAccountStatementWorker = async(accountId) => {
 /** get balance of the default account */
 const getDefaultAccountBalance = async (req, res) => {
     try {
+        res.send(await getDefaultAccountBalanceWorker());
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: ACCOUNTS_STRINGS.ERROR_GETTING_ACCOUNT, stack: err.stack})
+    }
+}
+
+const getDefaultAccountBalanceWorker = async () => {
+    try {
         const account = await Accounts.getDefaultAccount();
         if (account) {
             let balance = 0.00
@@ -201,10 +230,7 @@ const getDefaultAccountBalance = async (req, res) => {
                 amount: balance
             }
             
-            res.send(amountObject)
-        }
-        else {
-            res.status(404).send({message: `${ACCOUNTS_STRINGS.ACCOUNT_NOT_FOUND} ,id=${req.params.id}`})
+            return amountObject;
         }
     }
     catch (err) {
@@ -216,25 +242,29 @@ const getDefaultAccountBalance = async (req, res) => {
 /** get all accounts */
 const getAllAccounts = async (req, res) => {
     try {
-        const where = {}
-        const include = []
-        let allAccounts = await Accounts.getAll(where, include);
-
-        await Promise.all(allAccounts.map(async (account) => {
-            let balance = 0.00
-            let lastTransaction = await accounttransactionsModel.getLastTransaction(account.id);
-            if (lastTransaction) 
-                balance = lastTransaction.closingBalance;
-            
-            account.setDataValue('balance', balance);
-        }));
-
-        res.send(allAccounts);
+        res.send(await getAllAccountsWorker());
     }
     catch (err) {
         console.log(err)
         res.status(500).send({raw: err.message.toString(), message: ACCOUNTS_STRINGS.ERROR_GETTING_ACCOUNTS, stack: err.stack})
     }
+}
+
+const getAllAccountsWorker = async () => {
+    const where = {}
+    const include = []
+    let allAccounts = await Accounts.getAll(where, include);
+
+    await Promise.all(allAccounts.map(async (account) => {
+        let balance = 0.00
+        let lastTransaction = await accounttransactionsModel.getLastTransaction(account.id);
+        if (lastTransaction) 
+            balance = lastTransaction.closingBalance;
+        
+        account.setDataValue('balance', balance);
+    }));
+
+    return allAccounts
 }
 
 /** delete account by id */
@@ -262,6 +292,67 @@ const IsAccountBodyValid = (body, res) => {
     return true
 }
 
+/** add capital for a partner account */
+const addCapital = async (req, res) => {
+    try {
+        //add to partner capital account
+        await accounttransactionsController.createaccounttransaction(
+            req.body.date,
+            req.body.amount,
+            ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.CAPITAL_ADDED,
+            req.body.details,
+            req.body.partnerAccountId,
+            req.body.partnerAccountId,
+            "",
+            "",
+            "",
+            "");
+
+            //also add to amount to credit account
+        await accounttransactionsController.createaccounttransaction(
+            req.body.date,
+            req.body.amount,
+            ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.CAPITAL_ADDED,
+            req.body.details,
+            req.body.creditAccountId,
+            req.body.creditAccountId,
+            "",
+            "",
+            "",
+            "");
+
+            res.send(req.body)
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: "Error Adding Capital", stack: err.stack})
+    }
+}
+
+/** add profit for a partner account */
+const addProfit = async (req, res) => {
+    try {
+        //add to partner profit account
+        await accounttransactionsController.createaccounttransaction(
+            req.body.date,
+            req.body.amount,
+            ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.PROFIT_POSTED,
+            req.body.details,
+            req.body.partnerAccountId,
+            req.body.partnerAccountId,
+            "",
+            "",
+            "",
+            "");
+
+            res.send(req.body)
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: "Error Posting Profit", stack: err.stack})
+    }
+}
+
 module.exports = {
     createAccount,
     updateAccount,
@@ -272,5 +363,10 @@ module.exports = {
     createAccountDBMigration,
     getAccountStatement,
     consolidateAccountStatementWorker,
-    consolidateAccountStatement
+    consolidateAccountStatement,
+    consolidateAccountStatementForAll,
+    addCapital,
+    addProfit,
+    getDefaultAccountBalanceWorker,
+    getAllAccountsWorker
 }

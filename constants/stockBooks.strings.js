@@ -8,5 +8,6 @@ module.exports = {
         MANUAL_STOCK: 'MANUAL STOCK',
         PURCHASE_STOCK: 'PURCHASE STOCK',
         SALE: 'SALE',
+        STOCK_RETURN: 'STOCK RETURN',
     }
 }

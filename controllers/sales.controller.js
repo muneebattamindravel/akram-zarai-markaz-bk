@@ -27,6 +27,7 @@ const createSale = async (req, res) => {
             bookNumber: req.body.bookNumber,
             billNumber: req.body.billNumber,
             contactId: req.body.contactId == 0 ? null : req.body.contactId,
+            returnApplied: req.body.returnApplied,
         })
 
         const defaultAccount = await Accounts.getDefaultAccount();
@@ -220,6 +221,11 @@ const getSale = async (req, res) => {
 
 const getSaleObject = async(saleId, isComplete = false) => {
     const sale = await Sales.getById(saleId);
+    const models = require('../models')
+    const salePayments = await salepayments.getAll(
+        {saleId: saleId},
+        [{model: models.accounts}]
+    );
     const totalProfit = await saleprofitsmodel.getTotalProfitAmountBySaleId(sale.id);
     const salepaymentsAmount = await salepayments.getTotalPaymentsReceivedAmount(sale.id);
     const contact = await Contacts.getByID(sale.contactId);
@@ -231,16 +237,17 @@ const getSaleObject = async(saleId, isComplete = false) => {
         saleDate: sale.saleDate,
         bookNumber: sale.bookNumber,
         billNumber: sale.billNumber,
+        returnApplied: sale.returnApplied,
         saleType: sale.saleType,
         createdAt: sale.createdAt,
         contactId: sale.contactId,
         contact: contact,
         profitAmount: totalProfit,
-        receivedAmount: salepaymentsAmount[0].receivedAmount
+        receivedAmount: salepaymentsAmount[0].receivedAmount,
+        salePayment: salePayments[0]
     }
 
     if (isComplete) {
-        const models = require('../models')
         const saleitems = await saleitemsmodel.getAll(
             {saleId: saleId},
             [{model: models.products}]
@@ -311,10 +318,18 @@ const deleteSale = async (req, res) => {
 
 const getCounterSaleAmount = async (req, res) => {
     try {
-
         const from = req.query.from;
         const to = req.query.to;
+        res.send(await getCounterSaleAmountWorker(from, to));
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({error: err.message.toString(), message: "EXCEPTION", stack: err.stack})
+    }
+}
 
+const getCounterSaleAmountWorker = async(from, to) => {
+    try {
         let sale = await Sales.getCounterSalesAmount(from, to);
         sale = sale[0];
 
@@ -328,7 +343,7 @@ const getCounterSaleAmount = async (req, res) => {
             to: to,
         }
 
-        res.send(returnObject);
+        return returnObject;
     }
     catch (err) {
         console.log(err)
@@ -341,5 +356,6 @@ module.exports = {
     getAllSales,
     getSale,
     deleteSale,
-    getCounterSaleAmount
+    getCounterSaleAmount,
+    getCounterSaleAmountWorker
 }

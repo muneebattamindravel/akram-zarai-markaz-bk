@@ -73,20 +73,8 @@ const getaccounttransaction = async (req, res) => {
     }
 }
 
-/** get all accounttransactions */
-const getAllaccounttransactions = async (req, res) => {
-    try {
-        res.send(await accounttransactions.getAll())
-    }
-    catch (err) {
-        console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: ACCOUNTTRANSACTIONS_STRINGS.ERROR_GETTING_ACCOUNTTRANSACTIONS, stack: err.stack})
-    }
-}
-
 module.exports = {
     createaccounttransaction,
     getaccounttransaction,
-    getAllaccounttransactions,
-    updateOpeningBalance
+    updateOpeningBalance,
 }

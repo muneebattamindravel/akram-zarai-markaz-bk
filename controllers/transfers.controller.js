@@ -4,6 +4,7 @@ const accountsModel = require('../models/accounts.model');
 const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
 const accounttransactions = require('./accountTransactions.controller');
 const accounttransactionsModel = require('../models/accountTransactions.model');
+const accountsController = require('../controllers/accounts.controller');
 
 const addTransfer = async (req, res) => {
     try {
@@ -14,14 +15,15 @@ const addTransfer = async (req, res) => {
             req.body.bookNumber,
             req.body.billNumber,
             req.body.amount,
-            req.body.notes
+            req.body.notes,
+            req.body.details
         ));
     }
     catch (err) {
     }
 }
 
-const createTransferWorker = async (date, fromAccountId, toAccountId, bookNumber, billNumber, amount, notes) => {
+const createTransferWorker = async (date, fromAccountId, toAccountId, bookNumber, billNumber, amount, notes, details) => {
     const createdTransfer = await transfersModel.create({
         date: date,
         fromAccountId: fromAccountId,
@@ -32,11 +34,12 @@ const createTransferWorker = async (date, fromAccountId, toAccountId, bookNumber
         notes: notes,
     });
 
+    let fromAccountAmount = (amount * -1)
     await accounttransactions.createaccounttransaction(
         date,
-        (amount * -1), 
+        fromAccountAmount, 
         ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.TRANSFER,
-        "",
+        details,
         fromAccountId,
         createdTransfer.id,
         bookNumber,
@@ -45,11 +48,15 @@ const createTransferWorker = async (date, fromAccountId, toAccountId, bookNumber
         ""
     );
 
+    let toAccountAmount = (amount * 1)
+    if (details === "CAPITAL_WITHDRAWN")
+        toAccountAmount = (amount * -1)
+
     await accounttransactions.createaccounttransaction(
         date,
-        (amount * 1), 
+        toAccountAmount, 
         ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.TRANSFER,
-        "",
+        details,
         toAccountId,
         createdTransfer.id,
         bookNumber,
@@ -118,9 +125,28 @@ const updateTransfer = async (req, res) => {
     } 
 }
 
+/** delete Transfer */
+const deleteTransfer = async (req, res) => {
+    try {        
+        const transfer = await transfersModel.getByID(req.params.id)
+        await transfersModel.deleteById(transfer.id);
+
+        await accounttransactionsModel.deleteByReference(transfer.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.TRANSFER)
+        await accountsController.consolidateAccountStatementWorker(transfer.fromAccountId)
+        await accountsController.consolidateAccountStatementWorker(transfer.toAccountId)
+
+        res.status(200).send();
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: "Delete Transfer Error", stack: err.stack})
+    }
+}
+
 module.exports = {
     addTransfer,
     getTransfers,
     updateTransfer,
-    getTransfer
+    getTransfer,
+    deleteTransfer
 }

@@ -87,6 +87,21 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const getCurrentStock = async(productId) => {
+    try {
+      const model = require('.').stockbooks
+      const Sequelize = require('sequelize');
+
+      return model.findAll({
+        where: {productId: productId},
+        attributes: [[Sequelize.fn('sum', Sequelize.col('amount')), 'currentStock']],
+      });
+    }
+    catch (err) {
+      throw err;
+    }
+  }
+
   const setAssociations = (db) => {
     db.stockbooks.belongsTo(db.products)
   }
@@ -99,5 +114,6 @@ const initialize = (sequelize,Sequelize) => {
     getLastTransaction,
     deleteByReference,
     update,
-    getByReference
+    getByReference,
+    getCurrentStock
   }

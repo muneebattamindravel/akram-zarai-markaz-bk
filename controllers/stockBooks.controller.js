@@ -117,7 +117,6 @@ const conslidateStockBooksForAll = async (req, res) => {
     try {
         let allProducts = await productsModel.getAll();
         
-
         await Promise.all(allProducts.map(async (product) => {
             console.log(product.id)
             await consolidateStockBookWorker(product.id)

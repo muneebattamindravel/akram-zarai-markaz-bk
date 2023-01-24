@@ -2,11 +2,14 @@ const PURCHASES_STRINGS = require('../constants/purchases.strings');
 const STOCK_BOOKS_STRINGS = require('../constants/stockBooks.strings');
 const Purchases = require('../models/purchases.model');
 const productstocks = require('../models/productStocks.model');
+const stockbooksModel = require('../models/stockBooks.model');
 const ProductsController = require('../controllers/products.controller');
 const accounttransactions = require('./accountTransactions.controller');
 const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
 const CompaniesModel = require('../models/companies.model');
 const stockbooksController = require('./stockBooks.controller');
+const accountsController = require('./accounts.controller');
+const accounttransactionsModel = require('../models/accountTransactions.model');
 
 /**creates a new purchase */
 const createPurchase = async (req, res) => {
@@ -64,10 +67,52 @@ const createPurchase = async (req, res) => {
     }
 }
 
+/** delete purchase */
+const deletePurchase = async (req, res) => {
+    try {
+        const purchase = await Purchases.getByID(req.params.id)
+        const models = require('../models');
+
+        const where = {"purchaseId": purchase.id}
+        const include = [{model: models.products}]
+        
+        await stockbooksModel.deleteByReference(purchase.id, STOCK_BOOKS_STRINGS.TYPE.PURCHASE_STOCK)
+        const allProductStocksOfThisPurchase = await productstocks.getAll(where, include);
+        await Promise.all(allProductStocksOfThisPurchase.map(async (prs) => {
+            await stockbooksController.consolidateStockBookWorker(prs.product.id);
+        }));     
+
+        await productstocks.deleteAll({"purchaseId": purchase.id})
+        
+        await accounttransactionsModel.deleteByReference(purchase.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.PURCHASE)
+        await accountsController.consolidateAccountStatementWorker(purchase.company.accountId)
+        
+        await Purchases.deleteById(req.params.id)
+
+        res.status(200).send();
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: "Error in deleting purchase", stack: err.stack})
+    }
+}
+
 /** get all purchases */
 const getAllPurchases = async (req, res) => {
     try {
         res.send(await Purchases.getAll())
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: PURCHASES_STRINGS.ERROR_GETTING_PURCHASES, stack: err.stack})
+    }
+}
+
+
+/** get purchases */
+const getPurchase = async (req, res) => {
+    try {
+        res.send(await Purchases.getByID(req.params.id))
     }
     catch (err) {
         console.log(err)
@@ -105,4 +150,6 @@ const IsPurchaseBodyValid = (body, res) => {
 module.exports = {
     createPurchase,
     getAllPurchases,
+    getPurchase,
+    deletePurchase
 }

@@ -1,7 +1,7 @@
 const PRODUCTS_STRINGS = require('../constants/products.strings');
 const APP_STRINGS = require('../constants/app.strings');
 const Products = require('../models/products.model');
-const productstocksmodel = require('../models/productStocks.model');
+const stockBooksModel = require('../models/stockBooks.model');
 const imagesController = require('../controllers/images.controller');
 
 /**creates a new product */
@@ -83,7 +83,14 @@ const getNextLotNumber = async (id) => {
 /** get all products */
 const getAllProducts = async (req, res) => {
     try {
-        res.send(await Products.getAll())
+        const allProducts = await Products.getAll()
+
+        // await Promise.all(allProducts.map(async (prod) => {
+        //     currentStock = await stockBooksModel.getCurrentStock(prod.id);
+        //     prod.setDataValue('currentStock', currentStock);
+        // }));
+
+        res.send(allProducts)
     }
     catch (err) {
         console.log(err)

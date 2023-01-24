@@ -1,9 +1,19 @@
 const saleprofits = require('../models/saleProfits.model');
 
-const getCountersaleprofitAmount = async (req, res) => {
+const getCounterSaleProfitAmount = async (req, res) => {
     try {
         const from = req.query.from;
         const to = req.query.to;
+
+        res.send(await getCounterSaleProfitAmountWorker(from, to));
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({error: err.message.toString(), message: "EXCEPTION", stack: err.stack})
+    }
+}
+const getCounterSaleProfitAmountWorker = async (from, to) => {
+    try {
 
         let profit = await saleprofits.getCounterSalesProfit(from, to);
         profit = profit[0];
@@ -16,7 +26,7 @@ const getCountersaleprofitAmount = async (req, res) => {
             to: to,
         }
 
-        res.send(returnObject);
+        return returnObject;
     }
     catch (err) {
         console.log(err)
@@ -36,5 +46,6 @@ const getsaleprofits = async (req, res) => {
 
 module.exports = {
     getsaleprofits,
-    getCountersaleprofitAmount,
+    getCounterSaleProfitAmount,
+    getCounterSaleProfitAmountWorker
 }

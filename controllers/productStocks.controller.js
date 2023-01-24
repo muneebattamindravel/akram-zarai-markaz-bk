@@ -1,7 +1,9 @@
 const PRODUCT_STOCKS_STRINGS = require('../constants/productStocks.strings');
 const STOCK_BOOKS_STRINGS = require('../constants/stockBooks.strings');
+const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
 const productstocks = require('../models/productStocks.model');
 const productsController = require('./products.controller');
+const accounttransactionsController = require('./accountTransactions.controller');
 const stockbooksController = require('./stockBooks.controller');
 const stockbooksModel = require('../models/stockBooks.model');
 
@@ -24,6 +26,42 @@ const createproductstock = async (req, res) => {
             req.body.expiryDate,
         )
         res.send(productstock);
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_CREATING_PRODUCT_STOCK, stack: err.stack})
+    }
+}
+
+/**return product stock */
+const returnProductStock = async (req, res) => {
+    try {
+        const existingStock = await productstocks.getByID(req.body.productStockId)
+        const remainingStock = existingStock.quantity - req.body.returnQuantity;
+        const returnStockAmount = req.body.returnQuantity * existingStock.costPrice;
+
+        let updateBody = {
+            quantity: remainingStock
+        }
+
+        await stockbooksController.addstockbookEntry(
+            req.body.returnDate, "", "", req.body.invoiceNumber, -req.body.returnQuantity, STOCK_BOOKS_STRINGS.TYPE.STOCK_RETURN, req.body.details, existingStock.productId, existingStock.id);
+
+        await accounttransactionsController.createaccounttransaction(
+            req.body.returnDate,
+            returnStockAmount,
+            ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.STOCK_RETURN,
+            req.body.details,
+            req.body.companyAccountId,
+            req.body.companyAccountId,
+            "", 
+            "",
+            req.body.invoiceNumber,
+            "");
+        
+        await productstocks.update(updateBody, req.body.productStockId) ?
+        res.send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY}) :
+        res.status(406).send({message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}`})
     }
     catch (err) {
         console.log(err)
@@ -95,6 +133,25 @@ const getproductstocks = async (req, res) => {
     }
 }
 
+/** get all stocks for a particular purchase*/
+const getProductStocksByPurchaseId = async (req, res) => {
+    try {
+        let where = {purchaseId: req.params.purchaseId}
+        const models = require('../models')
+        const include = [
+            {model: models.products, include: [models.units]}
+        ]
+
+        res.send(await productstocks.getAll(
+            where,include
+        ))
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_GETTING_PRODUCT_STOCKS, stack: err.stack})
+    }
+}
+
 /** get a particular stock record*/
 const getproductstockByID = async (req, res) => {
     try {
@@ -128,4 +185,6 @@ module.exports = {
     getproductstockByID,
     updateproductstock,
     createproductstockWorker,
+    getProductStocksByPurchaseId,
+    returnProductStock,
 }

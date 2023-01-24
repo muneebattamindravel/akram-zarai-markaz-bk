@@ -5,6 +5,7 @@ const initialize = (sequelize,Sequelize) => {
         saleDate: {type: Sequelize.DATEONLY},
         bookNumber: {type: Sequelize.STRING},
         billNumber: {type: Sequelize.STRING},
+        returnApplied: {type: Sequelize.BOOLEAN},
     });
   }
   
@@ -35,7 +36,7 @@ const initialize = (sequelize,Sequelize) => {
             where : {
               "saleDate" : {[Op.between] : [from , to ]}
             },
-            order: [['id', 'ASC']],
+            order: [['saleDate', 'ASC']],
           }
         )
     }
@@ -67,7 +68,8 @@ const initialize = (sequelize,Sequelize) => {
             where: {id: id},
             include: [
               {
-                model: Models.saleitems
+                model: Models.saleitems,
+                model: Models.salepayments
               }
             ]
           }
@@ -99,6 +101,16 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
   
+  const update = async (body, id) => {
+    try {
+      const sales = require('../models').sales
+      return await sales.update(body, {where: {id:id}}) == 1 ? true : false
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
   module.exports = {
     initialize,
     create,
@@ -107,4 +119,5 @@ const initialize = (sequelize,Sequelize) => {
     setAssociations,
     deleteById,
     getCounterSalesAmount,
+    update
   }

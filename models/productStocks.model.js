@@ -56,6 +56,36 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const getAll = async (whereConditions, includeArray, order = 'ASC') => {
+    try {
+      const models = require('.')
+      return await models.productstocks.findAll(
+        {
+          where: whereConditions,
+          include: includeArray,
+        }
+      )
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
+  //delete all productStocks
+  const deleteAll = async (whereConditions) => {
+    try {
+      const productStocks = require('.').productstocks
+      return await productStocks.destroy(
+          {
+            where: whereConditions
+          }
+        );
+    }
+    catch (err) {
+      throw err;
+    }
+  }
+
   module.exports = {
     initialize,
     create,
@@ -63,4 +93,6 @@ const initialize = (sequelize,Sequelize) => {
     getByID,
     update,
     get,
+    getAll,
+    deleteAll
   }

@@ -41,9 +41,38 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const getByID = async(id) => {
+    try {
+      const purchases = require('../models').purchases
+      const models = require('../models');
+      return await purchases.findByPk(id, {
+        include: [
+            {model: models.companies},
+            {model: models.contacts},
+        ]
+      })
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
+  const deleteById = async(id) => {
+    try {
+      const accounts = require('../models').purchases
+      const result = await accounts.destroy({where: {id: id}})
+      return result == 1 ? true : false
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
   module.exports = {
     initialize,
     create,
     setAssociations,
     getAll,
+    getByID,
+    deleteById
   }
