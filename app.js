@@ -28,8 +28,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ limit: '5mb', parameterLimit: 5000, extended: true }));
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ limit: '20mb', parameterLimit: 5000, extended: true }));
 
 app.get('/', (req, res) => {
   res.send('OK');

@@ -72,7 +72,7 @@ const uploadFile = (filePath, fileName, res) => {
     }
 
     // form.submit('http://localhost:6969/data/upload/', function (error, response) {
-    form.submit('http://13.213.139.143:6969/data/upload/', function (error, response) {
+    form.submit('http://18.140.71.84:6969/data/upload/', function (error, response) {
         if (error) {
             console.error(`Error uploading dump file: ${error.message}`);
 
