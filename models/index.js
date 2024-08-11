@@ -7,8 +7,8 @@ const dbConfig = {
   password: 'INjOXmfcLd+4',
   host: 'localhost',
   port: 8889,
-  dialect: 'mysql',
-  logging: true,  // Set to `console.log` to enable logging
+  dialect: 'mysql'
+  // logging: true,  // Set to `console.log` to enable logging
 };
 
 // Create a new Sequelize instance
