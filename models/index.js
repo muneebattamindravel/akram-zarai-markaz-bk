@@ -4,7 +4,7 @@ const { Sequelize } = require('sequelize');
 const dbConfig = {
   database: 'akram-zarai-markaz',
   username: 'root',
-  password: 'INjOXmfcLd+4',
+  password: 'root',
   host: 'localhost',
   port: 8889,
   dialect: 'mysql',
@@ -14,8 +14,8 @@ const dbConfig = {
 // Create a new Sequelize instance
 const sequelize = new Sequelize(
   dbConfig.database,
-  dbConfig.password,
   dbConfig.username,
+  dbConfig.password,
   {
     host: dbConfig.host,
     port: dbConfig.port,
