@@ -11,7 +11,7 @@ try {
   sequelize = new Sequelize(dbnName, dbUser, dbPassword, {
     host: dbInstance,
     dialect: 'mysql',
-    port: 8889,
+    port: 8888,
     logging: console.log,
   });
 }
