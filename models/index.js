@@ -1,24 +1,63 @@
-const Sequelize = require('sequelize');
+// const Sequelize = require('sequelize');
 
-const dbnName = 'akram-zarai-markaz';
-const dbUser = 'azmuser1';
-const dbPassword = '';
+// const dbnName = 'akram-zarai-markaz';
+// const dbUser = 'azmuser1';
+// const dbPassword = '';
 
-const dbInstance = 'localhost';
+// const dbInstance = 'localhost';
 
-let sequelize = null;
+// let sequelize = null;
 
-try {
-  sequelize = new Sequelize(dbnName, dbUser, dbPassword, {
-    host: dbInstance,
-    dialect: 'mysql',
-    port: 8889,
-    logging: console.log,
-  });
-}
-catch (e) {
-  console.log(e);
-}
+// try {
+//   sequelize = new Sequelize(dbnName, dbUser, dbPassword, {
+//     host: dbInstance,
+//     dialect: 'mysql',
+//     port: 8889,
+//     logging: console.log,
+//   });
+// }
+// catch (e) {
+//   console.log(e);
+// }
+
+const { Sequelize } = require('sequelize');
+
+// Database configuration
+const dbConfig = {
+  database: 'akram-zarai-markaz',
+  username: 'azmuser1',
+  password: 'azmuser1',
+  host: 'localhost',
+  port: 8889,
+  dialect: 'mysql',
+  logging: false,  // Set to `console.log` to enable logging
+};
+
+// Create a new Sequelize instance
+const sequelize = new Sequelize(
+  dbConfig.database,
+  dbConfig.username,
+  dbConfig.password,
+  {
+    host: dbConfig.host,
+    port: dbConfig.port,
+    dialect: dbConfig.dialect,
+    logging: dbConfig.logging,
+  }
+);
+
+// Function to authenticate and connect to the database
+const connectToDatabase = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error.message);
+  }
+};
+
+// Connect to the database
+connectToDatabase();
 
 
 const db = {};
