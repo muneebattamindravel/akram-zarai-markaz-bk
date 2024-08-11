@@ -18,10 +18,10 @@ const dbConfigLocal = {
   host: 'localhost',
   port: 8889,
   dialect: 'mysql',
-  logging: console.log,  // Set to `console.log` to enable logging
+  logging: false,  // Set to `console.log` to enable logging
 };
 
-const dbConfig = dbConfigAWS
+const dbConfig = dbConfigLocal
 
 // Create a new Sequelize instance
 const sequelize = new Sequelize(
