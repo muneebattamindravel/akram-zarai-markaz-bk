@@ -3,6 +3,10 @@ const Sequelize = require('sequelize');
 const dbnName = 'akram-zarai-markaz';
 const dbUser = 'azmuser1';
 const dbPassword = 'azmuser1';
+
+// const dbUser = 'root';
+// const dbPassword = '';
+
 const dbInstance = 'localhost';
 
 let sequelize = null;
@@ -11,7 +15,7 @@ try {
   sequelize = new Sequelize(dbnName, dbUser, dbPassword, {
     host: dbInstance,
     dialect: 'mysql',
-    port: 8888,
+    port: 8889,
     logging: console.log,
   });
 }
