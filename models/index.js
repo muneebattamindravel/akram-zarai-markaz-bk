@@ -6,7 +6,6 @@ const dbConfig = {
   username: 'root',
   password: 'root',
   host: 'localhost',
-  // port: 8889,
   port: 3306,
   dialect: 'mysql'
   // logging: true,  // Set to `console.log` to enable logging
