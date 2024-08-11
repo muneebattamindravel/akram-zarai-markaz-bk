@@ -14,8 +14,8 @@ const dbConfig = {
 // Create a new Sequelize instance
 const sequelize = new Sequelize(
   dbConfig.database,
-  dbConfig.username,
   dbConfig.password,
+  dbConfig.username,
   {
     host: dbConfig.host,
     port: dbConfig.port,
