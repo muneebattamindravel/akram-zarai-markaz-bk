@@ -4,9 +4,10 @@ const { Sequelize } = require('sequelize');
 const dbConfig = {
   database: 'akram-zarai-markaz',
   username: 'root',
-  password: 'INjOXmfcLd+4',
+  password: 'root',
   host: 'localhost',
-  port: 8889,
+  // port: 8889,
+  port: 3306,
   dialect: 'mysql'
   // logging: true,  // Set to `console.log` to enable logging
 };
