@@ -5,9 +5,9 @@ const dbConfig = {
   database: 'akram-zarai-markaz',
   username: 'root',
   password: 'root',
-  host: '127.0.0.1',
+  host: 'localhost',
   port: 8889,
-  dialect: 'mysql',
+  // dialect: 'mysql',
   logging: true,  // Set to `console.log` to enable logging
 };
 
