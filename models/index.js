@@ -1,15 +1,27 @@
 const { Sequelize } = require('sequelize');
 
 // Database configuration
-const dbConfig = {
+const dbConfigAWS = {
   database: 'akram-zarai-markaz',
   username: 'root',
   password: 'INjOXmfcLd+4',
   host: 'localhost',
   port: 3306,
   dialect: 'mysql',
-  logging: `console.log`,  // Set to `console.log` to enable logging
+  logging: false,  // Set to `console.log` to enable logging
 };
+
+const dbConfigLocal = {
+  database: 'akram-zarai-markaz',
+  username: 'root',
+  password: 'root',
+  host: 'localhost',
+  port: 8889,
+  dialect: 'mysql',
+  logging: console.log,  // Set to `console.log` to enable logging
+};
+
+const dbConfig = dbConfigAWS
 
 // Create a new Sequelize instance
 const sequelize = new Sequelize(
