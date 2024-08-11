@@ -2,10 +2,7 @@ const Sequelize = require('sequelize');
 
 const dbnName = 'akram-zarai-markaz';
 const dbUser = 'azmuser1';
-const dbPassword = 'azmuser1';
-
-// const dbUser = 'root';
-// const dbPassword = '';
+const dbPassword = '';
 
 const dbInstance = 'localhost';
 
