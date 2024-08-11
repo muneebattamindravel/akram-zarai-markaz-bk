@@ -3,8 +3,8 @@ const { Sequelize } = require('sequelize');
 // Database configuration
 const dbConfig = {
   database: 'akram-zarai-markaz',
-  username: 'azmuser1',
-  password: 'azmuser1',
+  username: 'root',
+  password: 'INjOXmfcLd+4',
   host: 'localhost',
   port: 8889,
   dialect: 'mysql',
