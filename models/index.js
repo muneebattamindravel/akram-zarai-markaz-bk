@@ -1,25 +1,3 @@
-// const Sequelize = require('sequelize');
-
-// const dbnName = 'akram-zarai-markaz';
-// const dbUser = 'azmuser1';
-// const dbPassword = '';
-
-// const dbInstance = 'localhost';
-
-// let sequelize = null;
-
-// try {
-//   sequelize = new Sequelize(dbnName, dbUser, dbPassword, {
-//     host: dbInstance,
-//     dialect: 'mysql',
-//     port: 8889,
-//     logging: console.log,
-//   });
-// }
-// catch (e) {
-//   console.log(e);
-// }
-
 const { Sequelize } = require('sequelize');
 
 // Database configuration
