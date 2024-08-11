@@ -21,7 +21,8 @@ const dbConfigLocal = {
   logging: false,  // Set to `console.log` to enable logging
 };
 
-const dbConfig = dbConfigLocal
+const dbConfig = dbConfigAWS
+// const dbConfig = dbConfigLocal
 
 // Create a new Sequelize instance
 const sequelize = new Sequelize(
