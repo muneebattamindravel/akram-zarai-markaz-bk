@@ -23,7 +23,18 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const getAllAdmin = async() => {
+    try {
+      const model = require('../models').users
+      return await model.findAll()
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
   module.exports = {
     initialize,
     validate,
+    getAllAdmin
   }

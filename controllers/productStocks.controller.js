@@ -69,6 +69,42 @@ const returnProductStock = async (req, res) => {
     }
 }
 
+/**return manual product stock */
+const returnManualProductStock = async (req, res) => {
+    try {
+        const existingStock = await productstocks.getByID(req.body.productStockId)
+        const remainingStock = existingStock.quantity - req.body.returnQuantity;
+        const returnStockAmount = req.body.returnQuantity * req.body.returnPrice;
+
+        let updateBody = {
+            quantity: remainingStock
+        }
+
+        await stockbooksController.addstockbookEntry(
+            req.body.returnDate, "", "", req.body.invoiceNumber, -req.body.returnQuantity, STOCK_BOOKS_STRINGS.TYPE.MANUAL_STOCK_RETURN, req.body.details, existingStock.productId, existingStock.id);
+
+        await accounttransactionsController.createaccounttransaction(
+            req.body.returnDate,
+            returnStockAmount,
+            ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.MANUAL_STOCK_RETURN,
+            req.body.details,
+            req.body.companyAccountId,
+            req.body.companyAccountId,
+            "", 
+            "",
+            req.body.invoiceNumber,
+            "");
+        
+        await productstocks.update(updateBody, req.body.productStockId) ?
+        res.send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY}) :
+        res.status(406).send({message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}`})
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_CREATING_PRODUCT_STOCK, stack: err.stack})
+    }
+}
+
 const createproductstockWorker = async (productId, costPrice, batchNumber, invoiceNumber, purchaseId, initialQuantity, notes, expiryDate) => {
     productNextLotNumber = await productsController.getNextLotNumber(productId);
     const productstock = await productstocks.create({
@@ -187,4 +223,5 @@ module.exports = {
     createproductstockWorker,
     getProductStocksByPurchaseId,
     returnProductStock,
+    returnManualProductStock
 }

@@ -39,6 +39,7 @@ const initialize = (sequelize,Sequelize) => {
   const getAll = async (whereConditions, includeArray) => {
     try {
       const models = require('.')
+
       return await models.stockbooks.findAll(
         {
           where: whereConditions,
@@ -105,6 +106,16 @@ const initialize = (sequelize,Sequelize) => {
   const setAssociations = (db) => {
     db.stockbooks.belongsTo(db.products)
   }
+
+  const getAllAdmin = async() => {
+    try {
+      const model = require('../models').stockbooks
+      return await model.findAll()
+    }
+    catch (err) {
+      throw err
+    }
+  }
   
   module.exports = {
     initialize,
@@ -115,5 +126,6 @@ const initialize = (sequelize,Sequelize) => {
     deleteByReference,
     update,
     getByReference,
-    getCurrentStock
+    getCurrentStock,
+    getAllAdmin
   }

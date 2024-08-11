@@ -77,6 +77,16 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const getAllAdmin = async() => {
+    try {
+      const model = require('../models').units
+      return await model.findAll()
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
   module.exports = {
     initialize,
     create,
@@ -86,4 +96,5 @@ const initialize = (sequelize,Sequelize) => {
     deleteById,
     setAssociations,
     exists,
+    getAllAdmin
   }

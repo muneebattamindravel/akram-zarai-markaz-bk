@@ -193,6 +193,7 @@ const consolidateAccountStatementWorker = async(accountId) => {
     const where = {"accountId": accountId}
     const include = []
     const accounttransactions = await accounttransactionsModel.getAll(where, include,);
+    
     let closingBalance = accounttransactions[0].amount;
     accounttransactions.shift();
     await Promise.all(accounttransactions.map(async (accounttransaction) => {

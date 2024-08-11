@@ -73,6 +73,16 @@ const initialize = (sequelize,Sequelize) => {
   const setAssociations = (db) => {
     db.salepayments.belongsTo(db.accounts)
   } 
+
+  const getAllAdmin = async() => {
+    try {
+      const model = require('../models').salepayments
+      return await model.findAll()
+    }
+    catch (err) {
+      throw err
+    }
+  }
   
   module.exports = {
     initialize,
@@ -80,5 +90,6 @@ const initialize = (sequelize,Sequelize) => {
     setAssociations,
     deletesalepayments,
     getTotalPaymentsReceivedAmount,
-    getAll
+    getAll,
+    getAllAdmin
   }

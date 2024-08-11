@@ -98,6 +98,18 @@ const getAllProducts = async (req, res) => {
     }
 }
 
+/** get all products */
+const getAllProductsByNameFilter = async (req, res) => {
+    try {
+        const allProducts = await Products.getAllByNameFilter(req.params.filter)
+        res.send(allProducts)
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({error: err.message.toString(), message: PRODUCTS_STRINGS.ERROR_GETTING_PRODUCTS, stack: err.stack})
+    }
+}
+
 /** delete product by id */
 const deleteProduct = async (req, res) => {
     try {
@@ -144,4 +156,5 @@ module.exports = {
     getAllProducts,
     deleteProduct,
     getNextLotNumber,
+    getAllProductsByNameFilter
 }

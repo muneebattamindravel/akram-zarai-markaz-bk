@@ -6,6 +6,7 @@ const initialize = (sequelize,Sequelize) => {
         bookNumber: {type: Sequelize.STRING},
         billNumber: {type: Sequelize.STRING},
         returnApplied: {type: Sequelize.BOOLEAN},
+        notes: {type: Sequelize.STRING},
     });
   }
   
@@ -111,6 +112,16 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const getAllAdmin = async() => {
+    try {
+      const model = require('../models').sales
+      return await model.findAll()
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
   module.exports = {
     initialize,
     create,
@@ -119,5 +130,6 @@ const initialize = (sequelize,Sequelize) => {
     setAssociations,
     deleteById,
     getCounterSalesAmount,
-    update
+    update,
+    getAllAdmin
   }

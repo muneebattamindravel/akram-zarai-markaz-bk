@@ -116,6 +116,16 @@
       throw err
     }
   }
+
+  const getAllAdmin = async() => {
+    try {
+      const model = require('../models').accounts
+      return await model.findAll()
+    }
+    catch (err) {
+      throw err
+    }
+  }
   
   module.exports = {
     initialize,
@@ -127,4 +137,5 @@
     setAssociations,
     exists,
     getDefaultAccount,
+    getAllAdmin
   }

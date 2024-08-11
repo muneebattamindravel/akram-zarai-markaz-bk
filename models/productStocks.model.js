@@ -86,6 +86,16 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const getAllAdmin = async() => {
+    try {
+      const model = require('../models').productstocks
+      return await model.findAll()
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
   module.exports = {
     initialize,
     create,
@@ -94,5 +104,6 @@ const initialize = (sequelize,Sequelize) => {
     update,
     get,
     getAll,
-    deleteAll
+    deleteAll,
+    getAllAdmin
   }

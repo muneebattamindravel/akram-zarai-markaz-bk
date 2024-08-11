@@ -104,6 +104,16 @@ const initialize = (sequelize,Sequelize) => {
       throw err;
     }
   }
+
+  const getAllAdmin = async() => {
+    try {
+      const model = require('../models').accounttransactions
+      return await model.findAll()
+    }
+    catch (err) {
+      throw err
+    }
+  }
   
   module.exports = {
     initialize,
@@ -113,5 +123,7 @@ const initialize = (sequelize,Sequelize) => {
     getLastTransaction,
     deleteByReference,
     getFirstTransaction,
-    update
+    update,
+    getAllAdmin
+
   }

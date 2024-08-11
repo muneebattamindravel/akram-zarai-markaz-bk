@@ -18,171 +18,200 @@ const accountsController = require('../controllers/accounts.controller');
 /**creates a new sale */
 const createSale = async (req, res) => {
     try {
-        let saleDate = new Date(req.body.saleDate);
 
-        const createdSale = await Sales.create({
-            totalAmount: req.body.totalAmount,
-            discount: req.body.discount,
-            saleDate: saleDate,
-            bookNumber: req.body.bookNumber,
-            billNumber: req.body.billNumber,
-            contactId: req.body.contactId == 0 ? null : req.body.contactId,
-            returnApplied: req.body.returnApplied,
-        })
-
-        const defaultAccount = await Accounts.getDefaultAccount();
-
-        await salepayments.create({
-            receivedAmount: req.body.salepayment.receivedAmount,
-            receivedDate: req.body.salepayment.receivedDate,
-            paymentType: req.body.salepayment.paymentType,
-            bookNumber: req.body.bookNumber,
-            billNumber: req.body.billNumber,
-            saleId: createdSale.id,
-            accountId: req.body.salepayment.accountId == 0 ? defaultAccount.id : req.body.salepayment.accountId,
-        });
-
-        if (createdSale.contactId != null) {
-            const where = {type: "Customer", referenceId: createdSale.contactId}
-            const include = []
-            const cutomerAccount = (await Accounts.getAll(where, include))[0];
-
-            await accounttransactions.createaccounttransaction(
-                saleDate,
-                (req.body.totalAmount), 
-                ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE,
-                "",
-                cutomerAccount.id,
-                createdSale.id,
-                req.body.bookNumber,
-                req.body.billNumber,
-                "",
-                ""
-            );
-
-            await accounttransactions.createaccounttransaction(
-                saleDate,
-                (req.body.salepayment.receivedAmount * -1), 
-                ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT,
-                "",
-                cutomerAccount.id,
-                createdSale.id,
-                req.body.bookNumber,
-                req.body.billNumber,
-                "",
-                ""
-            );
-        }
-
-        if (req.body.salepayment.paymentType == 0) {
-            await accounttransactions.createaccounttransaction(
-                saleDate,
-                req.body.salepayment.receivedAmount, 
-                ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT, 
-                "",
-                defaultAccount.id,
-                createdSale.id,
-                req.body.bookNumber,
-                req.body.billNumber,
-                "",
-                ""
-            );
-        }
-        else if (req.body.salepayment.paymentType == 1) {
-            await accounttransactions.createaccounttransaction(
-                saleDate,
-                req.body.salepayment.receivedAmount, 
-                ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT, 
-                "",
-                req.body.salepayment.accountId,
-                createdSale.id,
-                req.body.bookNumber,
-                req.body.billNumber,
-                "",
-                ""
-            );
-        }
-
+        //first of all, double check that the total remaining stock is >= to the sold stock of each product in the saleItems
+        let isAnythingWrong = false;
         for (let i = 0; i < req.body.saleitems.length; i++) {
             let saleitem = req.body.saleitems[i];
             // Get The Product
             const product = await Products.getByID(saleitem.product.id);
 
-            //entry into the stock books
-            await stockbooksController.
-                addstockbookEntry
-                (saleDate, req.body.bookNumber, req.body.billNumber, "", saleitem.quantity * -1, 
-                STOCK_BOOKS_STRINGS.TYPE.SALE, "", product.id, createdSale.id);
-
-            // Create Sale Item
-            const saleitemCreated = await saleitemsmodel.create({
-                salePrice: saleitem.salePrice,
-                quantity: saleitem.quantity,
-                productId: product.id, 
-                saleId: createdSale.id,
-            });
-
-            var quantityRemaining = saleitem.quantity;
-            var lotsUsed = [];
-            // Loop Through the Stocks and Post Profits
+            let totalRemainingStockForProduct = 0;
             for (let j = 0; j < product.productstocks.length; j++) {
-
                 let productstock = product.productstocks[j];
-                if (productstock.quantity > 0 && quantityRemaining > 0) {
-                    //Case 1 - Existing Stock >= To Sold Stock
-                    if (productstock.quantity >= quantityRemaining) {
-                        let stockAmountUsed = quantityRemaining;
-                        productstock.quantity -= stockAmountUsed;
-                        quantityRemaining = 0;
-                        lotsUsed.push({lotNumber: productstock.lotNumber, quantity: stockAmountUsed})
-                        
-                        await productstocks.update({
-                            quantity: productstock.quantity,
-                        }, productstock.id);
-    
-                        // Profit Calculation
-                        let costPriceTotal = productstock.costPrice * stockAmountUsed;
-                        let salePriceTotal = saleitem.salePrice * stockAmountUsed;
-                        let profit = salePriceTotal - costPriceTotal;
-    
-                        await saleprofitsmodel.create({
-                            amount: profit,
-                            date: saleDate,
-                            saleId: createdSale.id,
-                            saleitemId: saleitemCreated.id
-                        })
-                    }
-                    //Case 2 - Existing Stock Doesn't Fulfil
-                    else {
-                        let stockAmountUsed = productstock.quantity;
-                        quantityRemaining -= stockAmountUsed;
-                        lotsUsed.push({lotNumber: productstock.lotNumber, quantity: stockAmountUsed})
-                        productstock.quantity = 0;
-
-                        await productstocks.update({
-                            quantity: productstock.quantity,
-                        }, productstock.id);
-    
-                        // Profit Calculation
-                        let costPriceTotal = productstock.costPrice * stockAmountUsed;
-                        let salePriceTotal = saleitem.salePrice * stockAmountUsed;
-                        let profit = salePriceTotal - costPriceTotal;
-    
-                        await saleprofitsmodel.create({
-                            amount: profit,
-                            date: saleDate,
-                            saleId: createdSale.id,
-                            saleitemId: saleitemCreated.id
-                        })
-                    }
-                }
+                totalRemainingStockForProduct += productstock.quantity;
             }
 
-            saleitemCreated.lotsUsedJson = JSON.stringify(lotsUsed);
-            await saleitemsmodel.update({lotsUsedJson: saleitemCreated.lotsUsedJson}, saleitemCreated.id);
+            if (totalRemainingStockForProduct < saleitem.quantity) {
+                isAnythingWrong = true;
+                break;
+            }
         }
+
+        if (isAnythingWrong) {
+            res.status(500).send({raw: "ERROR", message: SALES_STRINGS.ERROR_CREATING_SALE, stack: ""})
+            return;
+        }
+
+        if (!isAnythingWrong) {
+            let saleDate = new Date(req.body.saleDate);
+
+            console.log("Notes = " + req.body.notes);
+            const createdSale = await Sales.create({
+                totalAmount: req.body.totalAmount,
+                discount: req.body.discount,
+                saleDate: saleDate,
+                bookNumber: req.body.bookNumber,
+                billNumber: req.body.billNumber,
+                notes: req.body.notes,
+                contactId: req.body.contactId == 0 ? null : req.body.contactId,
+                returnApplied: req.body.returnApplied,
+            })
+
+            const defaultAccount = await Accounts.getDefaultAccount();
+
+            await salepayments.create({
+                receivedAmount: req.body.salepayment.receivedAmount,
+                receivedDate: req.body.salepayment.receivedDate,
+                paymentType: req.body.salepayment.paymentType,
+                bookNumber: req.body.bookNumber,
+                billNumber: req.body.billNumber,
+                saleId: createdSale.id,
+                accountId: req.body.salepayment.accountId == 0 ? defaultAccount.id : req.body.salepayment.accountId,
+            });
+
+            if (createdSale.contactId != null) {
+                const where = {type: "Customer", referenceId: createdSale.contactId}
+                const include = []
+                const cutomerAccount = (await Accounts.getAll(where, include))[0];
+
+                await accounttransactions.createaccounttransaction(
+                    saleDate,
+                    (req.body.totalAmount), 
+                    ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE,
+                    "",
+                    cutomerAccount.id,
+                    createdSale.id,
+                    req.body.bookNumber,
+                    req.body.billNumber,
+                    "",
+                    ""
+                );
+
+                await accounttransactions.createaccounttransaction(
+                    saleDate,
+                    (req.body.salepayment.receivedAmount * -1), 
+                    ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT,
+                    "",
+                    cutomerAccount.id,
+                    createdSale.id,
+                    req.body.bookNumber,
+                    req.body.billNumber,
+                    "",
+                    ""
+                );
+            }
+
+            if (req.body.salepayment.paymentType == 0) {
+                await accounttransactions.createaccounttransaction(
+                    saleDate,
+                    req.body.salepayment.receivedAmount, 
+                    ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT, 
+                    "",
+                    defaultAccount.id,
+                    createdSale.id,
+                    req.body.bookNumber,
+                    req.body.billNumber,
+                    "",
+                    ""
+                );
+            }
+            else if (req.body.salepayment.paymentType == 1) {
+                await accounttransactions.createaccounttransaction(
+                    saleDate,
+                    req.body.salepayment.receivedAmount, 
+                    ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT, 
+                    "",
+                    req.body.salepayment.accountId,
+                    createdSale.id,
+                    req.body.bookNumber,
+                    req.body.billNumber,
+                    "",
+                    ""
+                );
+            }
+
+            for (let i = 0; i < req.body.saleitems.length; i++) {
+                let saleitem = req.body.saleitems[i];
+                // Get The Product
+                const product = await Products.getByID(saleitem.product.id);
+
+                //entry into the stock books
+                await stockbooksController.
+                    addstockbookEntry
+                    (saleDate, req.body.bookNumber, req.body.billNumber, "", saleitem.quantity * -1, 
+                    STOCK_BOOKS_STRINGS.TYPE.SALE, "", product.id, createdSale.id);
+
+                // Create Sale Item
+                const saleitemCreated = await saleitemsmodel.create({
+                    salePrice: saleitem.salePrice,
+                    quantity: saleitem.quantity,
+                    productId: product.id, 
+                    saleId: createdSale.id,
+                });
+
+                var quantityRemaining = saleitem.quantity;
+                var lotsUsed = [];
+                // Loop Through the Stocks and Post Profits
+                for (let j = 0; j < product.productstocks.length; j++) {
+
+                    let productstock = product.productstocks[j];
+                    if (productstock.quantity > 0 && quantityRemaining > 0) {
+                        //Case 1 - Existing Stock >= To Sold Stock
+                        if (productstock.quantity >= quantityRemaining) {
+                            let stockAmountUsed = quantityRemaining;
+                            productstock.quantity -= stockAmountUsed;
+                            quantityRemaining = 0;
+                            lotsUsed.push({lotNumber: productstock.lotNumber, quantity: stockAmountUsed})
+                            
+                            await productstocks.update({
+                                quantity: productstock.quantity,
+                            }, productstock.id);
         
-        res.send(createdSale);
+                            // Profit Calculation
+                            let costPriceTotal = productstock.costPrice * stockAmountUsed;
+                            let salePriceTotal = saleitem.salePrice * stockAmountUsed;
+                            let profit = salePriceTotal - costPriceTotal;
+        
+                            await saleprofitsmodel.create({
+                                amount: profit,
+                                date: saleDate,
+                                saleId: createdSale.id,
+                                saleitemId: saleitemCreated.id
+                            })
+                        }
+                        //Case 2 - Existing Stock Doesn't Fulfil
+                        else {
+                            let stockAmountUsed = productstock.quantity;
+                            quantityRemaining -= stockAmountUsed;
+                            lotsUsed.push({lotNumber: productstock.lotNumber, quantity: stockAmountUsed})
+                            productstock.quantity = 0;
+
+                            await productstocks.update({
+                                quantity: productstock.quantity,
+                            }, productstock.id);
+        
+                            // Profit Calculation
+                            let costPriceTotal = productstock.costPrice * stockAmountUsed;
+                            let salePriceTotal = saleitem.salePrice * stockAmountUsed;
+                            let profit = salePriceTotal - costPriceTotal;
+        
+                            await saleprofitsmodel.create({
+                                amount: profit,
+                                date: saleDate,
+                                saleId: createdSale.id,
+                                saleitemId: saleitemCreated.id
+                            })
+                        }
+                    }
+                }
+
+                saleitemCreated.lotsUsedJson = JSON.stringify(lotsUsed);
+                await saleitemsmodel.update({lotsUsedJson: saleitemCreated.lotsUsedJson}, saleitemCreated.id);
+            }
+            
+            res.send(createdSale);
+        }
     }
     catch (err) {
         console.log(err)
@@ -211,7 +240,9 @@ const getAllSales = async (req, res) => {
 /** get sale */
 const getSale = async (req, res) => {
     try {
-        res.send(await getSaleObject(req.params.id, true))
+        var saleObject = await getSaleObject(req.params.id, true);
+        console.log(saleObject);
+        res.send(saleObject)
     }
     catch (err) {
         console.log(err)
@@ -237,6 +268,7 @@ const getSaleObject = async(saleId, isComplete = false) => {
         saleDate: sale.saleDate,
         bookNumber: sale.bookNumber,
         billNumber: sale.billNumber,
+        notes: sale.notes,
         returnApplied: sale.returnApplied,
         saleType: sale.saleType,
         createdAt: sale.createdAt,

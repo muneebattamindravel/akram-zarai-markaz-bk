@@ -64,6 +64,16 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const getAllAdmin = async() => {
+    try {
+      const model = require('../models').saleitems
+      return await model.findAll()
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
   
   
   module.exports = {
@@ -73,4 +83,5 @@ const initialize = (sequelize,Sequelize) => {
     deletesaleitems,
     setAssociations,
     getAll,
+    getAllAdmin
   }

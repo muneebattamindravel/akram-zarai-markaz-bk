@@ -72,6 +72,30 @@ const getAll = async() => {
   }
 }
 
+const getAllByNameFilter = async(nameFilter) => {
+  try {
+    const models = require('../models')
+    const { Op } = require("sequelize");
+    const products = await models.products.findAll({
+      where: {
+        name: {
+          [Op.like]: `%${nameFilter}%`
+        }
+      },
+      include: [
+        { model: models.companies },
+        { model: models.categories },
+        { model: models.units },
+        { model: models.productstocks }
+      ]
+    });
+    return products;
+  } catch (error) {
+    console.error('Error finding products:', error);
+    throw error;
+  }
+}
+
 const deleteById = async(id) => {
     try {
       const products = require('../models').products
@@ -93,6 +117,16 @@ const deleteById = async(id) => {
       throw err
     }
   }
+
+  const getAllAdmin = async() => {
+    try {
+      const model = require('../models').products
+      return await model.findAll()
+    }
+    catch (err) {
+      throw err
+    }
+  }
   
   module.exports = {
     initialize,
@@ -103,4 +137,6 @@ const deleteById = async(id) => {
     deleteById,
     setAssociations,
     exists,
+    getAllAdmin,
+    getAllByNameFilter
   }

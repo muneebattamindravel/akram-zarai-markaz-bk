@@ -155,10 +155,64 @@ const consolidateStockBookWorker = async(productId) => {
     return stockBookTransactions;
 }
 
+const checkAllFaultyDates = async (req, res) => {
+    try {
+        let finalLog = "Dates Check Data";
+
+        const referenceDate = new Date(req.params.date)
+
+
+        finalLog += await CheckDates(referenceDate, "accounts", "createdDate")
+        finalLog += await CheckDates(referenceDate, "accounttransactions", "transactionDate")
+        finalLog += await CheckDates(referenceDate, "bookings", "bookingDate")
+        finalLog += await CheckDates(referenceDate, "expenses", "date")
+        finalLog += await CheckDates(referenceDate, "incentives", "bookingDate")
+        finalLog += await CheckDates(referenceDate, "loans", "bookingDate")
+        finalLog += await CheckDates(referenceDate, "purchases", "invoiceDate")
+        finalLog += await CheckDates(referenceDate, "recoveries", "date")
+        finalLog += await CheckDates(referenceDate, "sales", "saleDate")
+        finalLog += await CheckDates(referenceDate, "salepayments", "receivedDate")
+        finalLog += await CheckDates(referenceDate, "saleprofits", "date")
+        finalLog += await CheckDates(referenceDate, "stockbooks", "date")
+        finalLog += await CheckDates(referenceDate, "transfers", "date")
+        
+        console.log(finalLog)
+        res.send(finalLog);
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: 'Error Consolidating Stock Book For All Products', stack: err.stack})
+    }
+}
+
+async function CheckDates(referenceDate, tableName, propertyName) {
+    let log = "\n------------------------\n"
+    log += "checking " + tableName + "\n"
+    const path = "../models/" + tableName + ".model";
+    const model = require(path);
+    const list = await model.getAllAdmin();
+    await Promise.all(list.map(async (item) => {
+        const dateToCheck = new Date(getPropertyValue(item, propertyName));
+        if (dateToCheck >= referenceDate)
+            log += "\nIssue in " + tableName + " id ("+item.id+") date ("+dateToCheck+")"
+    }));
+
+    return log
+}
+
+function getPropertyValue(obj, propName) {
+    if (obj.dataValues.hasOwnProperty(propName)) {
+      return obj.dataValues[propName];
+    } else {
+      return undefined;
+    }
+  }
+
 module.exports = {
     addstockbookEntry,
     getstockbook,
     consolidatestockbook,
     consolidateStockBookWorker,
     conslidateStockBooksForAll,
+    checkAllFaultyDates
 }

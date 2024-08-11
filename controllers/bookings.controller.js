@@ -1,8 +1,9 @@
 const BOOKINGS_STRINGS = require('../constants/bookings.strings');
 const Bookings = require('../models/bookings.model');
-const ACCOUNTS_STRINGS = require('../constants/accounts.strings');
+const accounttransactionsModel = require('../models/accountTransactions.model');
 const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
 const accounttransactionsController = require('./accountTransactions.controller');
+const accountsController = require('./accounts.controller');
 const CompaniesModel = require('../models/companies.model');
 
 /**creates a new booking */
@@ -61,6 +62,30 @@ const createBooking = async (req, res) => {
     }
 }
 
+/** delete booking */
+const deleteBooking = async (req, res) => {
+    try {
+        var bookingId = req.params.id;
+        const booking = await Bookings.getByID(bookingId);
+
+        const fromAccountId = booking.fromAccountId;
+        const company = await CompaniesModel.getByID(booking.companyId);
+        const companyAccountId = company.accountId;
+
+        await Bookings.deleteById(bookingId);
+        await accounttransactionsModel.deleteByReference(bookingId, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.BOOKING)
+
+        await accountsController.consolidateAccountStatementWorker(fromAccountId);
+        await accountsController.consolidateAccountStatementWorker(companyAccountId);
+
+        res.status(200).send();
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: "ERROR DELETING BOOKING", stack: err.stack})
+    }
+}
+
 /** get a booking with id */
 const getBooking = async (req, res) => {
     try {
@@ -105,4 +130,5 @@ module.exports = {
     createBooking,
     getBooking,
     getAllBookings,
+    deleteBooking
 }

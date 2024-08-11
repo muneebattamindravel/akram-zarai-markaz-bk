@@ -1,35 +1,24 @@
 const Sequelize = require('sequelize');
 
-const dbnName = process.env.DB_NAME || 'akram-zarai-markaz';
-const dbUser = process.env.DB_USER || 'azmuser1';
-const dbPassword = process.env.DB_PASS || 'azmuser1';
-const dbInstance = process.env.DB_INSTANCE || 'localhost';
-// const includeDialectOptions = process.env.INCLUDE_DIALECT_OPTIONS || false;
+const dbnName = 'akram-zarai-markaz';
+const dbUser = 'azmuser1';
+const dbPassword = 'azmuser1';
+const dbInstance = 'localhost';
 
 let sequelize = null;
-// if (includeDialectOptions) {npm 
-//   sequelize = new Sequelize(
-//     dbnName, 
-//     dbUser, 
-//     dbPassword, 
-//     {
-//       host: dbInstance,
-//       dialect: 'mysql',
-//       dialectOptions: {
-//         socketPath: dbInstance,
-//       },
-//     });
-// }
-// else {
-  sequelize = new Sequelize(
-    dbnName, 
-    dbUser, 
-    dbPassword, 
-    {
-      host: dbInstance,
-      dialect: 'mysql',
-    });
-// }
+
+try {
+  sequelize = new Sequelize(dbnName, dbUser, dbPassword, {
+    host: dbInstance,
+    dialect: 'mysql',
+    port: 8889,
+    logging: console.log,
+  });
+}
+catch (e) {
+  console.log(e);
+}
+
 
 const db = {};
 db.Sequelize = Sequelize;
@@ -102,5 +91,3 @@ Loans.setAssociations(db)
 Incentives.setAssociations(db)
 
 module.exports = db;
-
-//hello

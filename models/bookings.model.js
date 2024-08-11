@@ -53,10 +53,36 @@ const getAll = async() => {
   }
 }
 
+const deleteById = async(id) => {
+  try {
+    const Models = require('../models').bookings
+    return await Models.destroy(
+        {
+          where: {id: id}
+        }
+      )
+  }
+  catch (err) {
+    throw err
+  }
+}
+
+const getAllAdmin = async() => {
+  try {
+    const model = require('../models').bookings
+    return await model.findAll()
+  }
+  catch (err) {
+    throw err
+  }
+}
+
 module.exports = {
   initialize,
   create,
   getByID,
   getAll,
   setAssociations,
+  deleteById,
+  getAllAdmin
 }
