@@ -115,6 +115,8 @@ const returnSaleItems = async (req, res) => {
         const salePayment = sale.salePayments[0];
         const defaultAccount = await Accounts.getDefaultAccount();
 
+        //temp change
+
         const isCashSale = salePayment.receivedAmount == sale.totalAmount ? true : false;
 
         if (totalRefundAmount > 0) {
