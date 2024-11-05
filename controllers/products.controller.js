@@ -84,12 +84,6 @@ const getNextLotNumber = async (id) => {
 const getAllProducts = async (req, res) => {
     try {
         const allProducts = await Products.getAll()
-
-        // await Promise.all(allProducts.map(async (prod) => {
-        //     currentStock = await stockBooksModel.getCurrentStock(prod.id);
-        //     prod.setDataValue('currentStock', currentStock);
-        // }));
-
         res.send(allProducts)
     }
     catch (err) {

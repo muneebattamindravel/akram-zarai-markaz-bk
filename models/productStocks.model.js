@@ -71,6 +71,22 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const getByLotNumber = async (productId, lotNumber, includeArray = []) => {
+    try {
+      const models = require('.');
+      return await models.productstocks.findOne({
+        where: { 
+          productId: productId, 
+          lotNumber: lotNumber 
+        },
+        include: includeArray
+      });
+    } catch (err) {
+      throw err;
+    }
+  };
+  
+
   //delete all productStocks
   const deleteAll = async (whereConditions) => {
     try {
@@ -105,5 +121,6 @@ const initialize = (sequelize,Sequelize) => {
     get,
     getAll,
     deleteAll,
-    getAllAdmin
+    getAllAdmin,
+    getByLotNumber
   }

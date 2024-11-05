@@ -14,6 +14,7 @@ const accounttransactionsModel = require('../models/accountTransactions.model');
 const stockbooksController = require('./stockBooks.controller');
 const stockbooksModel = require('../models/stockBooks.model');
 const accountsController = require('../controllers/accounts.controller');
+const saleReturnsModel = require('../models/saleReturns.model');
 
 /**creates a new sale */
 const createSale = async (req, res) => {
@@ -46,7 +47,6 @@ const createSale = async (req, res) => {
         if (!isAnythingWrong) {
             let saleDate = new Date(req.body.saleDate);
 
-            console.log("Notes = " + req.body.notes);
             const createdSale = await Sales.create({
                 totalAmount: req.body.totalAmount,
                 discount: req.body.discount,
@@ -276,7 +276,8 @@ const getSaleObject = async(saleId, isComplete = false) => {
         contact: contact,
         profitAmount: totalProfit,
         receivedAmount: salepaymentsAmount[0].receivedAmount,
-        salePayment: salePayments[0]
+        salePayment: salePayments[0],
+        salePayments: salePayments
     }
 
     if (isComplete) {
@@ -321,6 +322,7 @@ const deleteSale = async (req, res) => {
         }
 
         //Now delete from other tables
+        await saleReturnsModel.DeleteSaleReturns(req.params.id);
         await salepayments.deletesalepayments(req.params.id);
         await saleprofitsmodel.deletesaleprofits(req.params.id);
         await saleitemsmodel.deletesaleitems(req.params.id);
@@ -389,5 +391,6 @@ module.exports = {
     getSale,
     deleteSale,
     getCounterSaleAmount,
-    getCounterSaleAmountWorker
+    getCounterSaleAmountWorker,
+    getSaleObject
 }

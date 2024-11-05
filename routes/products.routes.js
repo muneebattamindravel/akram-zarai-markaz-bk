@@ -13,3 +13,4 @@ app.get('/products/stockbook/:id',stockbooksController.getstockbook);
 app.get('/products/consolidate/stockbooks',stockbooksController.conslidateStockBooksForAll);
 
 app.get('/admin/checkdates/:date',stockbooksController.checkAllFaultyDates);
+app.get('/admin/checkfaultyproductstocks/',stockbooksController.checkAllFaultyProductStocks);

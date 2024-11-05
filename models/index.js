@@ -16,13 +16,13 @@ const dbConfigLocal = {
   username: 'root',
   password: 'root',
   host: 'localhost',
-  port: 8889,
+  port: 3306,
   dialect: 'mysql',
   logging: false,  // Set to `console.log` to enable logging
 };
 
-const dbConfig = dbConfigAWS
-// const dbConfig = dbConfigLocal
+// const dbConfig = dbConfigAWS
+const dbConfig = dbConfigLocal
 
 // Create a new Sequelize instance
 const sequelize = new Sequelize(
@@ -67,7 +67,9 @@ const Accounts = require('./accounts.model');
 const accounttransactions = require('./accountTransactions.model');
 const Bookings = require('./bookings.model');
 const Sales = require('./sales.model');
+const SaleReturns = require('./saleReturns.model');
 const saleitems = require('./saleItems.model');
+const salereturns = require('./saleReturns.model');
 const saleprofits = require('./saleProfits.model');
 const salepayments = require('./salePayments.model');
 const stockbooks = require('./stockBooks.model');
@@ -89,6 +91,7 @@ db.accounts = Accounts.initialize(sequelize,Sequelize);
 db.accounttransactions = accounttransactions.initialize(sequelize,Sequelize);
 db.bookings = Bookings.initialize(sequelize,Sequelize);
 db.sales = Sales.initialize(sequelize,Sequelize);
+db.salereturns = salereturns.initialize(sequelize,Sequelize);
 db.saleitems = saleitems.initialize(sequelize,Sequelize);
 db.saleprofits = saleprofits.initialize(sequelize,Sequelize);
 db.salepayments = salepayments.initialize(sequelize,Sequelize);
@@ -111,6 +114,7 @@ Accounts.setAssociations(db)
 accounttransactions.setAssociations(db)
 Bookings.setAssociations(db)
 Sales.setAssociations(db)
+SaleReturns.setAssociations(db)
 saleitems.setAssociations(db)
 saleprofits.setAssociations(db)
 salepayments.setAssociations(db)

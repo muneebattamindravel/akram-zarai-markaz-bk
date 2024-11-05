@@ -155,6 +155,8 @@ const consolidateStockBookWorker = async(productId) => {
     return stockBookTransactions;
 }
 
+
+
 const checkAllFaultyDates = async (req, res) => {
     try {
         let finalLog = "Dates Check Data";
@@ -208,11 +210,40 @@ function getPropertyValue(obj, propName) {
     }
   }
 
+const checkAllFaultyProductStocks = async (req, res) => {
+    try {
+        let reply = ''
+
+        const allProducts = await productsModel.getAll()
+
+        await Promise.all(allProducts.map(async (_product) => {
+
+            let totalStock = 0.0;
+            _product.productstocks.map((_productStock) => {
+                totalStock += _productStock.quantity
+            })
+            
+            const lastStockBookEntry = await stockbooksModel.getLastTransaction(_product.id);
+            if (lastStockBookEntry) {
+                if (totalStock != lastStockBookEntry.closing)
+                    reply += `\nProduct (${_product.id}) totalStock = ${totalStock}, lastStockBookEntry ${lastStockBookEntry.closing}`;
+            }
+        }));
+
+        res.send(reply);
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: 'Error Consolidating Stock Book For All Products', stack: err.stack})
+    }
+}
+
 module.exports = {
     addstockbookEntry,
     getstockbook,
     consolidatestockbook,
     consolidateStockBookWorker,
     conslidateStockBooksForAll,
-    checkAllFaultyDates
+    checkAllFaultyDates,
+    checkAllFaultyProductStocks
 }

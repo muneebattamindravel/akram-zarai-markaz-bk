@@ -6,6 +6,7 @@ module.exports = {
     ACCOUNT_TRANSACTION_TYPE : {
         ACCOUNT_CREATED: 'ACCOUNT_CREATED',
         SALE: 'SALE',
+        SALE_RETURN: 'SALE RETURN',
         SALE_PAYMENT: 'SALE_PAYMENT',
         BOOKING: 'BOOKING',
         PURCHASE: 'PURCHASE',

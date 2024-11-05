@@ -64,6 +64,19 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  const getByID = async (id, includeArray = []) => {
+    try {
+      const models = require('.');
+      return await models.saleitems.findOne({
+        where: { id: id },
+        include: includeArray
+      });
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  
   const getAllAdmin = async() => {
     try {
       const model = require('../models').saleitems
@@ -83,5 +96,6 @@ const initialize = (sequelize,Sequelize) => {
     deletesaleitems,
     setAssociations,
     getAll,
-    getAllAdmin
+    getAllAdmin,
+    getByID
   }

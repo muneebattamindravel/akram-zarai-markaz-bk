@@ -61,7 +61,7 @@
   
   const getByID = async(id) => {
     try {
-      const accounts = require('../models').accounts      
+      const accounts = require('../models').accounts
       return await accounts.findByPk(id)
     }
     catch (err) {
