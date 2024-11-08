@@ -3,6 +3,9 @@ const initialize = (sequelize,Sequelize) => {
       returnAmount: {type: Sequelize.FLOAT},
       lotsReturnedToJson: {type: Sequelize.TEXT},
       quantity: {type: Sequelize.FLOAT},
+      bookNumber: {type: Sequelize.STRING},
+      billNumber: {type: Sequelize.STRING},
+      returnDate: {type: Sequelize.DATEONLY}
     });
   }
   
@@ -48,15 +51,19 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
-  const getAll = async (whereConditions, includeArray) => {
+  const getAll = async(from, to) => {
     try {
-      const models = require('.')
-      return await models.salereturns.findAll(
-        {
-          where: whereConditions,
-          include: includeArray
-        }
-      )
+      const { Op } = require("sequelize");
+      const saleReturns = require('../models').salereturns
+
+      return await saleReturns.findAll(
+          {
+            where : {
+              "returnDate" : {[Op.between] : [from , to ]}
+            },
+            order: [['saleDate', 'ASC']],
+          }
+        )
     }
     catch (err) {
       throw err
