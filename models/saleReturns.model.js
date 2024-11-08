@@ -24,6 +24,8 @@ const initialize = (sequelize,Sequelize) => {
     }
   }
 
+  
+
    //delete all sale returns posted of a particular sale
    const DeleteSaleReturns = async (saleId) => {
     try {
