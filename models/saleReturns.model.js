@@ -57,13 +57,37 @@ const initialize = (sequelize,Sequelize) => {
     try {
       const { Op } = require("sequelize");
       const saleReturns = require('../models').salereturns
+      const models = require('../models')
 
       return await saleReturns.findAll(
           {
             where : {
               "returnDate" : {[Op.between] : [from , to ]}
             },
-            order: [['saleDate', 'ASC']],
+            include: [
+              {model: models.products}
+          ],
+          order: [['returnDate', 'ASC']],
+          }
+        )
+    }
+    catch (err) {
+      throw err
+    }
+  }
+
+  const getBySaleId = async(saleId) => {
+    try {
+      const models = require('../models')
+      const saleReturns = require('../models').salereturns
+      return await saleReturns.findAll(
+          {
+            where : {
+              "saleId" : saleId
+            },
+            include: [
+              {model: models.products}
+          ],
           }
         )
     }
@@ -91,5 +115,6 @@ const initialize = (sequelize,Sequelize) => {
     setAssociations,
     getAll,
     getAllAdmin,
-    DeleteSaleReturns
+    DeleteSaleReturns,
+    getBySaleId
   }

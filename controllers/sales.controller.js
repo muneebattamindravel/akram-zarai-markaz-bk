@@ -261,6 +261,8 @@ const getSaleObject = async(saleId, isComplete = false) => {
     const salepaymentsAmount = await salepayments.getTotalPaymentsReceivedAmount(sale.id);
     const contact = await Contacts.getByID(sale.contactId);
 
+    const saleReturns = await saleReturnsModel.getBySaleId(saleId);
+
      var saleObject = {
         id : sale.id,
         totalAmount: sale.totalAmount,
@@ -277,7 +279,8 @@ const getSaleObject = async(saleId, isComplete = false) => {
         profitAmount: totalProfit,
         receivedAmount: salepaymentsAmount[0].receivedAmount,
         salePayment: salePayments[0],
-        salePayments: salePayments
+        salePayments: salePayments,
+        saleReturns: saleReturns
     }
 
     if (isComplete) {
