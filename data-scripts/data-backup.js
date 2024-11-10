@@ -105,6 +105,9 @@ const upload = async (req, res) => {
         res.status(200).send({ message: 'Database restored successfully.' });
         return;
 
+
+        
+
         if (!req.files || !req.files.dumpFile) {
             res.status(400).send('No file received');
             return;
