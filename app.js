@@ -15,8 +15,6 @@ if (process.env.NODE_ENV === 'production') {
   dotenv.config({ path: path.resolve(__dirname, '.env') });
 }
 
-console.log("Variables = DB_NAME " + process.env.DB_NAME);
-
 const app = express();
 module.exports = app;
 console.log(process.pid)
