@@ -9,7 +9,7 @@ const dbConfig = {
     username: 'root',
     password: 'root',
     host: 'localhost',
-    port: 3306
+    port: 8889
 };
 
 // Function to create a database dump
