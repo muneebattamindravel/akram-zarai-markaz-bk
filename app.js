@@ -58,6 +58,6 @@ const db = require('./models');
 
 force = false;
 db.sequelize.sync({force}).then(() => {
-  if (force)
-    migrationScript.RunMigration();
+  // if (force)
+  //   migrationScript.RunMigration();
 })
