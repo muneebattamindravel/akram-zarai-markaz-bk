@@ -17,7 +17,7 @@ const dbConfigLocal = {
 };
 
 // Choose configuration as needed
-const GetLocalDBConfig = () => dbConfigAWS;
+const GetLocalDBConfig = () => dbConfigLocal;
 const GetSourceDBConfig = () => dbConfigLocal;
 const GetTargetDBConfig = () => dbConfigAWS;
 

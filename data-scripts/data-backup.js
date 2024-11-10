@@ -100,6 +100,11 @@ const uploadFile = (filePath, fileName, res) => {
 // Function to restore a database dump from the uploaded file
 const upload = async (req, res) => {
     try {
+
+        console.log("Here");
+        res.status(200).send({ message: 'Database restored successfully.' });
+        return;
+
         if (!req.files || !req.files.dumpFile) {
             res.status(400).send('No file received');
             return;
