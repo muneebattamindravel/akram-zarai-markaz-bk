@@ -6,6 +6,17 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const _ = require('lodash');
 
+const path = require('path');
+const dotenv = require('dotenv');
+
+if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: path.resolve(__dirname, '.env.production') });
+} else {
+  dotenv.config({ path: path.resolve(__dirname, '.env') });
+}
+
+console.log("Variables = DB_NAME " + process.env.DB_NAME);
+
 const app = express();
 module.exports = app;
 console.log(process.pid)

@@ -2,22 +2,16 @@ const { exec } = require('child_process');
 const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
-const config = require('../config/dbConfig'); // Import dbConfig.js
-
-// Database configuration
-const sourceDbConfig = config.GetSourceDBConfig();
-const targetDbConfig = config.GetTargetDBConfig();
-const uploadURL = config.GetUploadURL();
 
 // Determine the correct mysqldump and mysql paths based on the platform
 const isWindows = process.platform === 'win32' || process.platform === 'win64';
 const mysqldumpPath = isWindows
-  ? 'C:\\MAMP\\bin\\mysql\\bin\\mysqldump' // Path for MAMP on Windows
-  : '/Applications/MAMP/Library/bin/mysql80/bin/mysqldump'; // Path for MAMP on macOS
+    ? 'C:\\MAMP\\bin\\mysql\\bin\\mysqldump' // Path for MAMP on Windows
+    : '/Applications/MAMP/Library/bin/mysql80/bin/mysqldump'; // Path for MAMP on macOS
 
 const mysqlPath = isWindows
-  ? 'C:\\MAMP\\bin\\mysql\\bin\\mysql' // Path for MAMP on Windows
-  : '/Applications/MAMP/Library/bin/mysql80/bin/mysql'; // Path for MAMP on macOS
+    ? 'C:\\MAMP\\bin\\mysql\\bin\\mysql' // Path for MAMP on Windows
+    : '/Applications/MAMP/Library/bin/mysql80/bin/mysql'; // Path for MAMP on macOS
 
 // Function to create a database dump
 const backup = async (req, res) => {
@@ -25,7 +19,7 @@ const backup = async (req, res) => {
         const now = new Date();
         const date = now.toISOString().split('T')[0];
         const time = now.toTimeString().split(' ')[0].replace(/:/g, '-');
-        const dumpFileName = `${date}-${time}-${sourceDbConfig.database}.dump.sql`;
+        const dumpFileName = `${date}-${time}-${process.env.DB_NAME}.dump.sql`;
 
         const localDataBackups = '../local-data-backups';
         const dumpFilePath = path.join(__dirname, localDataBackups, dumpFileName);
@@ -35,8 +29,8 @@ const backup = async (req, res) => {
             fs.mkdirSync(path.join(__dirname, localDataBackups), { recursive: true });
         }
 
-        // Construct the dump command
-        const dumpCommand = `${mysqldumpPath} --protocol=tcp -u${sourceDbConfig.username} -p${sourceDbConfig.password} -h${sourceDbConfig.host} --port=${sourceDbConfig.port} ${sourceDbConfig.database} > "${dumpFilePath}"`;
+        // Construct the dump command using process.env variables directly
+        const dumpCommand = `${mysqldumpPath} --protocol=tcp -u${process.env.DB_USER} -p${process.env.DB_PASSWORD} -h${process.env.DB_HOST} --port=${process.env.DB_PORT} ${process.env.DB_NAME} > "${dumpFilePath}"`;
 
         // Execute the dump command
         exec(dumpCommand, (error, stdout, stderr) => {
@@ -47,8 +41,6 @@ const backup = async (req, res) => {
             }
 
             console.log('Database dump created successfully.');
-
-            // After successful backup, upload the file
             uploadFile(dumpFilePath, dumpFileName, res);
         });
     } catch (error) {
@@ -73,7 +65,7 @@ const uploadFile = (filePath, fileName, res) => {
         message: ''
     };
 
-    form.submit(uploadURL, (error, response) => {
+    form.submit(process.env.UPLOAD_URL_SERVER, (error, response) => {
         if (error) {
             console.error(`Error uploading dump file: ${error.message}`);
             responseObject.fileUploaded = false;
@@ -100,13 +92,9 @@ const uploadFile = (filePath, fileName, res) => {
 // Function to restore a database dump from the uploaded file
 const upload = async (req, res) => {
     try {
-
         console.log("Here");
         res.status(200).send({ message: 'Database restored successfully.' });
         return;
-
-
-        
 
         if (!req.files || !req.files.dumpFile) {
             res.status(400).send('No file received');
@@ -125,8 +113,8 @@ const upload = async (req, res) => {
         // Save the uploaded file
         await dumpFile.mv(dumpFilePath);
 
-        // Construct the restore command without my.cnf
-        const restoreCommand = `${mysqlPath} -h${targetDbConfig.host} -u${targetDbConfig.username} -p${targetDbConfig.password} --port=${targetDbConfig.port} ${targetDbConfig.database} < "${dumpFilePath}"`;
+        // Construct the restore command using process.env variables directly
+        const restoreCommand = `${mysqlPath} -h${process.env.TARGET_DB_HOST} -u${process.env.TARGET_DB_USER} -p${process.env.TARGET_DB_PASSWORD} --port=${process.env.TARGET_DB_PORT} ${process.env.TARGET_DB_NAME} < "${dumpFilePath}"`;
 
         exec(restoreCommand, (error, stdout, stderr) => {
             if (error) {

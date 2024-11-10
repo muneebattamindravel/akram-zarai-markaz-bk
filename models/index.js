@@ -1,18 +1,22 @@
 const { Sequelize } = require('sequelize');
-const config = require('../config/dbConfig');
 
-const dbConfig = config.GetLocalDBConfig();
+require('dotenv').config();
+console.log("Environment Variables:");
+console.log("DATABASE: " + process.env.DB_NAME);
+console.log("USERNAME: " + process.env.DB_USER);
+console.log("PASSWORD: " + process.env.DB_PASSWORD);
+console.log("HOST: " + process.env.DB_HOST);
 
 // Create a new Sequelize instance
 const sequelize = new Sequelize(
-  dbConfig.database,
-  dbConfig.username,
-  dbConfig.password,
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
   {
-    host: dbConfig.host,
-    port: dbConfig.port,
-    dialect: dbConfig.dialect,
-    logging: dbConfig.logging,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: 'mysql',
+    logging: false,
   }
 );
 
