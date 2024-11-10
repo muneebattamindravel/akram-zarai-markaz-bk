@@ -14,11 +14,12 @@ const mysqldumpPath = isWindows
     ? '/Applications/MAMP/Library/bin/mysql80/bin/mysqldump' // Path for MAMP on macOS
     : '/opt/bitnami/mariadb/bin/mysqldump'; // Path for Linux (AWS Lightsail)
 
-const mysqlPath = isWindows
+    const mysqlPath = isWindows
     ? 'C:\\MAMP\\bin\\mysql\\bin\\mysql' // Path for MAMP on Windows
     : isMac
     ? '/Applications/MAMP/Library/bin/mysql80/bin/mysql' // Path for MAMP on macOS
-    : '/opt/bitnami/mariadb/bin/mysql'; // Path for Linux (AWS Lightsail)
+    : '/opt/bitnami/mariadb/bin/mariadb'; // Updated path for Linux (AWS Lightsail)
+
 
 // Example usage
 console.log("mysqldump path:", mysqldumpPath);
