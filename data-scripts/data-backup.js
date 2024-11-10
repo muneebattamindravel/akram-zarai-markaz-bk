@@ -5,13 +5,25 @@ const path = require('path');
 
 // Determine the correct mysqldump and mysql paths based on the platform
 const isWindows = process.platform === 'win32' || process.platform === 'win64';
+const isMac = process.platform === 'darwin';
+const isLinux = process.platform === 'linux';
+
 const mysqldumpPath = isWindows
     ? 'C:\\MAMP\\bin\\mysql\\bin\\mysqldump' // Path for MAMP on Windows
-    : '/Applications/MAMP/Library/bin/mysql80/bin/mysqldump'; // Path for MAMP on macOS
+    : isMac
+    ? '/Applications/MAMP/Library/bin/mysql80/bin/mysqldump' // Path for MAMP on macOS
+    : '/opt/bitnami/mariadb/bin/mysqldump'; // Path for Linux (AWS Lightsail)
 
 const mysqlPath = isWindows
     ? 'C:\\MAMP\\bin\\mysql\\bin\\mysql' // Path for MAMP on Windows
-    : '/Applications/MAMP/Library/bin/mysql80/bin/mysql'; // Path for MAMP on macOS
+    : isMac
+    ? '/Applications/MAMP/Library/bin/mysql80/bin/mysql' // Path for MAMP on macOS
+    : '/opt/bitnami/mariadb/bin/mysql'; // Path for Linux (AWS Lightsail)
+
+// Example usage
+console.log("mysqldump path:", mysqldumpPath);
+console.log("mysql path:", mysqlPath);
+
 
 // Function to create a database dump
 const backup = async (req, res) => {
