@@ -92,27 +92,33 @@ const uploadFile = (filePath, fileName, res) => {
 // Function to restore a database dump from the uploaded file
 const upload = async (req, res) => {
     try {
-
+        console.log("1");
         if (!req.files || !req.files.dumpFile) {
             res.status(400).send('No file received');
             return;
         }
 
+        console.log("2");
         const dumpFile = req.files.dumpFile;
         const uploadedDataBackups = '../uploaded-data-backups';
         const dumpFilePath = path.join(__dirname, uploadedDataBackups, dumpFile.name);
+
+        console.log("3");
 
         // Ensure the directory exists
         if (!fs.existsSync(path.join(__dirname, uploadedDataBackups))) {
             fs.mkdirSync(path.join(__dirname, uploadedDataBackups), { recursive: true });
         }
 
+        console.log("4");
         // Save the uploaded file
         await dumpFile.mv(dumpFilePath);
 
+        console.log("5");
         // Construct the restore command using process.env variables directly
-        const restoreCommand = `${mysqlPath} -h${process.env.TARGET_DB_HOST} -u${process.env.TARGET_DB_USER} -p${process.env.TARGET_DB_PASSWORD} --port=${process.env.TARGET_DB_PORT} ${process.env.TARGET_DB_NAME} < "${dumpFilePath}"`;
+        const restoreCommand = `${mysqlPath} -h${process.env.DB_HOST} -u${process.env.DB_USER} -p${process.env.DB_PASSWORD} --port=${process.env.DB_PORT} ${process.env.DB_NAME} < "${dumpFilePath}"`;
 
+        console.log("6 Restore Command = " + restoreCommand);
         exec(restoreCommand, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error restoring database: ${error.message}`);
