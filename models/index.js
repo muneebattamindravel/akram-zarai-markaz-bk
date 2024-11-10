@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 const config = require('../config/dbConfig');
 
-const dbConfig = config.GetSourceDBConfig();
+const dbConfig = config.GetLocalDBConfig();
 
 // Create a new Sequelize instance
 const sequelize = new Sequelize(

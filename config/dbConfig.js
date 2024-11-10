@@ -17,6 +17,7 @@ const dbConfigLocal = {
 };
 
 // Choose configuration as needed
+const GetLocalDBConfig = () => dbConfigAWS;
 const GetSourceDBConfig = () => dbConfigLocal;
 const GetTargetDBConfig = () => dbConfigAWS;
 
@@ -25,7 +26,8 @@ const GetTargetDBConfig = () => dbConfigAWS;
 const GetUploadURL = () => 'http://18.140.71.84:6969/data/upload/';
 
 module.exports = {
-  GetSourceDBConfig,
-  GetTargetDBConfig,
-  GetUploadURL
+    GetLocalDBConfig,
+    GetSourceDBConfig,
+    GetTargetDBConfig,
+    GetUploadURL
 };
