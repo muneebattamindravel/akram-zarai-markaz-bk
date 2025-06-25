@@ -15,6 +15,7 @@ const stockbooksController = require('./stockBooks.controller');
 const stockbooksModel = require('../models/stockBooks.model');
 const accountsController = require('../controllers/accounts.controller');
 const saleReturnsModel = require('../models/saleReturns.model');
+const { Op } = require("sequelize");
 
 /**creates a new sale */
 const createSale = async (req, res) => {
@@ -388,6 +389,52 @@ const getCounterSaleAmountWorker = async(from, to) => {
     }
 }
 
+const searchSales = async (req, res) => {
+    try {
+        const query = {};
+
+        if (req.query.bookNumber) {
+            query.bookNumber = { [Op.like]: `%${req.query.bookNumber.trim()}%` };
+        }
+
+        if (req.query.billNumber) {
+            query.billNumber = { [Op.like]: `%${req.query.billNumber.trim()}%` };
+        }
+
+        if (req.query.totalAmount && !isNaN(req.query.totalAmount)) {
+            query.totalAmount = parseFloat(req.query.totalAmount);
+        }
+
+        if (req.query.saleDate) {
+            query.saleDate = req.query.saleDate;
+        }
+
+        console.log("*** On Server, Search Query =", query);
+
+        // ✅ Just pass query, NOT { where: query }
+        const sales = await Sales.search(query);
+
+        const result = await Promise.all(
+            sales.map(async sale => {
+                const obj = await getSaleObject(sale.id, false);
+                return obj || sale;
+            })
+        );
+
+        res.send(result);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).send({
+            raw: err.message.toString(),
+            message: "ERROR_SEARCHING_SALES",
+            stack: err.stack
+        });
+    }
+};
+
+
+
 module.exports = {
     createSale,
     getAllSales,
@@ -395,5 +442,6 @@ module.exports = {
     deleteSale,
     getCounterSaleAmount,
     getCounterSaleAmountWorker,
-    getSaleObject
+    getSaleObject,
+    searchSales
 }

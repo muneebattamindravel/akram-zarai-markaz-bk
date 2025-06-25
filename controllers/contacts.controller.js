@@ -182,6 +182,18 @@ const IsContactBodyValid = (body, res) => {
     return true
 }
 
+/** get all customers by name filter */
+const getAllCustomersByNameFilter = async (req, res) => {
+    try {
+        const customers = await Contacts.getAllCustomersByNameFilter(req.params.filter)
+        res.send(customers)
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({error: err.message.toString(), message: 'Error Getting Customers', stack: err.stack})
+    }
+}
+
 module.exports = {
     createContact,
     updateContact,
@@ -190,5 +202,6 @@ module.exports = {
     getAllSuppliers,
     getAllCustomers,
     deleteContact,
-    createContactDBMigration
+    createContactDBMigration,
+    getAllCustomersByNameFilter
 }
