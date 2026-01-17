@@ -3,10 +3,9 @@ const accounttransactions = require('./accountTransactions.controller');
 const ACCOUNT_TRANSACTION_STRINGS = require('../constants/accountTransactions.strings');
 const accounttransactionsModel = require('../models/accountTransactions.model');
 
-/**creates a new expense */
 const createExpense = async (req, res) => {
     try {
-        res.send(createExpenseWorker(
+        const result = await createExpenseWorker(
             req.body.date,
             req.body.type,
             req.body.description,
@@ -14,12 +13,15 @@ const createExpense = async (req, res) => {
             req.body.billNumber,
             req.body.accountId,
             req.body.amount
-        ));
+        );
+
+        res.send(result);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ raw: err.message?.toString(), message: "Create Expense Error", stack: err.stack });
     }
-    catch (err) {
-        console.log(err)
-    }
-}
+};
+
 
 const createExpenseWorker = async (date, type, description, bookNumber, billNumber, accountId, amount) => {
     const expense = await expensesModel.create({
@@ -34,7 +36,7 @@ const createExpenseWorker = async (date, type, description, bookNumber, billNumb
 
     await accounttransactions.createaccounttransaction(
         date,
-        (amount * -1), 
+        (amount * -1),
         ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.EXPENSE,
         type,
         accountId,
@@ -48,14 +50,17 @@ const createExpenseWorker = async (date, type, description, bookNumber, billNumb
     return expense;
 }
 
-/** update expense */
 const updateExpense = async (req, res) => {
-    try {        
+    try {
         const expenseId = req.params.id;
-        await expensesModel.deleteById(expenseId);
-        await accounttransactionsModel.deleteByReference(expenseId, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.EXPENSE)
 
-        res.send(createExpenseWorker(
+        await expensesModel.deleteById(expenseId);
+        await accounttransactionsModel.deleteByReference(
+            expenseId,
+            ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.EXPENSE
+        );
+
+        const result = await createExpenseWorker(
             req.body.date,
             req.body.type,
             req.body.description,
@@ -63,16 +68,19 @@ const updateExpense = async (req, res) => {
             req.body.billNumber,
             req.body.accountId,
             req.body.amount
-        ));
+        );
+
+        res.send(result);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ raw: err.message?.toString(), message: "Update Expense Error", stack: err.stack });
     }
-    catch (err) {
-        console.log(err)
-    }
-}
+};
+
 
 /** get all expenses */
 const getAllExpenses = async (req, res) => {
-    try {        
+    try {
         var allExpenses = await expensesModel.getAll(req.query.from, req.query.to);
         res.send(allExpenses)
     }
@@ -89,12 +97,12 @@ const getExpense = async (req, res) => {
             res.send(expense)
         }
         else {
-            res.status(404).send({message: 'Expense Not Found'})
+            res.status(404).send({ message: 'Expense Not Found' })
         }
     }
     catch (err) {
-        console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: COMPANIES_STRINGS.ERROR_GETTING_COMPANY, stack: err.stack})
+        console.log(err);
+        res.status(500).send({ raw: err.message?.toString(), message: "Get Expense Error", stack: err.stack });
     }
 }
 

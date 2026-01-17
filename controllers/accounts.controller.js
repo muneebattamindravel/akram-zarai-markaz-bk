@@ -132,80 +132,223 @@ const getAccount = async (req, res) => {
 
 /** get account statement against account id */
 const getAccountStatement = async (req, res) => {
-    try {
-        const { Op } = require("sequelize");
-        const models = require('../models');
+  try {
+    const { Op } = require("sequelize");
+    const models = require("../models");
 
-        const where = {
-            "accountId": req.params.id,
-            "transactionDate" : {
-                [Op.between]: [req.query.from, req.query.to]
-            }
-        }
-
-        const include = [
-            {model: models.accounts}
-        ] 
-
-        const accounttransactions = await accounttransactionsModel.getAll(
-            where, include,
-        );
-
-        res.send(accounttransactions);
+    const accountId = parseInt(req.params.id, 10);
+    if (!accountId || Number.isNaN(accountId)) {
+      return res.status(400).send({ message: "Invalid accountId" });
     }
-    catch (err) {
-        console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: ACCOUNTS_STRINGS.ERROR_GETTING_ACCOUNT_STATEMENT, stack: err.stack})
-    }
-}
 
-/** consolidateAccountStatementRoute */
+    // const from = req.query.from;
+    // const to = req.query.to;
+
+    // if (!from || !to) {
+    //   return res.status(400).send({ message: "from and to are required (YYYY-MM-DD)" });
+    // }
+
+    // const where = {
+    //   accountId,
+    //   createdAt: {
+    //     [Op.between]: [from, to],
+    //   },
+    // };
+
+    const where = {
+      accountId
+    };
+
+    const include = [{ model: models.accounts }];
+
+    // Statement display order:
+    // - If you want "latest first" (typical): DESC
+    // - If you want "oldest first": ASC
+    const order = [["id", "ASC"]];
+
+    const accounttransactions = await accounttransactionsModel.getAll(where, include, order);
+
+    res.send(accounttransactions);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      raw: err.message.toString(),
+      message: ACCOUNTS_STRINGS.ERROR_GETTING_ACCOUNT_STATEMENT,
+      stack: err.stack,
+    });
+  }
+};
+
 const consolidateAccountStatement = async (req, res) => {
-    try {
-        res.send(await consolidateAccountStatementWorker(req.params.id));
+  try {
+    const accountId = parseInt(req.params.id, 10);
+    if (!accountId || Number.isNaN(accountId)) {
+      return res.status(400).send({ message: "Invalid accountId" });
     }
-    catch (err) {
-        console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: 'Error Consolidating', stack: err.stack})
-    }
-}
+
+    const result = await consolidateAccountStatementWorker(accountId);
+    res.send(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      raw: err.message?.toString(),
+      message: "Error Consolidating",
+      stack: err.stack,
+    });
+  }
+};
 
 /** consolidateAccountStatementsForAllRoute */
 const consolidateAccountStatementForAll = async (req, res) => {
-    try {
-        let allAccounts = await Accounts.getAll();
-        
-        await Promise.all(allAccounts.map(async (account) => {
-            console.log(account.id)
-            await consolidateAccountStatementWorker(account.id)
-        }));
+  try {
+    const allAccounts = await Accounts.getAll();
 
-        console.log("Accounts Length = " + allAccounts.length)
-        res.send('Success');
-    }
-    catch (err) {
-        console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: 'Error Consolidating', stack: err.stack})
-    }
-}
+    // Do NOT run all at once. Limit concurrency to avoid DB overload.
+    const concurrency = 5; // adjust (3-10). Start with 5.
+    let idx = 0;
 
-const consolidateAccountStatementWorker = async(accountId) => {
-    const where = {"accountId": accountId}
-    const include = []
-    const accounttransactions = await accounttransactionsModel.getAll(where, include,);
-    
-    let closingBalance = accounttransactions[0].amount;
-    accounttransactions.shift();
-    await Promise.all(accounttransactions.map(async (accounttransaction) => {
-        closingBalance = closingBalance + accounttransaction.amount;
-        const updateBody = {
-            'closingBalance': closingBalance
+    let ok = 0;
+    let failed = 0;
+    const errors = [];
+
+    async function worker() {
+      while (idx < allAccounts.length) {
+        const currentIndex = idx++;
+        const account = allAccounts[currentIndex];
+
+        try {
+          console.log("Consolidating accountId:", account.id);
+          await consolidateAccountStatementWorker(account.id);
+          ok++;
+        } catch (e) {
+          failed++;
+          errors.push({ accountId: account.id, error: e.message });
         }
-        await accounttransactionsModel.update(updateBody, accounttransaction.id);
-    }));
+      }
+    }
 
-    return accounttransactions;
-}
+    await Promise.all(Array.from({ length: concurrency }, worker));
+
+    res.send({
+      message: "Done",
+      total: allAccounts.length,
+      ok,
+      failed,
+      errors,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      raw: err.message.toString(),
+      message: "Error Consolidating",
+      stack: err.stack,
+    });
+  }
+};
+
+const consolidateAccountStatementWorker = async (accountIdRaw) => {
+  const accountId = parseInt(accountIdRaw, 10);
+  if (!accountId || Number.isNaN(accountId)) {
+    throw new Error("Invalid accountId");
+  }
+
+  const where = { accountId };
+  const include = [];
+
+  // MUST consolidate in insertion order (oldest -> newest)
+  const order = [["id", "ASC"]];
+
+  const accounttransactions = await accounttransactionsModel.getAll(where, include, order);
+
+  if (!accounttransactions || accounttransactions.length === 0) {
+    return { accountId, updated: 0, message: "No transactions" };
+  }
+
+  // Start from 0. If you have an opening balance in accounts table, use it here.
+  let closingBalance = 0;
+
+  // Sequential loop (NO Promise.all) — running totals must be sequential
+  for (const t of accounttransactions) {
+    const amt = Number(t.amount) || 0;
+    closingBalance += amt;
+
+    await accounttransactionsModel.update(
+      { closingBalance },
+      t.id
+    );
+  }
+
+  return { accountId, updated: accounttransactions.length };
+};
+
+const validateAccountLedger = async (req, res) => {
+  try {
+    const models = require("../models");
+
+    const accountId = parseInt(req.params.id, 10);
+    if (!accountId || Number.isNaN(accountId)) {
+      return res.status(400).send({ message: "Invalid accountId" });
+    }
+
+    // IMPORTANT: deterministic order
+    const txns = await models.accounttransactions.findAll({
+      where: { accountId },
+      order: [["id", "ASC"]],
+    });
+
+    if (!txns.length) return res.send({ ok: true, message: "No transactions" });
+
+    // Start from FIRST ROW's closingBalance to avoid assumptions about opening balance
+    // (This makes the test valid even if opening balance isn't stored anywhere)
+    let running = Number(txns[0].closingBalance);
+    const EPS = 0.01; // float tolerance
+
+    const issues = [];
+    for (let i = 1; i < txns.length; i++) {
+      const prev = txns[i - 1];
+      const curr = txns[i];
+
+      const prevClose = Number(prev.closingBalance) || 0;
+      const amt = Number(curr.amount) || 0;
+
+      const expectedClose = prevClose + amt;
+      const storedClose = Number(curr.closingBalance) || 0;
+
+      if (Math.abs(storedClose - expectedClose) > EPS) {
+        issues.push({
+          index: i,
+          prevId: prev.id,
+          currId: curr.id,
+          transactionDate: curr.transactionDate,
+          amount: curr.amount,
+          prevClosing: prev.closingBalance,
+          expectedClosing: expectedClose,
+          storedClosing: curr.closingBalance,
+          delta: storedClose - expectedClose,
+          type: curr.type,
+          referenceId: curr.referenceId,
+          details: curr.details,
+        });
+
+        // stop at first mismatch (most useful for debugging)
+        break;
+      }
+
+      running = storedClose;
+    }
+
+    res.send({
+      ok: issues.length === 0,
+      accountId,
+      transactions: txns.length,
+      firstMismatch: issues[0] || null,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: err.message, stack: err.stack });
+  }
+};
+
 
 /** get balance of the default account */
 const getDefaultAccountBalance = async (req, res) => {
@@ -369,5 +512,6 @@ module.exports = {
     addCapital,
     addProfit,
     getDefaultAccountBalanceWorker,
-    getAllAccountsWorker
+    getAllAccountsWorker,
+    validateAccountLedger
 }

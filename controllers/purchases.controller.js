@@ -27,7 +27,7 @@ const createPurchase = async (req, res) => {
             totalAmount: req.body.totalAmount,
         })
 
-        Promise.all(req.body.purchasedproductstocks.map(async (productstock) => {
+        await Promise.all(req.body.purchasedproductstocks.map(async (productstock) => {
             const productNextLotNumber = await ProductsController.getNextLotNumber(productstock.productId);
             await productstocks.create({
                 lotNumber: productNextLotNumber,

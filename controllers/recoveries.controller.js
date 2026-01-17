@@ -21,7 +21,7 @@ const addRecovery = async (req, res) => {
         });
 
         if (req.body.contactId != null) {
-            const where = {type: "Customer", referenceId: req.body.contactId}
+            const where = { type: "Customer", referenceId: req.body.contactId }
             const include = []
             const cutomerAccount = (await Accounts.getAll(where, include))[0];
 
@@ -41,7 +41,7 @@ const addRecovery = async (req, res) => {
 
             await accounttransactions.createaccounttransaction(
                 req.body.date,
-                contactAmount, 
+                contactAmount,
                 contactTransactionString,
                 "",
                 cutomerAccount.id,
@@ -54,8 +54,8 @@ const addRecovery = async (req, res) => {
 
             await accounttransactions.createaccounttransaction(
                 req.body.date,
-                amount, 
-                transactionString, 
+                amount,
+                transactionString,
                 "",
                 req.body.accountId,
                 createdRecovery.id,
@@ -69,12 +69,14 @@ const addRecovery = async (req, res) => {
         res.send(createdRecovery);
     }
     catch (err) {
+        console.log(err);
+        res.status(500).send({ raw: err.message?.toString(), message: "Create Recovery Error", stack: err.stack });
     }
 }
 
 /** delete recovery */
 const deleteRecovery = async (req, res) => {
-    try {        
+    try {
         const recovery = await recoveriesModel.getByID(req.params.id)
         await recoveriesModel.deleteById(recovery.id);
         await accounttransactionsModel.deleteByReference(recovery.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.RECOVERY_GIVEN)
@@ -86,19 +88,19 @@ const deleteRecovery = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: "Delete Recoveries Error", stack: err.stack})
+        res.status(500).send({ raw: err.message.toString(), message: "Delete Recoveries Error", stack: err.stack })
     }
 }
 
 /** get recoveries */
 const getRecoveries = async (req, res) => {
-    try {        
+    try {
         var allRecoveries = await recoveriesModel.getAll(req.query.from, req.query.to);
         res.send(allRecoveries)
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: "Get Recoveries Error", stack: err.stack})
+        res.status(500).send({ raw: err.message.toString(), message: "Get Recoveries Error", stack: err.stack })
     }
 }
 
@@ -110,12 +112,12 @@ const getRecovery = async (req, res) => {
             res.send(recovery)
         }
         else {
-            res.status(404).send({message: 'Recovery Not Found'})
+            res.status(404).send({ message: 'Recovery Not Found' })
         }
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: 'Recoveries Error', stack: err.stack})
+        res.status(500).send({ raw: err.message.toString(), message: 'Recoveries Error', stack: err.stack })
     }
 }
 

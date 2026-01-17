@@ -60,7 +60,7 @@ const createsalepayment = async (req, res) => {
                 req.body.receivedAmount, 
                 ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT, 
                 "",
-                req.body.accountId,
+                createdsalepayment.accountId,
                 req.body.saleId,
                 req.body.bookNumber,
                 req.body.billNumber,

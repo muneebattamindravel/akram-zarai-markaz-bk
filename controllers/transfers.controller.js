@@ -7,21 +7,24 @@ const accounttransactionsModel = require('../models/accountTransactions.model');
 const accountsController = require('../controllers/accounts.controller');
 
 const addTransfer = async (req, res) => {
-    try {
-        res.send(createTransferWorker(
-            req.body.date,
-            req.body.fromAccountId,
-            req.body.toAccountId,
-            req.body.bookNumber,
-            req.body.billNumber,
-            req.body.amount,
-            req.body.notes,
-            req.body.details
-        ));
-    }
-    catch (err) {
-    }
-}
+  try {
+    const result = await createTransferWorker(
+      req.body.date,
+      req.body.fromAccountId,
+      req.body.toAccountId,
+      req.body.bookNumber,
+      req.body.billNumber,
+      req.body.amount,
+      req.body.notes,
+      req.body.details
+    );
+
+    res.send(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ raw: err.message?.toString(), message: "Create Transfer Error", stack: err.stack });
+  }
+};
 
 const createTransferWorker = async (date, fromAccountId, toAccountId, bookNumber, billNumber, amount, notes, details) => {
     const createdTransfer = await transfersModel.create({
@@ -64,6 +67,8 @@ const createTransferWorker = async (date, fromAccountId, toAccountId, bookNumber
         "",
         ""
     );
+
+    return createdTransfer;
 }
 
 /** get transfers */
@@ -105,25 +110,33 @@ const getTransfer = async (req, res) => {
 
 /** update transfer */
 const updateTransfer = async (req, res) => {
-    try {
-        const transferId = req.params.id;
-        await transfersModel.deleteById(transferId);
-        await accounttransactionsModel.deleteByReference(transferId, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.TRANSFER)
+  try {
+    const transferId = req.params.id;
 
-        res.send(createTransferWorker(
-            req.body.date,
-            req.body.fromAccountId,
-            req.body.toAccountId,
-            req.body.bookNumber,
-            req.body.billNumber,
-            req.body.amount,
-            req.body.notes
-        ));
-    }
-    catch (err) {
-        console.log(err)
-    } 
-}
+    await transfersModel.deleteById(transferId);
+    await accounttransactionsModel.deleteByReference(
+      transferId,
+      ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.TRANSFER
+    );
+
+    const result = await createTransferWorker(
+      req.body.date,
+      req.body.fromAccountId,
+      req.body.toAccountId,
+      req.body.bookNumber,
+      req.body.billNumber,
+      req.body.amount,
+      req.body.notes,
+      req.body.details
+    );
+
+    res.send(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ raw: err.message?.toString(), message: "Update Transfer Error", stack: err.stack });
+  }
+};
+
 
 /** delete Transfer */
 const deleteTransfer = async (req, res) => {
