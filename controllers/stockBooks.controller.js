@@ -113,23 +113,74 @@ const consolidatestockbook = async(productId) => {
     return stockbookTransactions;
 }
 
-const conslidateStockBooksForAll = async (req, res) => {
-    try {
-        let allProducts = await productsModel.getAll();
+// const conslidateStockBooksForAll = async (req, res) => {
+//     try {
+//         let allProducts = await productsModel.getAll();
         
-        await Promise.all(allProducts.map(async (product) => {
-            console.log(product.id)
-            await consolidateStockBookWorker(product.id)
-        }));
+//         await Promise.all(allProducts.map(async (product) => {
+//             console.log(product.id)
+//             await consolidateStockBookWorker(product.id)
+//         }));
 
-        console.log("Products Length = " + allProducts.length)
-        res.send('Success');
+//         console.log("Products Length = " + allProducts.length)
+//         res.send('Success');
+//     }
+//     catch (err) {
+//         console.log(err)
+//         res.status(500).send({raw: err.message.toString(), message: 'Error Consolidating Stock Book For All Products', stack: err.stack})
+//     }
+// }
+
+const conslidateStockBooksForAll = async (req, res) => {
+  try {
+    const allProducts = await productsModel.getAll();
+
+    const concurrency = 5;
+    let idx = 0;
+
+    let ok = 0;
+    let failed = 0;
+    const errors = [];
+
+    async function worker() {
+      while (idx < allProducts.length) {
+        const currentIndex = idx++;
+        const product = allProducts[currentIndex];
+
+        try {
+          console.log("Consolidating productId:", product.id);
+          await consolidateStockBookWorker(product.id);
+          ok++;
+        } catch (e) {
+          failed++;
+          errors.push({ id: product.id, error: e.message || String(e) });
+        }
+      }
     }
-    catch (err) {
-        console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: 'Error Consolidating Stock Book For All Products', stack: err.stack})
-    }
-}
+
+    await Promise.all(Array.from({ length: concurrency }, worker));
+
+    return res.send({
+      message: "Done",
+      scope: "stockBooks",
+      total: allProducts.length,
+      ok,
+      failed,
+      errors,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({
+      message: "Error Consolidating Stock Book For All Products",
+      scope: "stockBooks",
+      total: 0,
+      ok: 0,
+      failed: 0,
+      errors: [{ id: -1, error: err.message || String(err) }],
+    });
+  }
+};
+
 
 const consolidateStockBookWorker = async(productId) => {
     const where = {"productId": productId}

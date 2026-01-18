@@ -198,13 +198,59 @@ const consolidateAccountStatement = async (req, res) => {
   }
 };
 
-/** consolidateAccountStatementsForAllRoute */
+// /** consolidateAccountStatementsForAllRoute */
+// const consolidateAccountStatementForAll = async (req, res) => {
+//   try {
+//     const allAccounts = await Accounts.getAll();
+
+//     // Do NOT run all at once. Limit concurrency to avoid DB overload.
+//     const concurrency = 5; // adjust (3-10). Start with 5.
+//     let idx = 0;
+
+//     let ok = 0;
+//     let failed = 0;
+//     const errors = [];
+
+//     async function worker() {
+//       while (idx < allAccounts.length) {
+//         const currentIndex = idx++;
+//         const account = allAccounts[currentIndex];
+
+//         try {
+//           console.log("Consolidating accountId:", account.id);
+//           await consolidateAccountStatementWorker(account.id);
+//           ok++;
+//         } catch (e) {
+//           failed++;
+//           errors.push({ accountId: account.id, error: e.message });
+//         }
+//       }
+//     }
+
+//     await Promise.all(Array.from({ length: concurrency }, worker));
+
+//     res.send({
+//       message: "Done",
+//       total: allAccounts.length,
+//       ok,
+//       failed,
+//       errors,
+//     });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send({
+//       raw: err.message.toString(),
+//       message: "Error Consolidating",
+//       stack: err.stack,
+//     });
+//   }
+// };
+
 const consolidateAccountStatementForAll = async (req, res) => {
   try {
     const allAccounts = await Accounts.getAll();
 
-    // Do NOT run all at once. Limit concurrency to avoid DB overload.
-    const concurrency = 5; // adjust (3-10). Start with 5.
+    const concurrency = 5;
     let idx = 0;
 
     let ok = 0;
@@ -222,15 +268,16 @@ const consolidateAccountStatementForAll = async (req, res) => {
           ok++;
         } catch (e) {
           failed++;
-          errors.push({ accountId: account.id, error: e.message });
+          errors.push({ id: account.id, error: e.message || String(e) });
         }
       }
     }
 
     await Promise.all(Array.from({ length: concurrency }, worker));
 
-    res.send({
+    return res.send({
       message: "Done",
+      scope: "accounts",
       total: allAccounts.length,
       ok,
       failed,
@@ -238,13 +285,17 @@ const consolidateAccountStatementForAll = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(500).send({
-      raw: err.message.toString(),
+    return res.status(500).send({
       message: "Error Consolidating",
-      stack: err.stack,
+      scope: "accounts",
+      total: 0,
+      ok: 0,
+      failed: 0,
+      errors: [{ id: -1, error: err.message || String(err) }],
     });
   }
 };
+
 
 const consolidateAccountStatementWorker = async (accountIdRaw) => {
   const accountId = parseInt(accountIdRaw, 10);
@@ -278,6 +329,7 @@ const consolidateAccountStatementWorker = async (accountIdRaw) => {
     );
   }
 
+  console.log("consolidated account statement for account " + accountIdRaw)
   return { accountId, updated: accounttransactions.length };
 };
 

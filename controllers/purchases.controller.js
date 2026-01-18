@@ -13,6 +13,7 @@ const accounttransactionsModel = require('../models/accountTransactions.model');
 
 /**creates a new purchase */
 const createPurchase = async (req, res) => {
+
     try {
         if (!IsPurchaseBodyValid(req.body, res))
             return;

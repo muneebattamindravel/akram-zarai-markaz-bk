@@ -21,6 +21,7 @@ const loans = require('./loans.routes');
 const incentives = require('./incentives.routes');
 const dashboard = require('./dashboard.routes');
 const salereturns = require('./saleReturns.routes');
+const bankProfits = require('./bankProfits.routes');
 
 module.exports = {
     companies,
@@ -45,5 +46,6 @@ module.exports = {
     loans,
     incentives,
     dashboard,
-    salereturns
+    salereturns,
+    bankProfits
 }

@@ -28,7 +28,7 @@ const createBooking = async (req, res) => {
 
         await accounttransactionsController.createaccounttransaction(
             req.body.bookingDate,
-            (req.body.totalAmount * -1), 
+            (req.body.totalAmount * -1),
             ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.BOOKING,
             req.body.bookingType,
             req.body.fromAccountId,
@@ -37,13 +37,13 @@ const createBooking = async (req, res) => {
             "",
             "",
             req.body.prNumber
-            );
+        );
 
         const company = await CompaniesModel.getByID(req.body.companyId);
 
         await accounttransactionsController.createaccounttransaction(
             req.body.bookingDate,
-            (req.body.totalAmount * 1), 
+            (req.body.totalAmount * 1),
             ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.BOOKING,
             req.body.bookingType,
             company.accountId,
@@ -52,13 +52,13 @@ const createBooking = async (req, res) => {
             "",
             "",
             req.body.prNumber
-            );
+        );
 
         res.send(booking);
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: BOOKINGS_STRINGS.ERROR_CREATING_BOOKING, stack: err.stack})
+        res.status(500).send({ raw: err.message.toString(), message: BOOKINGS_STRINGS.ERROR_CREATING_BOOKING, stack: err.stack })
     }
 }
 
@@ -82,7 +82,7 @@ const deleteBooking = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: "ERROR DELETING BOOKING", stack: err.stack})
+        res.status(500).send({ raw: err.message.toString(), message: "ERROR DELETING BOOKING", stack: err.stack })
     }
 }
 
@@ -90,11 +90,11 @@ const deleteBooking = async (req, res) => {
 const getBooking = async (req, res) => {
     try {
         const booking = await Bookings.getByID(req.params.id)
-        booking? res.send(booking) : res.status(404).send({message: `${BOOKINGS_STRINGS.BOOKING_NOT_FOUND} ,id=${req.params.id}`})
+        booking ? res.send(booking) : res.status(404).send({ message: `${BOOKINGS_STRINGS.BOOKING_NOT_FOUND} ,id=${req.params.id}` })
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: BOOKINGS_STRINGS.ERROR_GETTING_BOOKING, stack: err.stack})
+        res.status(500).send({ raw: err.message.toString(), message: BOOKINGS_STRINGS.ERROR_GETTING_BOOKING, stack: err.stack })
     }
 }
 
@@ -105,21 +105,21 @@ const getAllBookings = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: BOOKINGS_STRINGS.ERROR_GETTING_BOOKINGS, stack: err.stack})
+        res.status(500).send({ raw: err.message.toString(), message: BOOKINGS_STRINGS.ERROR_GETTING_BOOKINGS, stack: err.stack })
     }
 }
 
 const IsBookingBodyValid = (body, res) => {
     if (!body.totalAmount) {
-        res.status(406).send({message: BOOKINGS_STRINGS.TOTAL_AMOUNT_NULL});
+        res.status(406).send({ message: BOOKINGS_STRINGS.TOTAL_AMOUNT_NULL });
         return false;
     }
     if (!body.bookingDate) {
-        res.status(406).send({message: BOOKINGS_STRINGS.BOOKING_DATE_NULL});
+        res.status(406).send({ message: BOOKINGS_STRINGS.BOOKING_DATE_NULL });
         return false;
     }
     if (!body.companyId) {
-        res.status(406).send({message: BOOKINGS_STRINGS.COMPANY_NULL});
+        res.status(406).send({ message: BOOKINGS_STRINGS.COMPANY_NULL });
         return false;
     }
 
