@@ -20,7 +20,9 @@ module.exports = app;
 console.log(process.pid)
 
 app.use(fileUpload({
-  createParentPath: true
+  limits: { fileSize: 64 * 1024 * 1024 }, // 64 MB
+  abortOnLimit: true,
+  createParentPath: true,
 }));
 
 app.use(cors());
