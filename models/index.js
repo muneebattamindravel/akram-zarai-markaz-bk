@@ -1,11 +1,11 @@
 const { Sequelize } = require('sequelize');
 
 require('dotenv').config();
-console.log("Environment Variables:");
-console.log("DATABASE: " + process.env.DB_NAME);
-console.log("USERNAME: " + process.env.DB_USER);
-console.log("PASSWORD: " + process.env.DB_PASSWORD);
-console.log("HOST: " + process.env.DB_HOST);
+// console.log("Environment Variables:");
+// console.log("DATABASE: " + process.env.DB_NAME);
+// console.log("USERNAME: " + process.env.DB_USER);
+// console.log("PASSWORD: " + process.env.DB_PASSWORD);
+// console.log("HOST: " + process.env.DB_HOST);
 
 // Create a new Sequelize instance
 const sequelize = new Sequelize(
