@@ -435,6 +435,28 @@ const getDefaultAccountBalanceWorker = async () => {
     }
 }
 
+const getAccountBalanceWorker = async (accountId) => {
+    try {
+        const account = await Accounts.getByID(accountId);
+        if (account) {
+            let balance = 0.00
+            let lastTransaction = await accounttransactionsModel.getLastTransaction(account.id);
+            if (lastTransaction) 
+                balance = lastTransaction.closingBalance;
+            
+            const amountObject = {
+                amount: balance
+            }
+            
+            return amountObject;
+        }
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).send({raw: err.message.toString(), message: ACCOUNTS_STRINGS.ERROR_GETTING_ACCOUNT, stack: err.stack})
+    }
+}
+
 /** get all accounts */
 const getAllAccounts = async (req, res) => {
     try {
@@ -565,5 +587,6 @@ module.exports = {
     addProfit,
     getDefaultAccountBalanceWorker,
     getAllAccountsWorker,
-    validateAccountLedger
+    validateAccountLedger,
+    getAccountBalanceWorker
 }

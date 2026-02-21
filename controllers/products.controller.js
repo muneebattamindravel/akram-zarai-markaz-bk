@@ -1,8 +1,9 @@
 const PRODUCTS_STRINGS = require('../constants/products.strings');
 const APP_STRINGS = require('../constants/app.strings');
 const Products = require('../models/products.model');
-const stockBooksModel = require('../models/stockBooks.model');
 const imagesController = require('../controllers/images.controller');
+const db = require("../models");
+const { QueryTypes } = require("sequelize");
 
 /**creates a new product */
 const createProduct = async (req, res) => {
@@ -46,25 +47,28 @@ const updateProduct = async (req, res) => {
 /** get a product with id */
 const getProduct = async (req, res) => {
     try {
-        const product = await Products.getByID(req.params.id)
-        product? res.send(product) : res.send({error: PRODUCTS_STRINGS.PRODUCT_NOT_FOUND, message: `${PRODUCTS_STRINGS.PRODUCT_NOT_FOUND} ,id=${req.params.id}`})
-    }
-    catch (err) {
-        console.log(err)
-        res.status(500).send({error: err.message.toString(), message: PRODUCTS_STRINGS.ERROR_GETTING_PRODUCT, stack: err.stack})
-    }
-}
+        const product = await Products.getByID(req.params.id);
 
-const getproducttocks = async (req, res) => {
-    try {
-        const product = await Products.getByID(req.params.id)
-        product? res.send(product) : res.send({error: PRODUCTS_STRINGS.PRODUCT_NOT_FOUND, message: `${PRODUCTS_STRINGS.PRODUCT_NOT_FOUND} ,id=${req.params.id}`})
+        if (!product) {
+            return res.send({
+                error: PRODUCTS_STRINGS.PRODUCT_NOT_FOUND,
+                message: `${PRODUCTS_STRINGS.PRODUCT_NOT_FOUND} ,id=${req.params.id}`
+            });
+        }
+
+        const merged = await attachStockSummaryToProducts(product);
+        return res.send(merged);
     }
     catch (err) {
-        console.log(err)
-        res.status(500).send({error: err.message.toString(), message: PRODUCTS_STRINGS.ERROR_GETTING_PRODUCT, stack: err.stack})
+        console.log(err);
+        res.status(500).send({
+            error: err.message.toString(),
+            message: PRODUCTS_STRINGS.ERROR_GETTING_PRODUCT,
+            stack: err.stack
+        });
     }
-}
+};
+
 
 /** get product current lot number with id */
 const getNextLotNumber = async (id) => {
@@ -83,26 +87,38 @@ const getNextLotNumber = async (id) => {
 /** get all products */
 const getAllProducts = async (req, res) => {
     try {
-        const allProducts = await Products.getAll()
-        res.send(allProducts)
+        const allProducts = await Products.getAll();
+        const merged = await attachStockSummaryToProducts(allProducts);
+        res.send(merged);
     }
     catch (err) {
-        console.log(err)
-        res.status(500).send({error: err.message.toString(), message: PRODUCTS_STRINGS.ERROR_GETTING_PRODUCTS, stack: err.stack})
+        console.log(err);
+        res.status(500).send({
+            error: err.message.toString(),
+            message: PRODUCTS_STRINGS.ERROR_GETTING_PRODUCTS,
+            stack: err.stack
+        });
     }
-}
+};
+
 
 /** get all products */
 const getAllProductsByNameFilter = async (req, res) => {
     try {
-        const allProducts = await Products.getAllByNameFilter(req.params.filter)
-        res.send(allProducts)
+        const allProducts = await Products.getAllByNameFilter(req.params.filter);
+        const merged = await attachStockSummaryToProducts(allProducts);
+        res.send(merged);
     }
     catch (err) {
-        console.log(err)
-        res.status(500).send({error: err.message.toString(), message: PRODUCTS_STRINGS.ERROR_GETTING_PRODUCTS, stack: err.stack})
+        console.log(err);
+        res.status(500).send({
+            error: err.message.toString(),
+            message: PRODUCTS_STRINGS.ERROR_GETTING_PRODUCTS,
+            stack: err.stack
+        });
     }
-}
+};
+
 
 /** delete product by id */
 const deleteProduct = async (req, res) => {
@@ -141,6 +157,54 @@ const IsProductBodyValid = (body, res) => {
         return false;
     }
     return true
+}
+
+async function attachStockSummaryToProducts(products) {
+    // products can be a single Sequelize instance or array
+    const list = Array.isArray(products) ? products : (products ? [products] : []);
+
+    const ids = list
+        .map(p => (p?.id ?? p?.dataValues?.id))
+        .filter(id => id !== undefined && id !== null);
+
+    if (ids.length === 0) {
+        return Array.isArray(products) ? [] : null;
+    }
+
+    // NOTE:
+    // - quantity: 3 decimals (you can change)
+    // - amount: 3 decimals (or 2 if money)
+    const summaries = await db.sequelize.query(
+        `
+        SELECT
+            productId,
+            ROUND(SUM(quantity), 3) AS currentStock,
+            ROUND(SUM(quantity * costPrice), 3) AS currentStockAmount
+        FROM productstocks
+        WHERE productId IN (:ids)
+        GROUP BY productId
+        `,
+        {
+            replacements: { ids },
+            type: QueryTypes.SELECT
+        }
+    );
+
+    const map = {};
+    for (const s of summaries) {
+        map[s.productId] = {
+            currentStock: Number(s.currentStock || 0),
+            currentStockAmount: Number(s.currentStockAmount || 0),
+        };
+    }
+
+    const merged = list.map(p => {
+        const obj = p?.toJSON ? p.toJSON() : p;
+        const extra = map[obj.id] || { currentStock: 0, currentStockAmount: 0 };
+        return { ...obj, ...extra };
+    });
+
+    return Array.isArray(products) ? merged : merged[0];
 }
 
 module.exports = {

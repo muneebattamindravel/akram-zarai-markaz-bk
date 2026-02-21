@@ -8,68 +8,130 @@ const { sequelize } = require('../models');
 const db = require('../models');
 const { saleitems, sales, products, contacts, saleprofits, salereturns, units } = db;
 
+const { QueryTypes } = require("sequelize");
+
+// const getTopBarData = async (req, res) => {
+//   try {
+
+//     const todaySale = await salesController.getCounterSaleAmountWorker(req.query.from, req.query.to);
+//     const todayProfit = await profitsController.getCounterSaleProfitAmountWorker(req.query.from, req.query.to);
+
+//     const cashAmount = await accountsController.getDefaultAccountBalanceWorker();
+//     let topBarData = {
+//       "todaySale": todaySale.amount,
+//       "todayProfit": todayProfit.amount,
+//       "totalCash": cashAmount.amount
+//     }
+//     res.send(topBarData);
+//   }
+//   catch (err) {
+//     console.log(err)
+//     res.status(500).send({ raw: err.message.toString(), message: "Error Fetching Top Bar Data", stack: err.stack })
+//   }
+// }
+
 const getTopBarData = async (req, res) => {
   try {
-    const todaySale = await salesController.getCounterSaleAmountWorker(req.query.from, req.query.to);
-    const todayProfit = await profitsController.getCounterSaleProfitAmountWorker(req.query.from, req.query.to);
-    const cashAmount = await accountsController.getDefaultAccountBalanceWorker();
-    let topBarData = {
-      "todaySale": todaySale.amount,
-      "todayProfit": todayProfit.amount,
-      "totalCash": cashAmount.amount
-    }
-    res.send(topBarData);
+    const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+
+    const from = req.query.from;
+    const to = req.query.to;
+
+    const todaySaleObj = await salesController.getCounterSaleAmountWorker(from, to);
+    const todayProfitObj = await profitsController.getCounterSaleProfitAmountWorker(from, to);
+    const cashAmountObj = await accountsController.getDefaultAccountBalanceWorker();
+
+    const topBarData = {
+      todaySale: round2(todaySaleObj?.amount),
+      todayProfit: round2(todayProfitObj?.amount),
+      totalCash: round2(cashAmountObj?.amount),
+    };
+
+    return res.send(topBarData);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({
+      raw: err.message.toString(),
+      message: "Error Fetching Top Bar Data",
+      stack: err.stack,
+    });
   }
-  catch (err) {
-    console.log(err)
-    res.status(500).send({ raw: err.message.toString(), message: "Error Fetching Top Bar Data", stack: err.stack })
-  }
-}
+};
 
 const getBusinessReport = async (req, res) => {
   try {
-    let accounts = await accountsController.getAllAccountsWorker();
-    let totalCashAmount = 0.00;
-    let totalBankAmount = 0.00;
-    let amountInCompanies = 0.00;
-    let customerLoansAmount = 0.00;
-    let totalCapitalAmount = 0.00;
+    const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
 
-    for (let i = 0; i < accounts.length; i++) {
-      if (accounts[i].type === "Cash")
-        totalCashAmount += parseFloat(accounts[i].dataValues.balance);
-      else if (accounts[i].type === "Online")
-        totalBankAmount += parseFloat(accounts[i].dataValues.balance);
-      else if (accounts[i].type === "Company")
-        amountInCompanies += parseFloat(accounts[i].dataValues.balance);
-      else if (accounts[i].type === "Customer")
-        customerLoansAmount += parseFloat(accounts[i].dataValues.balance);
-      else if (accounts[i].type === "Partner")
-        totalCapitalAmount += parseFloat(accounts[i].dataValues.balance);
+    // 1) Get totals by account type using latest closingBalance per account (fallback openingBalance)
+    const rows = await db.sequelize.query(
+      `
+      SELECT
+        a.type,
+        ROUND(SUM(COALESCE(latest.closingBalance, a.openingBalance, 0)), 2) AS total
+      FROM accounts a
+      LEFT JOIN (
+        SELECT t1.accountId, t1.closingBalance
+        FROM accounttransactions t1
+        INNER JOIN (
+          SELECT accountId, MAX(id) AS maxId
+          FROM accounttransactions
+          GROUP BY accountId
+        ) t2 ON t2.accountId = t1.accountId AND t2.maxId = t1.id
+      ) AS latest
+      ON latest.accountId = a.id
+      GROUP BY a.type;
+      `,
+      { type: QueryTypes.SELECT }
+    );
+
+    // defaults
+    let totalCashAmount = 0;
+    let totalBankAmount = 0;
+    let amountInCompanies = 0;
+    let customerLoansAmount = 0;
+    let totalCapitalAmount = 0;
+
+    for (const r of rows) {
+      const v = round2(r.total);
+      if (r.type === "Cash") totalCashAmount = v;
+      else if (r.type === "Online") totalBankAmount = v;
+      else if (r.type === "Company") amountInCompanies = v;
+      else if (r.type === "Customer") customerLoansAmount = v;
+      else if (r.type === "Partner") totalCapitalAmount = v;
     }
 
-    const productStocks = await productStocksModel.getAll({}, []);
-    let totalStockAmount = 0;
-    for (let i = 0; i < productStocks.length; i++) {
-      totalStockAmount += (productStocks[i].costPrice * productStocks[i].quantity);
-    }
+    // 2) Stock total from productstocks (DB-summed inside your model)
+    const totalStockAmount = round2(await productStocksModel.getTotalStockAmount());
 
-    let businessReport = {
-      "totalCashAmount": totalCashAmount,
-      "totalBankAmount": totalBankAmount,
-      "amountInCompanies": amountInCompanies,
-      "customerLoansAmount": customerLoansAmount,
-      "totalStockAmount": totalStockAmount,
-      "totalCapitalAmount": totalCapitalAmount
-    }
+    // 3) Build consistent response (all rounded)
+    const businessReport = {
+      totalCashAmount: round2(totalCashAmount),
+      totalBankAmount: round2(totalBankAmount),
+      amountInCompanies: round2(amountInCompanies),
+      customerLoansAmount: round2(customerLoansAmount),
+      totalStockAmount: round2(totalStockAmount),
+      totalCapitalAmount: round2(totalCapitalAmount),
 
-    res.send(businessReport);
+      // Total shown in your Unity UI (excluding Partner/Capital like your existing logic)
+      totalAmount: round2(
+        totalCashAmount +
+          totalBankAmount +
+          amountInCompanies +
+          customerLoansAmount +
+          totalStockAmount
+      ),
+    };
+
+    return res.send(businessReport);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({
+      raw: err.message.toString(),
+      message: "Error Fetching Business Report",
+      stack: err.stack,
+    });
   }
-  catch (err) {
-    console.log(err)
-    res.status(500).send({ raw: err.message.toString(), message: "Error Fetching Business Report", stack: err.stack })
-  }
-}
+};
 
 const getTopLoans = async (req, res) => {
   try {

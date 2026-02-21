@@ -29,7 +29,7 @@ const createproductstock = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_CREATING_PRODUCT_STOCK, stack: err.stack})
+        res.status(500).send({ error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_CREATING_PRODUCT_STOCK, stack: err.stack })
     }
 }
 
@@ -54,18 +54,18 @@ const returnProductStock = async (req, res) => {
             req.body.details,
             req.body.companyAccountId,
             req.body.companyAccountId,
-            "", 
+            "",
             "",
             req.body.invoiceNumber,
             "");
-        
+
         await productstocks.update(updateBody, req.body.productStockId) ?
-        res.send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY}) :
-        res.status(406).send({message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}`})
+            res.send({ message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY }) :
+            res.status(406).send({ message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}` })
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_CREATING_PRODUCT_STOCK, stack: err.stack})
+        res.status(500).send({ error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_CREATING_PRODUCT_STOCK, stack: err.stack })
     }
 }
 
@@ -90,18 +90,18 @@ const returnManualProductStock = async (req, res) => {
             req.body.details,
             req.body.companyAccountId,
             req.body.companyAccountId,
-            "", 
+            "",
             "",
             req.body.invoiceNumber,
             "");
-        
+
         await productstocks.update(updateBody, req.body.productStockId) ?
-        res.send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY}) :
-        res.status(406).send({message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}`})
+            res.send({ message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY }) :
+            res.status(406).send({ message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}` })
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_CREATING_PRODUCT_STOCK, stack: err.stack})
+        res.status(500).send({ error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_CREATING_PRODUCT_STOCK, stack: err.stack })
     }
 }
 
@@ -148,13 +148,13 @@ const updateproductstock = async (req, res) => {
             "initialQuantity": req.body.initialQuantity
         }
 
-        await productstocks.update(updateBody, req.params.id) ? 
-        res.send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY}) : 
-        res.status(406).send({message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}`})
+        await productstocks.update(updateBody, req.params.id) ?
+            res.send({ message: PRODUCT_STOCKS_STRINGS.PRODUCT_STOCK_UPDATED_SUCCESSFULLY }) :
+            res.status(406).send({ message: `${PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK}, id=${req.params.id}` })
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({raw: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK, stack: err.stack})
+        res.status(500).send({ raw: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_UPDATING_PRODUCT_STOCK, stack: err.stack })
     }
 }
 
@@ -165,26 +165,26 @@ const getproductstocks = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_GETTING_PRODUCT_STOCKS, stack: err.stack})
+        res.status(500).send({ error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_GETTING_PRODUCT_STOCKS, stack: err.stack })
     }
 }
 
 /** get all stocks for a particular purchase*/
 const getProductStocksByPurchaseId = async (req, res) => {
     try {
-        let where = {purchaseId: req.params.purchaseId}
+        let where = { purchaseId: req.params.purchaseId }
         const models = require('../models')
         const include = [
-            {model: models.products, include: [models.units]}
+            { model: models.products, include: [models.units] }
         ]
 
         res.send(await productstocks.getAll(
-            where,include
+            where, include
         ))
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_GETTING_PRODUCT_STOCKS, stack: err.stack})
+        res.status(500).send({ error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_GETTING_PRODUCT_STOCKS, stack: err.stack })
     }
 }
 
@@ -195,25 +195,43 @@ const getproductstockByID = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_GETTING_PRODUCT_STOCKS, stack: err.stack})
+        res.status(500).send({ error: err.message.toString(), message: PRODUCT_STOCKS_STRINGS.ERROR_GETTING_PRODUCT_STOCKS, stack: err.stack })
     }
 }
 
 const IsproductstockBodyValid = (body, res) => {
     if (!body.productId) {
-        res.status(406).send({message: PRODUCT_STOCKS_STRINGS.PRODUCT_ID_NULL});
+        res.status(406).send({ message: PRODUCT_STOCKS_STRINGS.PRODUCT_ID_NULL });
         return false;
     }
     if (!body.initialQuantity) {
-        res.status(406).send({message: PRODUCT_STOCKS_STRINGS.INITIAL_QUANTITY_NULL});
+        res.status(406).send({ message: PRODUCT_STOCKS_STRINGS.INITIAL_QUANTITY_NULL });
         return false;
     }
     if (!body.costPrice) {
-        res.status(406).send({message: PRODUCT_STOCKS_STRINGS.COST_PRICE_NULL});
+        res.status(406).send({ message: PRODUCT_STOCKS_STRINGS.COST_PRICE_NULL });
         return false;
     }
     return true
 }
+
+const getTotalStockAmount = async (req, res) => {
+    try {
+        const totalStockAmount = await productstocks.getTotalStockAmount();
+
+        return res.send({
+            totalStockAmount
+        });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send({
+            error: err.message.toString(),
+            message: "Error getting total stock amount",
+            stack: err.stack
+        });
+    }
+};
 
 module.exports = {
     createproductstock,
@@ -223,5 +241,6 @@ module.exports = {
     createproductstockWorker,
     getProductStocksByPurchaseId,
     returnProductStock,
-    returnManualProductStock
+    returnManualProductStock,
+    getTotalStockAmount
 }

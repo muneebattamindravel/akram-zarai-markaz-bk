@@ -81,26 +81,45 @@ const getById = async (id) => {
   }
 }
 
+// const getCounterSalesAmount = async (from, to) => {
+//   try {
+//     const sales = require('../models').sales
+//     const Sequelize = require('sequelize');
+//     const { Op } = require("sequelize");
+
+//     return await sales.findAll(
+//       {
+//         attributes: [
+//           [Sequelize.fn('sum', Sequelize.col('totalAmount')), 'amount'],
+//         ],
+//         where: { "saleDate": { [Op.between]: [from, to] } },
+//         groupBy: ['saleDate'],
+//       }
+//     );
+//   }
+//   catch (err) {
+//     throw err
+//   }
+// }
+
 const getCounterSalesAmount = async (from, to) => {
   try {
-    const sales = require('../models').sales
+    const sales = require('../models').sales;
     const Sequelize = require('sequelize');
     const { Op } = require("sequelize");
 
-    return await sales.findAll(
-      {
-        attributes: [
-          [Sequelize.fn('sum', Sequelize.col('totalAmount')), 'amount'],
-        ],
-        where: { "saleDate": { [Op.between]: [from, to] } },
-        groupBy: ['saleDate'],
-      }
-    );
+    return await sales.findOne({
+      attributes: [
+        [Sequelize.fn('sum', Sequelize.col('totalAmount')), 'amount'],
+      ],
+      where: { saleDate: { [Op.between]: [from, to] } },
+      raw: true
+    });
+  } catch (err) {
+    throw err;
   }
-  catch (err) {
-    throw err
-  }
-}
+};
+
 
 const update = async (body, id) => {
   try {

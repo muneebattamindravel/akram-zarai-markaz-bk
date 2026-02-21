@@ -9,30 +9,35 @@ const getCounterSaleProfitAmount = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({error: err.message.toString(), message: "EXCEPTION", stack: err.stack})
+        res.status(500).send({ error: err.message.toString(), message: "EXCEPTION", stack: err.stack })
     }
 }
+// const getCounterSaleProfitAmountWorker = async (from, to) => {
+//     try {
+
+//         let profit = await saleprofits.getCounterSalesProfit(from, to);
+//         profit = profit[0];
+//         if (profit.amount == null) 
+//             profit.amount = 0.00;
+
+//         let returnObject = {
+//             amount: profit.amount,
+//             from: from,
+//             to: to,
+//         }
+
+//         return returnObject;
+//     }
+//     catch (err) {
+//         console.log(err)
+//         res.status(500).send({error: err.message.toString(), message: "EXCEPTION", stack: err.stack})
+//     }
+// }
+
 const getCounterSaleProfitAmountWorker = async (from, to) => {
-    try {
-
-        let profit = await saleprofits.getCounterSalesProfit(from, to);
-        profit = profit[0];
-        if (profit.amount == null) 
-            profit.amount = 0.00;
-
-        let returnObject = {
-            amount: profit.amount,
-            from: from,
-            to: to,
-        }
-
-        return returnObject;
-    }
-    catch (err) {
-        console.log(err)
-        res.status(500).send({error: err.message.toString(), message: "EXCEPTION", stack: err.stack})
-    }
-}
+    const row = await saleprofits.getCounterSalesProfit(from, to);
+    return { amount: Number(row?.amount || 0), from, to };
+};
 
 const getsaleprofits = async (req, res) => {
     try {
@@ -40,7 +45,7 @@ const getsaleprofits = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.status(500).send({error: err.message.toString(), message: "EXCEPTION", stack: err.stack})
+        res.status(500).send({ error: err.message.toString(), message: "EXCEPTION", stack: err.stack })
     }
 }
 

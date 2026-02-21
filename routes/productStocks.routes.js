@@ -8,3 +8,5 @@ app.get('/productstocks/:productId',productstocksController.getproductstocks);
 app.get('/productstocksbypurchaseid/:purchaseId',productstocksController.getProductStocksByPurchaseId);
 app.get('/productstock/:id',productstocksController.getproductstockByID);
 app.patch('/productstock/:id',productstocksController.updateproductstock);
+app.get('/productstocks/totalStockAmount', productstocksController.getTotalStockAmount);
+

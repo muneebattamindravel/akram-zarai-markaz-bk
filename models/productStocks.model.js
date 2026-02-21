@@ -113,6 +113,28 @@ const getAllAdmin = async () => {
   }
 }
 
+const { QueryTypes } = require("sequelize");
+
+const getTotalStockAmount = async () => {
+    try {
+        const db = require(".");
+
+        const rows = await db.sequelize.query(
+            `
+            SELECT ROUND(SUM(quantity * costPrice), 2) AS totalStockAmount
+            FROM productstocks
+            `,
+            { type: QueryTypes.SELECT }
+        );
+
+        return Number(rows?.[0]?.totalStockAmount || 0);
+    }
+    catch (err) {
+        throw err;
+    }
+};
+
+
 module.exports = {
   initialize,
   create,
@@ -123,5 +145,6 @@ module.exports = {
   getAll,
   deleteAll,
   getAllAdmin,
-  getByLotNumber
+  getByLotNumber,
+  getTotalStockAmount
 }

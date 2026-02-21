@@ -1,14 +1,8 @@
 const initialize = (sequelize, Sequelize) => {
   return sequelize.define('accounttransactions', {
     transactionDate: { type: Sequelize.DATEONLY },
-    amount: {
-      type: Sequelize.FLOAT,
-      allowNull: false,
-    },
-    closingBalance: {
-      type: Sequelize.FLOAT,
-      allowNull: false
-    },
+    amount: Sequelize.DECIMAL(18, 2),
+    closingBalance: Sequelize.DECIMAL(18, 2),
     type: {
       type: Sequelize.STRING
     },

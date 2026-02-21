@@ -229,7 +229,7 @@ const getAllSales = async (req, res) => {
                 return await getSaleObject(sale.id, false);
             })
         )
-
+        
         res.send(allSalesWithDetails)
     }
     catch (err) {
@@ -334,7 +334,10 @@ const deleteSale = async (req, res) => {
         //Delete the account transactions as well
         await accounttransactionsModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE)
         await accounttransactionsModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT)
+        await accounttransactionsModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_RETURN)
         await stockbooksModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE)
+        await stockbooksModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_PAYMENT)
+        await stockbooksModel.deleteByReference(sale.id, ACCOUNT_TRANSACTION_STRINGS.ACCOUNT_TRANSACTION_TYPE.SALE_RETURN)
 
         const defaultAccount = await Accounts.getDefaultAccount();
         await accountsController.consolidateAccountStatementWorker(defaultAccount.id)
@@ -366,28 +369,36 @@ const getCounterSaleAmount = async (req, res) => {
     }
 }
 
-const getCounterSaleAmountWorker = async(from, to) => {
-    try {
-        let sale = await Sales.getCounterSalesAmount(from, to);
-        sale = sale[0];
+// const getCounterSaleAmountWorker = async(from, to) => {
+//     try {
+//         let sale = await Sales.getCounterSalesAmount(from, to);
+//         sale = sale[0];
 
-        let returnAmount = sale.dataValues.amount;
-        if (returnAmount == null) 
-            returnAmount = 0.00;
+//         let returnAmount = sale.dataValues.amount;
+//         if (returnAmount == null) 
+//             returnAmount = 0.00;
 
-        let returnObject = {
-            amount: returnAmount,
-            from: from,
-            to: to,
-        }
+//         let returnObject = {
+//             amount: returnAmount,
+//             from: from,
+//             to: to,
+//         }
 
-        return returnObject;
-    }
-    catch (err) {
-        console.log(err)
-        res.status(500).send({error: err.message.toString(), message: "EXCEPTION", stack: err.stack})
-    }
-}
+//         return returnObject;
+//     }
+//     catch (err) {
+//         console.log(err)
+//         res.status(500).send({error: err.message.toString(), message: "EXCEPTION", stack: err.stack})
+//     }
+// }
+
+const getCounterSaleAmountWorker = async (from, to) => {
+  const row = await Sales.getCounterSalesAmount(from, to);
+  const amount = Number(row?.amount || 0);
+
+  return { amount, from, to };
+};
+
 
 const searchSales = async (req, res) => {
     try {
