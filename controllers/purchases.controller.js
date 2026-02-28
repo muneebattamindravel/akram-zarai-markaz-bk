@@ -78,8 +78,10 @@ const deletePurchase = async (req, res) => {
         const include = [{model: models.products}]
         
         await stockbooksModel.deleteByReference(purchase.id, STOCK_BOOKS_STRINGS.TYPE.PURCHASE_STOCK)
+        
         const allProductStocksOfThisPurchase = await productstocks.getAll(where, include);
         await Promise.all(allProductStocksOfThisPurchase.map(async (prs) => {
+            await stockbooksModel.deleteByReference(prs.id, STOCK_BOOKS_STRINGS.TYPE.STOCK_RETURN)
             await stockbooksController.consolidateStockBookWorker(prs.product.id);
         }));     
 
